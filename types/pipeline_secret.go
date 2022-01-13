@@ -6,7 +6,7 @@ import "time"
 type PipelineSecret struct {
 	ID        string    `json:"id" yaml:"id"`
 	Key       string    `json:"key" yaml:"key"`
-	Value     string    `json:"value" yaml:"value"`
+	Value     []byte    `json:"value" yaml:"value"`
 	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
@@ -30,5 +30,5 @@ type PipelineSecretsParams struct {
 
 // UpdatePipelineSecret request payload for updating a pipeline secret.
 type UpdatePipelineSecret struct {
-	Value *string `json:"value"`
+	Value *[]byte `json:"value"`
 }
