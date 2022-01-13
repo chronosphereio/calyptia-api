@@ -6,7 +6,7 @@ import "time"
 type PipelineFile struct {
 	ID        string    `json:"id" yaml:"id"`
 	Name      string    `json:"name" yaml:"name"`
-	Contents  string    `json:"contents" yaml:"contents"`
+	Contents  []byte    `json:"contents" yaml:"contents"`
 	Encrypted bool      `json:"encrypted" yaml:"encrypted"`
 	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
