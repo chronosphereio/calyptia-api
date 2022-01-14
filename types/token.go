@@ -15,7 +15,7 @@ type CreateToken struct {
 	Name string `json:"name"`
 }
 
-// TokenParams request payload for querying tokens.
+// TokensParams request payload for querying tokens.
 type TokensParams struct {
 	Last *uint64
 	Name *string

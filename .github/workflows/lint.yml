@@ -1,0 +1,22 @@
+name: Lint on pull requests (or manually)
+on:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    name: PR - Markdownlint
+    steps:
+      - name: Run markdownlint
+        uses: actionshub/markdownlint@2.0.2
+  actions:
+
+    runs-on: ubuntu-latest
+    name: PR - Actionlint
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          echo "::add-matcher::.github/actionlint-matcher.json"
+          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          ./actionlint -color -shellcheck=
+        shell: bash

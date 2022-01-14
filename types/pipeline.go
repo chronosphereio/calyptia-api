@@ -48,7 +48,7 @@ type UpdatePipeline struct {
 	AutoCreatePortsFromConfig *bool   `json:"autoCreatePortsFromConfig"`
 }
 
-// PipelineParams request payload for querying pipelines.
+// PipelinesParams request payload for querying pipelines.
 type PipelinesParams struct {
 	Last *uint64
 	Name *string
