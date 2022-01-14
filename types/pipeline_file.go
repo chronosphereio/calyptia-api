@@ -12,7 +12,7 @@ type PipelineFile struct {
 	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
 
-// CreatePipeLineFile request payload for creating a new pipeline file.
+// CreatePipelineFile request payload for creating a new pipeline file.
 type CreatePipelineFile struct {
 	Name      string `json:"name"`
 	Contents  []byte `json:"contents"`

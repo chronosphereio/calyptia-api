@@ -1,3 +1,4 @@
+// Package types contains the required base types used for both client and server side for Calyptia Cloud API.
 package types
 
 import (
@@ -24,17 +25,23 @@ type Agent struct {
 	UpdatedAt           time.Time        `json:"updatedAt" yaml:"updatedAt"`
 }
 
+// AgentType declares the fluent agent type (fluentbit/fluentd).
 type AgentType string
 
 const (
+	// AgentTypeFluentBit fluentbit agent type.
 	AgentTypeFluentBit AgentType = "fluentbit"
-	AgentTypeFluentd   AgentType = "fluentd"
+	// AgentTypeFluentd fluentd agent type.
+	AgentTypeFluentd AgentType = "fluentd"
 )
 
+// AgentEdition declares the fluent agent edition (community/enterprise).
 type AgentEdition string
 
 const (
-	AgentEditionCommunity  AgentEdition = "community"
+	// AgentEditionCommunity fluent community edition.
+	AgentEditionCommunity AgentEdition = "community"
+	// AgentEditionEnterprise fluent enterprise edition.
 	AgentEditionEnterprise AgentEdition = "enterprise"
 )
 
@@ -50,7 +57,7 @@ type RegisterAgent struct {
 	Metadata  *json.RawMessage `json:"metadata"`
 }
 
-// RegisterAgent response payload after registering an agent successfully.
+// RegisteredAgent response payload after registering an agent successfully.
 type RegisteredAgent struct {
 	ID        string    `json:"id"`
 	Token     string    `json:"token"`
