@@ -54,7 +54,7 @@ type UpdatePipeline struct {
 	Metadata                  *json.RawMessage    `json:"metadata"`
 }
 
-// PipelineParams request payload for querying pipelines.
+// PipelinesParams request payload for querying pipelines.
 type PipelinesParams struct {
 	Last *uint64
 	Name *string

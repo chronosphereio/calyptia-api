@@ -11,11 +11,14 @@ type Membership struct {
 	User *User `json:"user" yaml:"user"`
 }
 
+// MembershipRole type of membership role (creator/admin).
 type MembershipRole string
 
 const (
+	// MembershipRoleCreator creator membership role.
 	MembershipRoleCreator MembershipRole = "creator"
-	MembershipRoleAdmin   MembershipRole = "admin"
+	// MembershipRoleAdmin admin membership role.
+	MembershipRoleAdmin MembershipRole = "admin"
 )
 
 // MembersParams request payload for querying members.
