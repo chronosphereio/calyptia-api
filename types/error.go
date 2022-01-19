@@ -2,6 +2,7 @@ package types
 
 import "fmt"
 
+// Error returned by the API.
 type Error struct {
 	Msg    string  `json:"error"`
 	Detail *string `json:"detail"`

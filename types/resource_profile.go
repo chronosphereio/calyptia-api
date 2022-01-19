@@ -21,11 +21,15 @@ type ResourceProfile struct {
 }
 
 const (
+	// ResourceProfileHighPerformanceGuaranteedDelivery is one of the 3 default resource profiles created with an aggregator.
 	ResourceProfileHighPerformanceGuaranteedDelivery = "high-performance-guaranteed-delivery"
-	ResourceProfileHighPerformanceOptimalThroughput  = "high-performance-optimal-throughput"
-	ResourceProfileBestEffortLowResource             = "best-effort-low-resource"
+	// ResourceProfileHighPerformanceOptimalThroughput is one of the 3 default resource profiles created with an aggregator.
+	ResourceProfileHighPerformanceOptimalThroughput = "high-performance-optimal-throughput"
+	// ResourceProfileBestEffortLowResource is one of the 3 default resource profiles created with an aggregator. This is the default one.
+	ResourceProfileBestEffortLowResource = "best-effort-low-resource"
 )
 
+// DefaultResourceProfileName is the default resource profile used when creating pipelines.
 const DefaultResourceProfileName = ResourceProfileBestEffortLowResource
 
 // CreateResourceProfile request payload for creating a resource profile.

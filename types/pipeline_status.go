@@ -11,14 +11,20 @@ type PipelineStatus struct {
 	UpdatedAt time.Time          `json:"updatedAt" yaml:"updatedAt"`
 }
 
+// PipelineStatusKind enum.
 type PipelineStatusKind string
 
 const (
-	PipelineStatusNew      PipelineStatusKind = "NEW"
-	PipelineStatusFailed   PipelineStatusKind = "FAILED"
+	// PipelineStatusNew is the default status right after a pipeline is created.
+	PipelineStatusNew PipelineStatusKind = "NEW"
+	// PipelineStatusFailed is the status when a pipeline fails.
+	PipelineStatusFailed PipelineStatusKind = "FAILED"
+	// PipelineStatusStarting is the status of a starting pipeline.
 	PipelineStatusStarting PipelineStatusKind = "STARTING"
-	PipelineStatusStarted  PipelineStatusKind = "STARTED"
-	PipelineStatusDeleted  PipelineStatusKind = "DELETED"
+	// PipelineStatusStarted is the status of a started pipeline.
+	PipelineStatusStarted PipelineStatusKind = "STARTED"
+	// PipelineStatusDeleted is the status of a deleted pipeline.
+	PipelineStatusDeleted PipelineStatusKind = "DELETED"
 )
 
 // PipelineStatusHistoryParams request payload for querying the pipeline status history.

@@ -1,9 +1,11 @@
 package types
 
+// ValidatingConfig request body for validating a config.
 type ValidatingConfig struct {
 	Configs []ValidatingConfigEntry `json:"config"`
 }
 
+// ValidatingConfigEntry defines a single config to the validated. See `ValidatingConfig`.
 type ValidatingConfigEntry struct {
 	Command  string            `json:"command"`
 	Name     string            `json:"name"`
