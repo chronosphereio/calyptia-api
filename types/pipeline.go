@@ -1,17 +1,21 @@
 package types
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 // Pipeline model.
 type Pipeline struct {
-	ID              string          `json:"id" yaml:"id"`
-	Name            string          `json:"name" yaml:"name"`
-	Config          PipelineConfig  `json:"config" yaml:"config"`
-	Status          PipelineStatus  `json:"status" yaml:"status"`
-	ResourceProfile ResourceProfile `json:"resourceProfile" yaml:"resourceProfile"`
-	ReplicasCount   uint64          `json:"replicasCount" yaml:"replicasCount"`
-	CreatedAt       time.Time       `json:"createdAt" yaml:"createdAt"`
-	UpdatedAt       time.Time       `json:"updatedAt" yaml:"updatedAt"`
+	ID              string           `json:"id" yaml:"id"`
+	Name            string           `json:"name" yaml:"name"`
+	Config          PipelineConfig   `json:"config" yaml:"config"`
+	Status          PipelineStatus   `json:"status" yaml:"status"`
+	ResourceProfile ResourceProfile  `json:"resourceProfile" yaml:"resourceProfile"`
+	ReplicasCount   uint64           `json:"replicasCount" yaml:"replicasCount"`
+	Metadata        *json.RawMessage `json:"metadata"`
+	CreatedAt       time.Time        `json:"createdAt" yaml:"createdAt"`
+	UpdatedAt       time.Time        `json:"updatedAt" yaml:"updatedAt"`
 }
 
 // CreatePipeline request payload for creating a new pipeline.
@@ -23,6 +27,7 @@ type CreatePipeline struct {
 	Files                     []CreatePipelineFile   `json:"files"`
 	ResourceProfileName       string                 `json:"resourceProfile"`
 	AutoCreatePortsFromConfig bool                   `json:"autoCreatePortsFromConfig"`
+	Metadata                  *json.RawMessage       `json:"metadata"`
 }
 
 // CreatedPipeline response payload after creating a pipeline successfully.
@@ -40,12 +45,13 @@ type CreatedPipeline struct {
 
 // UpdatePipeline request payload for updating a pipeline.
 type UpdatePipeline struct {
-	Name                      *string `json:"name"`
-	ReplicasCount             *uint64 `json:"replicasCount"`
-	RawConfig                 *string `json:"rawConfig"`
-	Status                    *string `json:"status"`
-	ResourceProfile           *string `json:"resourceProfile"`
-	AutoCreatePortsFromConfig *bool   `json:"autoCreatePortsFromConfig"`
+	Name                      *string             `json:"name"`
+	ReplicasCount             *uint64             `json:"replicasCount"`
+	RawConfig                 *string             `json:"rawConfig"`
+	Status                    *PipelineStatusKind `json:"status"`
+	ResourceProfile           *string             `json:"resourceProfile"`
+	AutoCreatePortsFromConfig *bool               `json:"autoCreatePortsFromConfig"`
+	Metadata                  *json.RawMessage    `json:"metadata"`
 }
 
 // PipelineParams request payload for querying pipelines.

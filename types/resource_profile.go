@@ -20,6 +20,14 @@ type ResourceProfile struct {
 	UpdatedAt              time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
 
+const (
+	ResourceProfileHighPerformanceGuaranteedDelivery = "high-performance-guaranteed-delivery"
+	ResourceProfileHighPerformanceOptimalThroughput  = "high-performance-optimal-throughput"
+	ResourceProfileBestEffortLowResource             = "best-effort-low-resource"
+)
+
+const DefaultResourceProfileName = ResourceProfileBestEffortLowResource
+
 // CreateResourceProfile request payload for creating a resource profile.
 type CreateResourceProfile struct {
 	Name                   string `json:"name"`
