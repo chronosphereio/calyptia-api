@@ -9,11 +9,15 @@ import (
 	"github.com/calyptia/api/types"
 )
 
+// CreateAggregator within a project.
+// The project in which the aggregator is created is parser from the authorization token.
+// Users are not allowed to create aggregators.
 func (c *Client) CreateAggregator(ctx context.Context, payload types.CreateAggregator) (types.CreatedAggregator, error) {
 	var out types.CreatedAggregator
 	return out, c.do(ctx, http.MethodPost, "/v1/aggregators", payload, &out)
 }
 
+// Aggregators from a project in descending order.
 func (c *Client) Aggregators(ctx context.Context, projectID string, params types.AggregatorsParams) ([]types.Aggregator, error) {
 	q := url.Values{}
 	if params.Last != nil {
@@ -28,15 +32,18 @@ func (c *Client) Aggregators(ctx context.Context, projectID string, params types
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }
 
+// Aggregator by ID.
 func (c *Client) Aggregator(ctx context.Context, aggregatorID string) (types.Aggregator, error) {
 	var out types.Aggregator
 	return out, c.do(ctx, http.MethodGet, "/v1/aggregators/"+url.PathEscape(aggregatorID), nil, &out)
 }
 
+// UpdateAggregator by its ID.
 func (c *Client) UpdateAggregator(ctx context.Context, aggregatorID string, payload types.UpdateAggregator) error {
 	return c.do(ctx, http.MethodPatch, "/v1/aggregators/"+url.PathEscape(aggregatorID), payload, nil)
 }
 
+// DeleteAggregator by its ID.
 func (c *Client) DeleteAggregator(ctx context.Context, aggregatorID string) error {
 	return c.do(ctx, http.MethodDelete, "/v1/aggregators/"+url.PathEscape(aggregatorID), nil, nil)
 }

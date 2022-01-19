@@ -171,6 +171,10 @@ func TestClient_Pipelines(t *testing.T) {
 	wantEqual(t, got[1], *aggregator.HealthCheckPipeline)
 }
 
+func TestClient_ProjectPipelines(t *testing.T) {
+	t.Skip("TODO: implement")
+}
+
 func TestClient_Pipeline(t *testing.T) {
 	ctx := context.Background()
 

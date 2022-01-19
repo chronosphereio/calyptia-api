@@ -1,3 +1,4 @@
+// Package client provides a client over the REST HTTP API of Calyptia Cloud.
 package client
 
 import (
@@ -11,6 +12,7 @@ import (
 	"github.com/calyptia/api/types"
 )
 
+// Client is the client over the REST HTTP API of Calyptia Cloud.
 type Client struct {
 	BaseURL string
 	// Tip: Use oauth2.NewClient(context.Context, *oauth2.TokenSource)
@@ -21,6 +23,7 @@ type Client struct {
 	aggregatorToken string
 }
 
+// New default client.
 func New(baseURL string) *Client {
 	return &Client{
 		BaseURL: baseURL,
@@ -28,18 +31,22 @@ func New(baseURL string) *Client {
 	}
 }
 
+// SetUserAgent sets the "User-Agent" header of the client.
 func (c *Client) SetUserAgent(s string) {
 	c.userAgent = s
 }
 
+// SetProjectToken sets the "X-Project-Token" header of the client.
 func (c *Client) SetProjectToken(s string) {
 	c.projectToken = s
 }
 
+// SetAgentToken sets the "X-Agent-Token" header of the client.
 func (c *Client) SetAgentToken(s string) {
 	c.agentToken = s
 }
 
+// SetAggregatorToken sets the "X-Aggregator-Token" header of the client.
 func (c *Client) SetAggregatorToken(s string) {
 	c.aggregatorToken = s
 }
@@ -90,9 +97,11 @@ func (c *Client) do(ctx context.Context, method, path string, v, dest interface{
 		return err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
-	if resp.StatusCode >= 400 {
+	if resp.StatusCode >= http.StatusBadRequest {
 		e := &types.Error{}
 		err = json.NewDecoder(resp.Body).Decode(&e)
 		if err != nil {

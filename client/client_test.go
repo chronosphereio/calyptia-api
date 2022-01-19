@@ -17,13 +17,9 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// var testBaseURL = "https://cloud-api-dev.calyptia.com"
 var testBaseURL = "http://localhost:4000"
 
-var (
-	auth0Client = setupAuth0Client()
-	// asGuest     = &client.Client{BaseURL: testBaseURL, Client: http.DefaultClient}
-)
+var auth0Client = setupAuth0Client()
 
 func setupAuth0Client() *Auth0Client {
 	_ = godotenv.Load("../.env")

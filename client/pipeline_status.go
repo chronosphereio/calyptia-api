@@ -9,6 +9,8 @@ import (
 	"github.com/calyptia/api/types"
 )
 
+// PipelineStatusHistory in descending order.
+// Every time a pipeline status is changed, a new history entry with the change is created.
 func (c *Client) PipelineStatusHistory(ctx context.Context, pipelineID string, params types.PipelineStatusHistoryParams) ([]types.PipelineStatus, error) {
 	q := url.Values{}
 	if params.Last != nil {

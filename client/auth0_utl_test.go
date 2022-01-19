@@ -75,7 +75,9 @@ func (c *Auth0Client) AccessToken(ctx context.Context, claims Auth0UserClaims) (
 		return nil, fmt.Errorf("could not do access token request: %w", err)
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	if resp.StatusCode >= 400 {
 		e := &Auth0Error{}

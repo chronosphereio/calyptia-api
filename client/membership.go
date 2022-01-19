@@ -9,6 +9,7 @@ import (
 	"github.com/calyptia/api/types"
 )
 
+// Members from a project in descending order.
 func (c *Client) Members(ctx context.Context, projectID string, params types.MembersParams) ([]types.Membership, error) {
 	q := url.Values{}
 	if params.Last != nil {

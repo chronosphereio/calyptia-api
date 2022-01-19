@@ -8,6 +8,8 @@ import (
 	"github.com/calyptia/api/types"
 )
 
+// ProjectMetrics contains an overview of the aggregated metrics for a project.
+// It includes metrics link the amount of records, bytes, and errors per plugin.
 func (c *Client) ProjectMetrics(ctx context.Context, projectID string, params types.MetricsParams) (types.ProjectMetrics, error) {
 	q := url.Values{
 		"start":    []string{params.Start.String()},
@@ -19,6 +21,8 @@ func (c *Client) ProjectMetrics(ctx context.Context, projectID string, params ty
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }
 
+// AgentMetrics contains an overview of the aggregated metrics for an agent.
+// It includes metrics link the amount of records, bytes, and errors per plugin.
 func (c *Client) AgentMetrics(ctx context.Context, agentID string, params types.MetricsParams) (types.AgentMetrics, error) {
 	q := url.Values{
 		"start":    []string{params.Start.String()},
@@ -30,6 +34,8 @@ func (c *Client) AgentMetrics(ctx context.Context, agentID string, params types.
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }
 
+// PipelineMetrics contains an overview of the aggregated metrics for a pipeline.
+// It includes metrics link the amount of records, bytes, and errors per plugin.
 func (c *Client) PipelineMetrics(ctx context.Context, pipelineID string, params types.MetricsParams) (types.AgentMetrics, error) {
 	q := url.Values{
 		"start":    []string{params.Start.String()},
