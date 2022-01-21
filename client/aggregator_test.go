@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/calyptia/api/client"
 	"github.com/calyptia/api/types"
 )
 
@@ -100,4 +101,16 @@ func TestClient_DeleteAggregator(t *testing.T) {
 
 	err = withToken.DeleteAggregator(ctx, created.ID)
 	wantEqual(t, err, nil)
+}
+
+func setupAggregator(t *testing.T, withToken *client.Client) types.CreatedAggregator {
+	t.Helper()
+	ctx := context.Background()
+
+	aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+		Name: "test-aggregator",
+	})
+	wantEqual(t, err, nil)
+
+	return aggregator
 }

@@ -12,12 +12,7 @@ func TestClient_CreateResourceProfile(t *testing.T) {
 	ctx := context.Background()
 
 	asUser := userClient(t)
-	withToken := withToken(t, asUser)
-
-	aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
-		Name: "test-aggregator",
-	})
-	wantEqual(t, err, nil)
+	aggregator := setupAggregator(t, withToken(t, asUser))
 
 	got, err := asUser.CreateResourceProfile(ctx, aggregator.ID, types.CreateResourceProfile{
 		Name:                   "test-resource-profile",
@@ -41,12 +36,7 @@ func TestClient_ResourceProfiles(t *testing.T) {
 	ctx := context.Background()
 
 	asUser := userClient(t)
-	withToken := withToken(t, asUser)
-
-	aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
-		Name: "test-aggregator",
-	})
-	wantEqual(t, err, nil)
+	aggregator := setupAggregator(t, withToken(t, asUser))
 
 	got, err := asUser.ResourceProfiles(ctx, aggregator.ID, types.ResourceProfilesParams{})
 	wantEqual(t, err, nil)
@@ -81,12 +71,7 @@ func TestClient_ResourceProfile(t *testing.T) {
 	ctx := context.Background()
 
 	asUser := userClient(t)
-	withToken := withToken(t, asUser)
-
-	aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
-		Name: "test-aggregator",
-	})
-	wantEqual(t, err, nil)
+	aggregator := setupAggregator(t, withToken(t, asUser))
 
 	resourceProfile, err := asUser.CreateResourceProfile(ctx, aggregator.ID, types.CreateResourceProfile{
 		Name:                   "test-resource-profile",
@@ -125,12 +110,7 @@ func TestClient_UpdateResourceProfile(t *testing.T) {
 	ctx := context.Background()
 
 	asUser := userClient(t)
-	withToken := withToken(t, asUser)
-
-	aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
-		Name: "test-aggregator",
-	})
-	wantEqual(t, err, nil)
+	aggregator := setupAggregator(t, withToken(t, asUser))
 
 	resourceProfile, err := asUser.CreateResourceProfile(ctx, aggregator.ID, types.CreateResourceProfile{
 		Name:                   "test-resource-profile",
@@ -167,12 +147,7 @@ func TestClient_DeleteResourceProfile(t *testing.T) {
 	ctx := context.Background()
 
 	asUser := userClient(t)
-	withToken := withToken(t, asUser)
-
-	aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
-		Name: "test-aggregator",
-	})
-	wantEqual(t, err, nil)
+	aggregator := setupAggregator(t, withToken(t, asUser))
 
 	resourceProfile, err := asUser.CreateResourceProfile(ctx, aggregator.ID, types.CreateResourceProfile{
 		Name:                   "test-resource-profile",

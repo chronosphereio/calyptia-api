@@ -3,9 +3,11 @@ package client_test
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"sort"
 	"testing"
 
+	"github.com/calyptia/api/client"
 	"github.com/calyptia/api/types"
 )
 
@@ -37,12 +39,7 @@ func TestClient_CreatePipeline(t *testing.T) {
 	ctx := context.Background()
 
 	asUser := userClient(t)
-	withToken := withToken(t, asUser)
-
-	aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
-		Name: "test-aggregator",
-	})
-	wantEqual(t, err, nil)
+	aggregator := setupAggregator(t, withToken(t, asUser))
 
 	jsonMetadata, err := json.Marshal(map[string]interface{}{
 		"test-key": "test-value",
@@ -89,11 +86,21 @@ func TestClient_CreatePipeline(t *testing.T) {
 	wantNoTimeZero(t, got.Secrets[0].UpdatedAt)
 
 	wantEqual(t, len(got.Files), 2) // Aditional "parsers" file should be created by default.
-	wantNoEqual(t, got.Files[0].ID, "")
-	wantEqual(t, got.Files[0].Name, "testfile")
-	wantNoEqual(t, got.Files[0].Contents, []byte("test-contents")) // should be encrypted now.
-	wantNoTimeZero(t, got.Files[0].CreatedAt)
-	wantNoTimeZero(t, got.Files[0].UpdatedAt)
+
+	// Sort files by name
+	// since they are created at the same time
+	// and the order may switch.
+	sort.Slice(got.Files, func(i, j int) bool {
+		return got.Files[i].Name < got.Files[j].Name
+	})
+
+	wantEqual(t, got.Files[0].Name, "parsers")
+
+	wantNoEqual(t, got.Files[1].ID, "")
+	wantEqual(t, got.Files[1].Name, "testfile")
+	wantNoEqual(t, got.Files[1].Contents, []byte("test-contents")) // should be encrypted now.
+	wantNoTimeZero(t, got.Files[1].CreatedAt)
+	wantNoTimeZero(t, got.Files[1].UpdatedAt)
 
 	wantNoEqual(t, got.Status.ID, "")
 	wantEqual(t, got.Status.Config, got.Config)
@@ -172,19 +179,58 @@ func TestClient_Pipelines(t *testing.T) {
 }
 
 func TestClient_ProjectPipelines(t *testing.T) {
-	t.Skip("TODO: implement")
+	ctx := context.Background()
+
+	asUser := userClient(t)
+	withToken := withToken(t, asUser)
+
+	var want []types.CreatedPipeline
+
+	for i := 0; i < 3; i++ {
+		aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+			Name: fmt.Sprintf("test-aggregator-%d", i),
+		})
+		wantEqual(t, err, nil)
+
+		pipeline, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:                      fmt.Sprintf("test-pipeline-%d", i),
+			ReplicasCount:             1,
+			RawConfig:                 testFbitConfigWithAddr,
+			ResourceProfileName:       types.DefaultResourceProfileName,
+			AutoCreatePortsFromConfig: true,
+		})
+		wantEqual(t, err, nil)
+
+		want = append(want, pipeline)
+	}
+
+	project := defaultProject(t, asUser)
+
+	got, err := asUser.ProjectPipelines(ctx, project.ID, types.PipelinesParams{})
+	wantEqual(t, err, nil)
+	wantEqual(t, len(got), len(want))
+
+	// Reverse order to do proper assertion since retuls come in descending order.
+	sort.Slice(got, func(i, j int) bool {
+		return got[i].CreatedAt.Before(got[j].CreatedAt)
+	})
+
+	for i := range got {
+		wantEqual(t, got[i].ID, want[i].ID)
+		wantEqual(t, got[i].Name, want[i].Name)
+		wantEqual(t, got[i].Config, want[i].Config)
+		wantEqual(t, got[i].Status, want[i].Status)
+		wantEqual(t, got[i].ResourceProfile, want[i].ResourceProfile)
+		wantEqual(t, got[i].ReplicasCount, want[i].ReplicasCount)
+		wantEqual(t, got[i].CreatedAt, want[i].CreatedAt)
+	}
 }
 
 func TestClient_Pipeline(t *testing.T) {
 	ctx := context.Background()
 
 	asUser := userClient(t)
-	withToken := withToken(t, asUser)
-
-	aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
-		Name: "test-aggregator",
-	})
-	wantEqual(t, err, nil)
+	aggregator := setupAggregator(t, withToken(t, asUser))
 
 	jsonMetadata, err := json.Marshal(map[string]interface{}{
 		"test-key": "test-value",
@@ -235,12 +281,7 @@ func TestClient_UpdatePipeline(t *testing.T) {
 	ctx := context.Background()
 
 	asUser := userClient(t)
-	withToken := withToken(t, asUser)
-
-	aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
-		Name: "test-aggregator",
-	})
-	wantEqual(t, err, nil)
+	aggregator := setupAggregator(t, withToken(t, asUser))
 
 	jsonMetadata, err := json.Marshal(map[string]interface{}{
 		"test-key": "test-value",
@@ -273,9 +314,22 @@ func TestClient_UpdatePipeline(t *testing.T) {
 	wantEqual(t, err, nil)
 
 	got, err := asUser.UpdatePipeline(ctx, pipeline.ID, types.UpdatePipeline{
-		Name:                      ptrStr("test-pipeline-updated"),
-		ReplicasCount:             ptrUint64(4),
-		RawConfig:                 ptrStr(testFbitConfigWithAddr3),
+		Name:          ptrStr("test-pipeline-updated"),
+		ReplicasCount: ptrUint64(4),
+		RawConfig:     ptrStr(testFbitConfigWithAddr3),
+		Secrets: []types.UpdatePipelineSecret{
+			{
+				Key:   ptrStr("testkeyupdated"),
+				Value: ptrBytes([]byte("test-value-updated")),
+			},
+		},
+		Files: []types.UpdatePipelineFile{
+			{
+				Name:      ptrStr("testfileupdated"),
+				Contents:  ptrBytes([]byte("test-contents-updated")),
+				Encrypted: ptrBool(true),
+			},
+		},
 		Status:                    (*types.PipelineStatusKind)(ptrStr(string(types.PipelineStatusStarted))),
 		ResourceProfile:           ptrStr(string(types.ResourceProfileHighPerformanceOptimalThroughput)),
 		AutoCreatePortsFromConfig: ptrBool(true),
@@ -288,9 +342,13 @@ func TestClient_UpdatePipeline(t *testing.T) {
 	// since they are created at the same time
 	// and the order may switch.
 	sort.Slice(got.AddedPorts, func(i, j int) bool {
-		return got.AddedPorts[i].Protocol < got.AddedPorts[j].Protocol &&
-			got.AddedPorts[i].FrontendPort < got.AddedPorts[j].FrontendPort &&
-			got.AddedPorts[i].BackendPort < got.AddedPorts[j].BackendPort
+		if got.AddedPorts[i].Protocol == got.AddedPorts[j].Protocol {
+			if got.AddedPorts[i].FrontendPort == got.AddedPorts[j].FrontendPort {
+				return got.AddedPorts[i].BackendPort < got.AddedPorts[j].BackendPort
+			}
+			return got.AddedPorts[i].FrontendPort < got.AddedPorts[j].FrontendPort
+		}
+		return got.AddedPorts[i].Protocol < got.AddedPorts[j].Protocol
 	})
 
 	wantNoEqual(t, got.AddedPorts[0].ID, "")
@@ -314,12 +372,7 @@ func TestClient_DeletePipeline(t *testing.T) {
 	ctx := context.Background()
 
 	asUser := userClient(t)
-	withToken := withToken(t, asUser)
-
-	aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
-		Name: "test-aggregator",
-	})
-	wantEqual(t, err, nil)
+	aggregator := setupAggregator(t, withToken(t, asUser))
 
 	jsonMetadata, err := json.Marshal(map[string]interface{}{
 		"test-key": "test-value",
@@ -353,4 +406,20 @@ func TestClient_DeletePipeline(t *testing.T) {
 
 	err = asUser.DeletePipeline(ctx, pipeline.ID)
 	wantEqual(t, err, nil)
+}
+
+func setupPipeline(t *testing.T, asUser *client.Client, aggregatorID string) types.CreatedPipeline {
+	t.Helper()
+	ctx := context.Background()
+
+	pipeline, err := asUser.CreatePipeline(ctx, aggregatorID, types.CreatePipeline{
+		Name:                      "test-pipeline",
+		ReplicasCount:             1,
+		RawConfig:                 testFbitConfigWithAddr,
+		ResourceProfileName:       types.DefaultResourceProfileName,
+		AutoCreatePortsFromConfig: true,
+	})
+	wantEqual(t, err, nil)
+
+	return pipeline
 }

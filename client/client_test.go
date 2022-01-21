@@ -173,3 +173,7 @@ func ptrUint64(u uint64) *uint64 {
 func ptrUint(u uint) *uint {
 	return &u
 }
+
+func ptrBytes(b []byte) *[]byte {
+	return &b
+}

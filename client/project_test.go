@@ -10,19 +10,17 @@ import (
 func TestClient_CreateProject(t *testing.T) {
 	ctx := context.Background()
 
-	t.Run("ok", func(t *testing.T) {
-		asUser := userClient(t)
-		got, err := asUser.CreateProject(ctx, types.CreateProject{
-			Name: "test-project",
-		})
-		wantEqual(t, err, nil)
-		wantNoEqual(t, got.ID, "")
-		wantNoTimeZero(t, got.CreatedAt)
-		wantNoEqual(t, got.Token, "")
-		wantNoEqual(t, got.Membership.ID, "")
-		wantNoTimeZero(t, got.Membership.CreatedAt)
-		wantEqual(t, got.Membership.Roles, []types.MembershipRole{types.MembershipRoleCreator})
+	asUser := userClient(t)
+	got, err := asUser.CreateProject(ctx, types.CreateProject{
+		Name: "test-project",
 	})
+	wantEqual(t, err, nil)
+	wantNoEqual(t, got.ID, "")
+	wantNoTimeZero(t, got.CreatedAt)
+	wantNoEqual(t, got.Token, "")
+	wantNoEqual(t, got.Membership.ID, "")
+	wantNoTimeZero(t, got.Membership.CreatedAt)
+	wantEqual(t, got.Membership.Roles, []types.MembershipRole{types.MembershipRoleCreator})
 }
 
 func TestClient_Projects(t *testing.T) {
