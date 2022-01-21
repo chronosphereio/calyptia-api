@@ -17,7 +17,7 @@ import (
 // - you might use it within the Calyptia CLI to grant access to your project.
 func (c *Client) CreateToken(ctx context.Context, projectID string, payload types.CreateToken) (types.Token, error) {
 	var out types.Token
-	return out, c.do(ctx, http.MethodPost, "/v1/projects/"+url.PathEscape(projectID)+"/aggregators", payload, &out)
+	return out, c.do(ctx, http.MethodPost, "/v1/projects/"+url.PathEscape(projectID)+"/tokens", payload, &out)
 }
 
 // Tokens from a project.
