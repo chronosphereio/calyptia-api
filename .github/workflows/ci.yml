@@ -24,6 +24,7 @@ jobs:
         env:
           TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: git config --global url."https://${TOKEN}@github.com".insteadOf "https://github.com"
+        continue-on-error: true
 
       - name: Setup
         uses: actions/setup-go@v2
@@ -36,6 +37,7 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
           credentials_file_path: /tmp/gcloud.json
+        continue-on-error: true
 
       - name: Release
         uses: goreleaser/goreleaser-action@v2
