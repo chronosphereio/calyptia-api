@@ -38,8 +38,6 @@ func TestClient_AgentConfigHistory(t *testing.T) {
 	wantEqual(t, err, nil)
 	wantEqual(t, len(got), 2)
 
-	// results in descending order
-
 	wantNoEqual(t, got[0].ID, "")
 	wantEqual(t, got[0].RawConfig, "test-raw-config-updated")
 	wantNoTimeZero(t, got[0].CreatedAt)

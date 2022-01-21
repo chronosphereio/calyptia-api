@@ -76,7 +76,6 @@ func TestClient_CreatePipeline(t *testing.T) {
 	wantNoEqual(t, got.Config.ID, "")
 	wantEqual(t, got.Config.RawConfig, testFbitConfigWithAddr)
 	wantNoTimeZero(t, got.Config.CreatedAt)
-	wantNoTimeZero(t, got.Config.UpdatedAt)
 
 	wantEqual(t, len(got.Secrets), 1)
 	wantNoEqual(t, got.Secrets[0].ID, "")
@@ -106,7 +105,6 @@ func TestClient_CreatePipeline(t *testing.T) {
 	wantEqual(t, got.Status.Config, got.Config)
 	wantEqual(t, got.Status.Status, types.PipelineStatusNew)
 	wantNoTimeZero(t, got.Status.CreatedAt)
-	wantNoTimeZero(t, got.Status.UpdatedAt)
 
 	wantNoEqual(t, got.ResourceProfile.ID, "")
 	wantEqual(t, got.ResourceProfile.Name, types.DefaultResourceProfileName)
@@ -173,7 +171,6 @@ func TestClient_Pipelines(t *testing.T) {
 	wantNoEqual(t, got[0].Metadata, nil)
 	wantEqual(t, *got[0].Metadata, rawMetadata)
 	wantEqual(t, got[0].Config.CreatedAt, pipeline.Config.CreatedAt)
-	wantEqual(t, got[0].Config.UpdatedAt, pipeline.Config.UpdatedAt)
 
 	wantEqual(t, got[1], *aggregator.HealthCheckPipeline)
 }
@@ -274,7 +271,6 @@ func TestClient_Pipeline(t *testing.T) {
 	wantNoEqual(t, got.Metadata, nil)
 	wantEqual(t, *got.Metadata, rawMetadata)
 	wantEqual(t, got.Config.CreatedAt, pipeline.Config.CreatedAt)
-	wantEqual(t, got.Config.UpdatedAt, pipeline.Config.UpdatedAt)
 }
 
 func TestClient_UpdatePipeline(t *testing.T) {
