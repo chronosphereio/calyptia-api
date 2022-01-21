@@ -8,7 +8,6 @@ type PipelineStatus struct {
 	Config    PipelineConfig     `json:"config" yaml:"config"`
 	Status    PipelineStatusKind `json:"status" yaml:"status"`
 	CreatedAt time.Time          `json:"createdAt" yaml:"createdAt"`
-	UpdatedAt time.Time          `json:"updatedAt" yaml:"updatedAt"`
 }
 
 // PipelineStatusKind enum.
