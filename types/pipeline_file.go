@@ -32,6 +32,7 @@ type PipelineFilesParams struct {
 
 // UpdatePipelineFile request payload for updating a pipeline file.
 type UpdatePipelineFile struct {
+	Name      *string `json:"name"`
 	Contents  *[]byte `json:"contents"`
 	Encrypted *bool   `json:"encrypted"`
 }

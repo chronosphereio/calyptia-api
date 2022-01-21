@@ -23,8 +23,8 @@ type CreateAggregator struct {
 type CreatedAggregator struct {
 	ID            string    `json:"id"`
 	Token         string    `json:"token"`
-	PrivateRSAKey string    `json:"privateRSAKey"`
-	PublicRSAKey  string    `json:"publicRSAKey"`
+	PrivateRSAKey []byte    `json:"privateRSAKey"`
+	PublicRSAKey  []byte    `json:"publicRSAKey"`
 	Name          string    `json:"name"`
 	CreatedAt     time.Time `json:"createdAt"`
 

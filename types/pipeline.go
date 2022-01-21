@@ -45,13 +45,15 @@ type CreatedPipeline struct {
 
 // UpdatePipeline request payload for updating a pipeline.
 type UpdatePipeline struct {
-	Name                      *string             `json:"name"`
-	ReplicasCount             *uint64             `json:"replicasCount"`
-	RawConfig                 *string             `json:"rawConfig"`
-	Status                    *PipelineStatusKind `json:"status"`
-	ResourceProfile           *string             `json:"resourceProfile"`
-	AutoCreatePortsFromConfig *bool               `json:"autoCreatePortsFromConfig"`
-	Metadata                  *json.RawMessage    `json:"metadata"`
+	Name                      *string                `json:"name"`
+	ReplicasCount             *uint64                `json:"replicasCount"`
+	RawConfig                 *string                `json:"rawConfig"`
+	Secrets                   []UpdatePipelineSecret `json:"secrets"`
+	Files                     []UpdatePipelineFile   `json:"files"`
+	Status                    *PipelineStatusKind    `json:"status"`
+	ResourceProfile           *string                `json:"resourceProfile"`
+	AutoCreatePortsFromConfig *bool                  `json:"autoCreatePortsFromConfig"`
+	Metadata                  *json.RawMessage       `json:"metadata"`
 }
 
 // PipelinesParams request payload for querying pipelines.
