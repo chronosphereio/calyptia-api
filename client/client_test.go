@@ -35,6 +35,21 @@ import (
 var testBearerTokenPrivateKey jwk.RSAPrivateKey
 var testCloudURL string
 
+var testCloudImage = func() string {
+	if v, ok := os.LookupEnv("TEST_CLOUD_IMAGE"); ok {
+		return v
+	}
+
+	return "gcr.io/calyptia-infra/cloud"
+}()
+
+var testCloudPort = func() string {
+	if v, ok := os.LookupEnv("TEST_CLOUD_PORT"); ok {
+		return v
+	}
+	return "6661"
+}()
+
 var (
 	testFluentbitConfigValidatorAPIKey = os.Getenv("TEST_FLUENTBIT_CONFIG_VALIDATOR_API_KEY")
 	testFluentdConfigValidatorAPIKey   = os.Getenv("TEST_FLUENTD_CONFIG_VALIDATOR_API_KEY")
@@ -113,11 +128,18 @@ func testMain(m *testing.M) int {
 	jwksURL.Path = "/.well-known/jwks.json"
 
 	cloud, err := setupCloud(pool, setupCloudConfig{
-		jwksURL:             jwksURL.String(),
-		accessTokenAudience: "http://cloud-api-testing.localhost",
-		accessTokenIssuer:   "http://cloud-api-testing.localhost",
-		postgresDSN:         "postgresql://postgres@host.docker.internal:" + postgres.GetPort("5432/tcp") + "?sslmode=disable",
-		influxServer:        "http://host.docker.internal:" + influx.GetPort("8086/tcp"),
+		port:                           testCloudPort,
+		jwksURL:                        jwksURL.String(),
+		accessTokenAudience:            "http://cloud-api-testing.localhost",
+		accessTokenIssuer:              "http://cloud-api-testing.localhost",
+		postgresDSN:                    "postgresql://postgres@host.docker.internal:" + postgres.GetPort("5432/tcp") + "?sslmode=disable",
+		influxServer:                   "http://host.docker.internal:" + influx.GetPort("8086/tcp"),
+		fluentBitConfigValidatorAPIKey: testFluentbitConfigValidatorAPIKey,
+		fluentdConfigValidatorAPIKey:   testFluentdConfigValidatorAPIKey,
+		smtpHost:                       testSMTPHost,
+		smtpPort:                       testSMTPPort,
+		smtpUsername:                   testSMTPUsername,
+		smtpPassword:                   testSMTPPassword,
 	})
 	if err != nil {
 		fmt.Printf("could not setup cloud: %v\n", err)
@@ -148,7 +170,7 @@ func testMain(m *testing.M) int {
 		return 1
 	}
 
-	testCloudURL = "http://" + cloud.GetHostPort("6661/tcp")
+	testCloudURL = "http://" + cloud.GetHostPort(testCloudPort+"/tcp")
 
 	return m.Run()
 }
@@ -315,6 +337,7 @@ func pingInflux(influx *dockertest.Resource) error {
 }
 
 type setupCloudConfig struct {
+	port                           string
 	jwksURL                        string
 	accessTokenAudience            string
 	accessTokenIssuer              string
@@ -330,10 +353,10 @@ type setupCloudConfig struct {
 
 func setupCloud(pool *dockertest.Pool, conf setupCloudConfig) (*dockertest.Resource, error) {
 	return pool.RunWithOptions(&dockertest.RunOptions{
-		Repository: "gcr.io/calyptia-infra/cloud",
+		Repository: testCloudImage,
 		Env: []string{
-			"PORT=6661",
-			"ORIGIN=http://localhost:6661",
+			"PORT=" + conf.port,
+			"ORIGIN=http://localhost:" + conf.port,
 			"JWKS_URL=" + conf.jwksURL,
 			"ACCESS_TOKEN_AUD=" + conf.accessTokenAudience,
 			"ACCESS_TOKEN_ISS=" + conf.accessTokenIssuer,
@@ -348,7 +371,7 @@ func setupCloud(pool *dockertest.Pool, conf setupCloudConfig) (*dockertest.Resou
 			"ALLOWED_ORIGINS=http://cloud-api-testing.localhost",
 			// "DEBUG=true",
 		},
-		ExposedPorts: []string{"6661"},
+		ExposedPorts: []string{conf.port},
 	}, func(hc *docker.HostConfig) {
 		hc.AutoRemove = true
 		hc.RestartPolicy = docker.RestartPolicy{Name: "no"}
@@ -357,7 +380,7 @@ func setupCloud(pool *dockertest.Pool, conf setupCloudConfig) (*dockertest.Resou
 
 func pingCloud(cloud *dockertest.Resource) error {
 	return retry(func() error {
-		hostPort := cloud.GetHostPort("6661/tcp")
+		hostPort := cloud.GetHostPort(testCloudPort + "/tcp")
 		if hostPort == "" {
 			return errors.New("cloud host-port not ready")
 		}
