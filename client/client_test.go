@@ -14,6 +14,7 @@ import (
 	"net/url"
 	"os"
 	"reflect"
+	"syscall"
 	"testing"
 	"time"
 
@@ -141,11 +142,13 @@ func testMain(m *testing.M) int {
 		}()
 	}
 
-	testCloudURL, err = getCloudURL(cloud)
+	err = pingCloud(cloud)
 	if err != nil {
 		fmt.Printf("could not get cloud base url: %v\n", err)
 		return 1
 	}
+
+	testCloudURL = "http://" + cloud.GetHostPort("6661/tcp")
 
 	return m.Run()
 }
@@ -161,7 +164,10 @@ func setupJWKSServer() (*httptest.Server, jwk.RSAPrivateKey, error) {
 		return nil, nil, fmt.Errorf("could not create symmetric key: %w", err)
 	}
 
-	key.Set(jwk.KeyIDKey, "test-kid")
+	err = key.Set(jwk.KeyIDKey, "test-kid")
+	if err != nil {
+		return nil, nil, fmt.Errorf("could not set jwt key id: %w", err)
+	}
 
 	priv, ok := key.(jwk.RSAPrivateKey)
 	if !ok {
@@ -180,7 +186,10 @@ func setupJWKSServer() (*httptest.Server, jwk.RSAPrivateKey, error) {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/.well-known/jwks.json", func(w http.ResponseWriter, r *http.Request) {
-		w.Write(resp)
+		_, err := w.Write(resp)
+		if err != nil && !errors.Is(err, syscall.EPIPE) {
+			fmt.Printf("could not write jkws response: %v\n", err)
+		}
 	})
 
 	srv := httptest.NewServer(mux)
@@ -346,16 +355,14 @@ func setupCloud(pool *dockertest.Pool, conf setupCloudConfig) (*dockertest.Resou
 	})
 }
 
-func getCloudURL(cloud *dockertest.Resource) (string, error) {
-	var cloudURL string
-	return cloudURL, retry(func() error {
+func pingCloud(cloud *dockertest.Resource) error {
+	return retry(func() error {
 		hostPort := cloud.GetHostPort("6661/tcp")
 		if hostPort == "" {
 			return errors.New("cloud host-port not ready")
 		}
 
-		cloudURL = "http://" + hostPort
-		resp, err := http.Get(cloudURL)
+		resp, err := http.Get("http://" + hostPort + "/healthz")
 		if err != nil {
 			return err
 		}
