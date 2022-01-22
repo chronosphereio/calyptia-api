@@ -8,6 +8,10 @@ import (
 )
 
 func TestClient_CreateInvitation(t *testing.T) {
+	if testSMTPHost == "" || testSMTPPort == "" || testSMTPUsername == "" || testSMTPPassword == "" {
+		t.Skip("TODO: setup SMTP config")
+	}
+
 	ctx := context.Background()
 
 	asUser := userClient(t)
@@ -15,7 +19,7 @@ func TestClient_CreateInvitation(t *testing.T) {
 
 	err := asUser.CreateInvitation(ctx, project.ID, types.CreateInvitation{
 		Email:       randStr(t) + "@example.com",
-		RedirectURI: testBaseURL + "/callback",
+		RedirectURI: "http://cloud-api-testing.localhost/callback",
 	})
 	wantEqual(t, err, nil)
 }

@@ -8,6 +8,10 @@ import (
 )
 
 func TestClient_ValidateConfig(t *testing.T) {
+	if testFluentbitConfigValidatorAPIKey == "" || testFluentdConfigValidatorAPIKey == "" {
+		t.Skip("TODO: setup fluentbit/d config validator API keys")
+	}
+
 	ctx := context.Background()
 	asUser := userClient(t)
 	withToken := withToken(t, asUser)
