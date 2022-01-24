@@ -22,7 +22,7 @@ func (c *Client) CreatePipeline(ctx context.Context, aggregatorID string, payloa
 func (c *Client) Pipelines(ctx context.Context, aggregatorID string, params types.PipelinesParams) ([]types.Pipeline, error) {
 	q := url.Values{}
 	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(*params.Last, 10))
+		q.Set("last", strconv.FormatUint(*params.Last, DefaultUintFormatBase))
 	}
 	if params.Name != nil {
 		q.Set("name", *params.Name)
@@ -33,11 +33,11 @@ func (c *Client) Pipelines(ctx context.Context, aggregatorID string, params type
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }
 
-// ProjectPipelines returns the entire deduplicated set of pipelines from a project.
+// ProjectPipelines returns the entire set of pipelines from a project.
 func (c *Client) ProjectPipelines(ctx context.Context, projectID string, params types.PipelinesParams) ([]types.Pipeline, error) {
 	q := url.Values{}
 	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(*params.Last, 10))
+		q.Set("last", strconv.FormatUint(*params.Last, DefaultUintFormatBase))
 	}
 	if params.Name != nil {
 		q.Set("name", *params.Name)

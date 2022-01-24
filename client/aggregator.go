@@ -21,7 +21,7 @@ func (c *Client) CreateAggregator(ctx context.Context, payload types.CreateAggre
 func (c *Client) Aggregators(ctx context.Context, projectID string, params types.AggregatorsParams) ([]types.Aggregator, error) {
 	q := url.Values{}
 	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(*params.Last, 10))
+		q.Set("last", strconv.FormatUint(*params.Last, DefaultUintFormatBase))
 	}
 	if params.Name != nil {
 		q.Set("name", *params.Name)

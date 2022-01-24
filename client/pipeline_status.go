@@ -14,7 +14,7 @@ import (
 func (c *Client) PipelineStatusHistory(ctx context.Context, pipelineID string, params types.PipelineStatusHistoryParams) ([]types.PipelineStatus, error) {
 	q := url.Values{}
 	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(*params.Last, 10))
+		q.Set("last", strconv.FormatUint(*params.Last, DefaultUintFormatBase))
 	}
 
 	var out []types.PipelineStatus

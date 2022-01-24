@@ -18,8 +18,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/calyptia/api/client"
-	"github.com/calyptia/api/types"
 	"github.com/cenkalti/backoff/v4"
 	influxdb "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/lestrrat-go/jwx/jwa"
@@ -30,24 +28,29 @@ import (
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	"golang.org/x/oauth2"
+
+	"github.com/calyptia/api/client"
+	"github.com/calyptia/api/types"
 )
 
-var testBearerTokenPrivateKey jwk.RSAPrivateKey
-var testCloudURL string
+var (
+	testBearerTokenPrivateKey jwk.RSAPrivateKey
+	testCloudURL              string
+)
 
 var testCloudImage = func() string {
 	if v, ok := os.LookupEnv("TEST_CLOUD_IMAGE"); ok {
 		return v
 	}
 
-	return "gcr.io/calyptia-infra/cloud"
+	return "gcr.io/calyptia-infra/cloud:latest"
 }()
 
 var testCloudPort = func() string {
 	if v, ok := os.LookupEnv("TEST_CLOUD_PORT"); ok {
 		return v
 	}
-	return "6661"
+	return "5000"
 }()
 
 var (
@@ -66,6 +69,7 @@ func TestMain(m *testing.M) {
 	os.Exit(testMain(m))
 }
 
+//nolint //gocyclo this function setups all the components required by tests.
 func testMain(m *testing.M) int {
 	jwksServer, privateKey, err := setupJWKSServer()
 	if err != nil {
@@ -94,8 +98,18 @@ func testMain(m *testing.M) int {
 		return 1
 	}
 
-	defer postgres.Close()
-	defer pool.Purge(postgres)
+	defer func(postgres *dockertest.Resource) {
+		err := postgres.Close()
+		if err != nil {
+			return
+		}
+	}(postgres)
+	defer func(pool *dockertest.Pool, r *dockertest.Resource) {
+		err := pool.Purge(r)
+		if err != nil {
+			return
+		}
+	}(pool, postgres)
 
 	influx, err := setupInflux(pool)
 	if err != nil {
@@ -103,8 +117,18 @@ func testMain(m *testing.M) int {
 		return 1
 	}
 
-	defer influx.Close()
-	defer pool.Purge(influx)
+	defer func(influx *dockertest.Resource) {
+		err := influx.Close()
+		if err != nil {
+			return
+		}
+	}(influx)
+	defer func(pool *dockertest.Pool, r *dockertest.Resource) {
+		err := pool.Purge(r)
+		if err != nil {
+			return
+		}
+	}(pool, influx)
 
 	err = pingPostgres(postgres)
 	if err != nil {
@@ -146,8 +170,18 @@ func testMain(m *testing.M) int {
 		return 1
 	}
 
-	defer cloud.Close()
-	defer pool.Purge(cloud)
+	defer func(cloud *dockertest.Resource) {
+		err := cloud.Close()
+		if err != nil {
+			return
+		}
+	}(cloud)
+	defer func(pool *dockertest.Pool, r *dockertest.Resource) {
+		err := pool.Purge(r)
+		if err != nil {
+			return
+		}
+	}(pool, cloud)
 
 	for _, name := range []string{cloud.Container.ID} {
 		name := name
@@ -285,7 +319,12 @@ func pingPostgres(postgres *dockertest.Resource) error {
 			return fmt.Errorf("could not open postgres db: %w", err)
 		}
 
-		defer db.Close()
+		defer func(db *sql.DB) {
+			err := db.Close()
+			if err != nil {
+				return
+			}
+		}(db)
 
 		if err := db.Ping(); err != nil {
 			return fmt.Errorf("could not ping postgres db: %w", err)
@@ -385,6 +424,7 @@ func pingCloud(cloud *dockertest.Resource) error {
 			return errors.New("cloud host-port not ready")
 		}
 
+		//nolint //http.Get is okay on this context
 		resp, err := http.Get("http://" + hostPort + "/healthz")
 		if err != nil {
 			return err
@@ -489,6 +529,7 @@ func defaultToken(t *testing.T, asUser *client.Client) types.Token {
 func randStr(t *testing.T) string {
 	t.Helper()
 	math_rand.Seed(time.Now().UnixNano())
+	//nolint // math_rand uses math/rand import
 	return fmt.Sprintf("%x", math_rand.Int63())
 }
 

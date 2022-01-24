@@ -23,6 +23,11 @@ type Client struct {
 	aggregatorToken string
 }
 
+const (
+	// DefaultUintFormatBase Default base to use on string conversion to uint.
+	DefaultUintFormatBase = 10
+)
+
 // New default client.
 func New(baseURL string) *Client {
 	return &Client{
@@ -51,6 +56,24 @@ func (c *Client) SetAggregatorToken(s string) {
 	c.aggregatorToken = s
 }
 
+func (c *Client) setRequestHeaders(req *http.Request) {
+	if c.projectToken != "" {
+		req.Header.Set("X-Project-Token", c.projectToken)
+	}
+
+	if c.agentToken != "" {
+		req.Header.Set("X-Agent-Token", c.agentToken)
+	}
+
+	if c.aggregatorToken != "" {
+		req.Header.Set("X-Aggregator-Token", c.aggregatorToken)
+	}
+
+	if c.userAgent != "" {
+		req.Header.Set("User-Agent", c.userAgent)
+	}
+}
+
 func (c *Client) do(ctx context.Context, method, path string, v, dest interface{}) error {
 	var body io.Reader
 
@@ -76,21 +99,7 @@ func (c *Client) do(ctx context.Context, method, path string, v, dest interface{
 		req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	}
 
-	if c.projectToken != "" {
-		req.Header.Set("X-Project-Token", c.projectToken)
-	}
-
-	if c.agentToken != "" {
-		req.Header.Set("X-Agent-Token", c.agentToken)
-	}
-
-	if c.aggregatorToken != "" {
-		req.Header.Set("X-Aggregator-Token", c.aggregatorToken)
-	}
-
-	if c.userAgent != "" {
-		req.Header.Set("User-Agent", c.userAgent)
-	}
+	c.setRequestHeaders(req)
 
 	resp, err := c.Client.Do(req)
 	if err != nil {

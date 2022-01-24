@@ -21,7 +21,7 @@ func (c *Client) RegisterAgent(ctx context.Context, payload types.RegisterAgent)
 func (c *Client) Agents(ctx context.Context, projectID string, params types.AgentsParams) ([]types.Agent, error) {
 	q := url.Values{}
 	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(*params.Last, 10))
+		q.Set("last", strconv.FormatUint(*params.Last, DefaultUintFormatBase))
 	}
 	if params.Name != nil {
 		q.Set("name", *params.Name)

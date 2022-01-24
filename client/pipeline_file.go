@@ -22,7 +22,7 @@ func (c *Client) CreatePipelineFile(ctx context.Context, pipelineID string, payl
 func (c *Client) PipelineFiles(ctx context.Context, pipelineID string, params types.PipelineFilesParams) ([]types.PipelineFile, error) {
 	q := url.Values{}
 	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(*params.Last, 10))
+		q.Set("last", strconv.FormatUint(*params.Last, DefaultUintFormatBase))
 	}
 
 	var out []types.PipelineFile
