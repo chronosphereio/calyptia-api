@@ -8,7 +8,7 @@ import (
 )
 
 func TestClient_CreateInvitation(t *testing.T) {
-	if testSMTPHost == "" || testSMTPPort == "" || testSMTPUsername == "" || testSMTPPassword == "" {
+	if testSMTPHost == "" || testSMTPPort == "" {
 		t.Skip("TODO: setup SMTP config")
 	}
 

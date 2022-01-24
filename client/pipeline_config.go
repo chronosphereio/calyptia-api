@@ -21,10 +21,3 @@ func (c *Client) PipelineConfigHistory(ctx context.Context, pipelineID string, p
 	path := "/v1/aggregator_pipelines/" + url.PathEscape(pipelineID) + "/config_history?" + q.Encode()
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }
-
-// PipelineConfig retrieves a single pipeline config history entry by its ID.
-func (c *Client) PipelineConfig(ctx context.Context, configID string) (types.PipelineConfig, error) {
-	var out types.PipelineConfig
-	path := "/v1/pipeline_config_history/" + url.PathEscape(configID)
-	return out, c.do(ctx, http.MethodGet, path, nil, &out)
-}

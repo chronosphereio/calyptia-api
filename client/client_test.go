@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	math_rand "math/rand"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -43,7 +44,7 @@ var testCloudImage = func() string {
 		return v
 	}
 
-	return "gcr.io/calyptia-infra/cloud:latest"
+	return "gcr.io/calyptia-infra/cloud"
 }()
 
 var testCloudPort = func() string {
@@ -59,10 +60,10 @@ var (
 )
 
 var (
-	testSMTPHost     = os.Getenv("TEST_SMTP_HOST")
-	testSMTPPort     = os.Getenv("TEST_SMTP_PORT")
-	testSMTPUsername = os.Getenv("TEST_SMTP_USERNAME")
-	testSMTPPassword = os.Getenv("TEST_SMTP_PASSWORD")
+	testSMTPHost     = env("TEST_SMTP_HOST", "mailhog")
+	testSMTPPort     = env("TEST_SMTP_PORT", "1025")
+	testSMTPUsername = env("TEST_SMTP_USERNAME", "")
+	testSMTPPassword = env("TEST_SMTP_PASSWORD", "")
 )
 
 func TestMain(m *testing.M) {
@@ -92,6 +93,26 @@ func testMain(m *testing.M) int {
 		return 1
 	}
 
+	mailServer, err := setupMailServer(pool)
+	if err != nil {
+		fmt.Printf("could not setup mail server: %v\n", err)
+		return 1
+	}
+
+	defer func(mailServer *dockertest.Resource) {
+		err := mailServer.Close()
+		if err != nil {
+			return
+		}
+	}(mailServer)
+
+	defer func(pool *dockertest.Pool, r *dockertest.Resource) {
+		err := pool.Purge(r)
+		if err != nil {
+			return
+		}
+	}(pool, mailServer)
+
 	postgres, err := setupPostgres(pool)
 	if err != nil {
 		fmt.Printf("could not setup postgres: %v\n", err)
@@ -104,6 +125,7 @@ func testMain(m *testing.M) int {
 			return
 		}
 	}(postgres)
+
 	defer func(pool *dockertest.Pool, r *dockertest.Resource) {
 		err := pool.Purge(r)
 		if err != nil {
@@ -160,8 +182,8 @@ func testMain(m *testing.M) int {
 		influxServer:                   "http://host.docker.internal:" + influx.GetPort("8086/tcp"),
 		fluentBitConfigValidatorAPIKey: testFluentbitConfigValidatorAPIKey,
 		fluentdConfigValidatorAPIKey:   testFluentdConfigValidatorAPIKey,
-		smtpHost:                       testSMTPHost,
-		smtpPort:                       testSMTPPort,
+		smtpHost:                       "host.docker.internal",
+		smtpPort:                       mailServer.GetPort("1025/tcp"),
 		smtpUsername:                   testSMTPUsername,
 		smtpPassword:                   testSMTPPassword,
 	})
@@ -176,6 +198,7 @@ func testMain(m *testing.M) int {
 			return
 		}
 	}(cloud)
+
 	defer func(pool *dockertest.Pool, r *dockertest.Resource) {
 		err := pool.Purge(r)
 		if err != nil {
@@ -248,9 +271,18 @@ func setupJWKSServer() (*httptest.Server, jwk.RSAPrivateKey, error) {
 		}
 	})
 
-	srv := httptest.NewServer(mux)
+	l, err := net.Listen("tcp", "172.17.0.1:0")
+	if err != nil {
+		return nil, nil, err
+	}
 
-	return srv, priv, nil
+	srv := httptest.Server{
+		Listener: l,
+		Config:   &http.Server{Handler: mux},
+	}
+
+	defer srv.Start()
+	return &srv, priv, nil
 }
 
 type bearerTokenClaims struct {
@@ -294,6 +326,16 @@ func issueBearerToken(key jwk.RSAPrivateKey, claims bearerTokenClaims) (*oauth2.
 		RefreshToken: "",
 		Expiry:       exp,
 	}, nil
+}
+
+func setupMailServer(pool *dockertest.Pool) (*dockertest.Resource, error) {
+	return pool.RunWithOptions(&dockertest.RunOptions{
+		Repository:   "mailhog/mailhog",
+		ExposedPorts: []string{testSMTPPort},
+	}, func(hc *docker.HostConfig) {
+		hc.AutoRemove = true
+		hc.RestartPolicy = docker.RestartPolicy{Name: "no"}
+	})
 }
 
 func setupPostgres(pool *dockertest.Pool) (*dockertest.Resource, error) {
@@ -408,9 +450,10 @@ func setupCloud(pool *dockertest.Pool, conf setupCloudConfig) (*dockertest.Resou
 			"SMTP_USERNAME=" + conf.smtpUsername,
 			"SMTP_PASSWORD=" + conf.smtpPassword,
 			"ALLOWED_ORIGINS=http://cloud-api-testing.localhost",
-			// "DEBUG=true",
+			//"DEBUG=true",
 		},
 		ExposedPorts: []string{conf.port},
+		ExtraHosts:   []string{"host.docker.internal:host-gateway"},
 	}, func(hc *docker.HostConfig) {
 		hc.AutoRemove = true
 		hc.RestartPolicy = docker.RestartPolicy{Name: "no"}
@@ -587,4 +630,12 @@ func retry(op func() error) error {
 	}
 
 	return nil
+}
+
+func env(key, fallback string) string {
+	v, ok := os.LookupEnv(key)
+	if !ok {
+		return fallback
+	}
+	return v
 }
