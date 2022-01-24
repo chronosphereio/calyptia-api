@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	math_rand "math/rand"
 	"net"
 	"net/http"
@@ -60,8 +61,8 @@ var (
 )
 
 var (
-	testSMTPHost     = env("TEST_SMTP_HOST", "mailhog")
-	testSMTPPort     = env("TEST_SMTP_PORT", "1025")
+	testSMTPHost     = env("TEST_SMTP_HOST", "smtp.mailtrap.io")
+	testSMTPPort     = env("TEST_SMTP_PORT", "465")
 	testSMTPUsername = env("TEST_SMTP_USERNAME", "")
 	testSMTPPassword = env("TEST_SMTP_PASSWORD", "")
 )
@@ -92,26 +93,6 @@ func testMain(m *testing.M) int {
 		fmt.Printf("could not ping docker: %v\n", err)
 		return 1
 	}
-
-	mailServer, err := setupMailServer(pool)
-	if err != nil {
-		fmt.Printf("could not setup mail server: %v\n", err)
-		return 1
-	}
-
-	defer func(mailServer *dockertest.Resource) {
-		err := mailServer.Close()
-		if err != nil {
-			return
-		}
-	}(mailServer)
-
-	defer func(pool *dockertest.Pool, r *dockertest.Resource) {
-		err := pool.Purge(r)
-		if err != nil {
-			return
-		}
-	}(pool, mailServer)
 
 	postgres, err := setupPostgres(pool)
 	if err != nil {
@@ -182,8 +163,8 @@ func testMain(m *testing.M) int {
 		influxServer:                   "http://host.docker.internal:" + influx.GetPort("8086/tcp"),
 		fluentBitConfigValidatorAPIKey: testFluentbitConfigValidatorAPIKey,
 		fluentdConfigValidatorAPIKey:   testFluentdConfigValidatorAPIKey,
-		smtpHost:                       "host.docker.internal",
-		smtpPort:                       mailServer.GetPort("1025/tcp"),
+		smtpHost:                       testSMTPHost,
+		smtpPort:                       testSMTPPort,
 		smtpUsername:                   testSMTPUsername,
 		smtpPassword:                   testSMTPPassword,
 	})
@@ -271,7 +252,12 @@ func setupJWKSServer() (*httptest.Server, jwk.RSAPrivateKey, error) {
 		}
 	})
 
-	l, err := net.Listen("tcp", "172.17.0.1:0")
+	hostname, err := os.Hostname()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	l, err := net.Listen("tcp", fmt.Sprintf("%s:0", hostname))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -326,16 +312,6 @@ func issueBearerToken(key jwk.RSAPrivateKey, claims bearerTokenClaims) (*oauth2.
 		RefreshToken: "",
 		Expiry:       exp,
 	}, nil
-}
-
-func setupMailServer(pool *dockertest.Pool) (*dockertest.Resource, error) {
-	return pool.RunWithOptions(&dockertest.RunOptions{
-		Repository:   "mailhog/mailhog",
-		ExposedPorts: []string{testSMTPPort},
-	}, func(hc *docker.HostConfig) {
-		hc.AutoRemove = true
-		hc.RestartPolicy = docker.RestartPolicy{Name: "no"}
-	})
 }
 
 func setupPostgres(pool *dockertest.Pool) (*dockertest.Resource, error) {
@@ -450,7 +426,7 @@ func setupCloud(pool *dockertest.Pool, conf setupCloudConfig) (*dockertest.Resou
 			"SMTP_USERNAME=" + conf.smtpUsername,
 			"SMTP_PASSWORD=" + conf.smtpPassword,
 			"ALLOWED_ORIGINS=http://cloud-api-testing.localhost",
-			"DEBUG=true",
+			// "DEBUG=true",
 		},
 		ExposedPorts: []string{conf.port},
 		ExtraHosts:   []string{"host.docker.internal:host-gateway"},
@@ -473,7 +449,12 @@ func pingCloud(cloud *dockertest.Resource) error {
 			return err
 		}
 
-		defer resp.Body.Close()
+		defer func(Body io.ReadCloser) {
+			err := Body.Close()
+			if err != nil {
+				return
+			}
+		}(resp.Body)
 
 		if resp.StatusCode != http.StatusOK {
 			return fmt.Errorf("healthz returned %d", resp.StatusCode)
