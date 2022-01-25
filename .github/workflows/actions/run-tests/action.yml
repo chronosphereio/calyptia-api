@@ -8,6 +8,9 @@ inputs:
   username:
     description: The username for the registry.
     required: false
+  token:
+    description: The Github token to use.
+    required: false
   image_name:
     description: The cloud image repository and name to use.
     required: false
@@ -32,7 +35,6 @@ inputs:
     description: Golang version to use for running tests
     required: false
     default: "1.17"
-
 runs:
   using: "composite"
   steps:
