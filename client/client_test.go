@@ -426,7 +426,7 @@ func setupCloud(pool *dockertest.Pool, conf setupCloudConfig) (*dockertest.Resou
 			"SMTP_USERNAME=" + conf.smtpUsername,
 			"SMTP_PASSWORD=" + conf.smtpPassword,
 			"ALLOWED_ORIGINS=http://cloud-api-testing.localhost",
-			// "DEBUG=true",
+			"DEBUG=true",
 		},
 		ExposedPorts: []string{conf.port},
 		ExtraHosts:   []string{"host.docker.internal:host-gateway"},
