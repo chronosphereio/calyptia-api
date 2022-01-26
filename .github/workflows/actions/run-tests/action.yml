@@ -52,12 +52,11 @@ runs:
     - name: Go tests
       run: |
         echo ${{ env.PAT }} | docker login -u ${{ github.repository_owner }} --password-stdin ghcr.io
-        docker pull ${{ env.TEST_CLOUD_IMAGE }}
         go test -v ./...
       shell: bash
       env:
         PAT: ${{ inputs.token }}
-        TEST_CLOUD_IMAGE: ${{ inputs.registry }}/${{ inputs.image_name }}:${{ inputs.image_tag }}
+        TEST_CLOUD_IMAGE: ${{ inputs.registry }}/${{ inputs.image_name }}
         TEST_FLUENTBIT_CONFIG_VALIDATOR_API_KEY: ${{ inputs.fluentbit_config_validator_api_key }}
         TEST_FLUENTD_CONFIG_VALIDATOR_API_KEY: ${{ inputs.fluentd_config_validator_api_key }}
         TEST_SMTP_USERNAME: ${{ inputs.smtp_username }}
