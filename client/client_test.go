@@ -48,6 +48,14 @@ var testCloudImage = func() string {
 	return "gcr.io/calyptia-infra/cloud"
 }()
 
+var testCloudImageTag = func() string {
+	if v, ok := os.LookupEnv("TEST_CLOUD_IMAGE_TAG"); ok {
+		return v
+	}
+
+	return "latest"
+}()
+
 var testCloudPort = func() string {
 	if v, ok := os.LookupEnv("TEST_CLOUD_PORT"); ok {
 		return v
@@ -412,6 +420,7 @@ type setupCloudConfig struct {
 func setupCloud(pool *dockertest.Pool, conf setupCloudConfig) (*dockertest.Resource, error) {
 	return pool.RunWithOptions(&dockertest.RunOptions{
 		Repository: testCloudImage,
+		Tag:        testCloudImageTag,
 		Env: []string{
 			"PORT=" + conf.port,
 			"ORIGIN=http://localhost:" + conf.port,
