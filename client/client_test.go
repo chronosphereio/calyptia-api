@@ -252,12 +252,12 @@ func setupJWKSServer() (*httptest.Server, jwk.RSAPrivateKey, error) {
 		}
 	})
 
-	hostname, err := os.Hostname()
-	if err != nil {
-		return nil, nil, err
-	}
+	//hostname, err := os.Hostname()
+	//if err != nil {
+	//	return nil, nil, err
+	//}
 
-	l, err := net.Listen("tcp", fmt.Sprintf("%s:0", hostname))
+	l, err := net.Listen("tcp", "host.docker.internal:0")
 	if err != nil {
 		return nil, nil, err
 	}
