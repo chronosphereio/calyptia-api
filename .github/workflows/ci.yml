@@ -45,61 +45,22 @@ jobs:
           args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  ci:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Configure git for private modules
-        env:
-          TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-        run: git config --global url."https://${TOKEN}@github.com".insteadOf "https://github.com"
-        continue-on-error: true
-
-      - name: Setup
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.17
-
-      - name: Lint
-        uses: golangci/golangci-lint-action@v2
-        with:
-          version: v1.43.0
-
-      - name: Setup google credentials
-        uses: google-github-actions/setup-gcloud@v0
-        with:
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
-          credentials_file_path: /tmp/gcloud.json
-
-      - name: Login to GCR
-        uses: docker/login-action@v1
-        with:
-          registry: gcr.io
-          username: _json_key_base64
-          password: ${{ secrets.GCP_SA_KEY }}
-
-      - name: Test
-        run: |
-          go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
-          go tool cover -html=coverage.out -o coverage.html
-
-      - name: Upload coverage artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: coverage reports
-          path: |
-            coverage.out
-            coverage.html
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2.1.0
-        with:
-          file: ./coverage.out
-          flags: ${{ runner.os }}
-          token: ${{ secrets.CODECOV_TOKEN }}
-        continue-on-error: true
+  tests:
+    name: PR - Run tests for api
+    #TODO: switch before merging
+    uses: niedbalski/go-repo-template-1/.github/workflows/reusable-integration-tests.yml@reusable
+    with:
+      cloud_image_registry: ghcr.io
+      cloud_image_name: ${{ github.repository }}/pr-3
+      cloud_image_tag: latest
+      target_repository: ${{ github.repository }}
+      #TODO: switch before merging
+      target_repository_branch: ${{ github.ref }}
+      go_version: "1.17"
+    secrets:
+      fluentbit_config_validator_api_key: ${{ secrets.FLUENTBIT_CONFIG_VALIDATOR_API_KEY }}
+      fluentd_config_validator_api_key: ${{ secrets.FLUENTD_CONFIG_VALIDATOR_API_KEY }}
+      smtp_username: ${{ secrets.MAILTRAP_USERNAME }}
+      smtp_password: ${{ secrets.MAILTRAP_PASSWORD }}
+      image_registry_username: ${{ github.actor }}
+      image_registry_password: ${{ secrets.PERSONAL_TOKEN }}
