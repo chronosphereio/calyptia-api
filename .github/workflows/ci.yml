@@ -12,7 +12,7 @@ jobs:
   release:
     if: startsWith(github.ref, 'refs/tags/v')
     needs:
-      - ci
+      - tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -46,7 +46,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   tests:
-    name: PR - Run tests for api
+    name: Run tests
     #TODO: switch before merging
     uses: niedbalski/go-repo-template-1/.github/workflows/reusable-integration-tests.yml@reusable
     with:
