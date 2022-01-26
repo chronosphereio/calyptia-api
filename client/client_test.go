@@ -126,6 +126,7 @@ func testMain(m *testing.M) int {
 			return
 		}
 	}(influx)
+
 	defer func(pool *dockertest.Pool, r *dockertest.Resource) {
 		err := pool.Purge(r)
 		if err != nil {
@@ -257,7 +258,7 @@ func setupJWKSServer() (*httptest.Server, jwk.RSAPrivateKey, error) {
 	//	return nil, nil, err
 	//}
 
-	l, err := net.Listen("tcp", "host.docker.internal:0")
+	l, err := net.Listen("tcp", "172.17.0.1:0")
 	if err != nil {
 		return nil, nil, err
 	}
