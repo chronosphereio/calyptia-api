@@ -261,11 +261,6 @@ func setupJWKSServer() (*httptest.Server, jwk.RSAPrivateKey, error) {
 		}
 	})
 
-	//hostname, err := os.Hostname()
-	//if err != nil {
-	//	return nil, nil, err
-	//}
-
 	l, err := net.Listen("tcp", "172.17.0.1:0")
 	if err != nil {
 		return nil, nil, err
