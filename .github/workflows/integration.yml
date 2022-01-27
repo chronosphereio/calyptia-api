@@ -12,7 +12,7 @@ jobs:
     uses: calyptia/go-repo-template/.github/workflows/reusable-run-tests.yml@reusable
     with:
       cloud_image_registry: ghcr.io
-      cloud_image_name: calyptia/cloud/main
+      cloud_image_name: niedbalski/cloud/pr-3
       cloud_image_tag: latest
       target_repository: ${{ github.repository }}
       target_repository_ref: ${{ github.ref }}
