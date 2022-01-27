@@ -70,20 +70,20 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
         continue-on-error: true
 
-  integration:
-    name: run integration tests
-    uses: calyptia/go-repo-template/.github/workflows/reusable-run-tests.yml@reusable
-    with:
-      cloud_image_registry: ghcr.io
-      cloud_image_name: calyptia/cloud/main
-      cloud_image_tag: latest
-      target_repository: ${{ github.repository }}
-      target_repository_ref: ${{ github.ref }}
-      go_version: 1.17
-    secrets:
-      fluentbit_config_validator_api_key: ${{ secrets.FLUENTBIT_CONFIG_VALIDATOR_API_KEY }}
-      fluentd_config_validator_api_key: ${{ secrets.FLUENTD_CONFIG_VALIDATOR_API_KEY }}
-      smtp_username: ${{ secrets.MAILTRAP_USERNAME }}
-      smtp_password: ${{ secrets.MAILTRAP_PASSWORD }}
-      image_registry_username: ${{ github.actor }}
-      image_registry_password: ${{ secrets.PERSONAL_TOKEN }}
+      - uses: FranzDiebold/github-env-vars-action@v2
+
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@v1.6
+        with:
+          args: >
+            -Dsonar.organization=calyptia
+            -Dsonar.projectKey=${{ env.CI_REPOSITORY_NAME_SLUG }}
+            -Dsonar.sources=.
+            -Dsonar.exclusions=**/*_test.go
+            -Dsonar.tests=.
+            -Dsonar.test.inclusions=**/*_test.go
+            -Dsonar.go.coverage.reportPaths=coverage.out
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        continue-on-error: true
