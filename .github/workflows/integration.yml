@@ -9,7 +9,7 @@ on:
 jobs:
   run-integration-cloud-api:
     name: run integration tests with cloud api
-    uses: calyptia/go-repo-template/.github/workflows/reusable-run-tests.yml@reusable
+    uses: calyptia/go-repo-template/.github/workflows/reusable-run-integration-tests.yml@reusable
     with:
       cloud_image_registry: ghcr.io
       cloud_image_name: niedbalski/cloud/pr-3
