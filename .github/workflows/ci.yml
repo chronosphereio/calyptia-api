@@ -56,7 +56,7 @@ jobs:
       target_repository: ${{ github.repository }}
       target_repository_ref: ${{ github.ref }}
       go_version: "1.17"
-      use_kind: true
+      enable_kind: true
     secrets:
       fluentbit_config_validator_api_key: ${{ secrets.FLUENTBIT_CONFIG_VALIDATOR_API_KEY }}
       fluentd_config_validator_api_key: ${{ secrets.FLUENTD_CONFIG_VALIDATOR_API_KEY }}
