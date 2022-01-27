@@ -20,6 +20,18 @@ type ResourceProfile struct {
 	UpdatedAt              time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
 
+const (
+	// ResourceProfileHighPerformanceGuaranteedDelivery is one of the 3 default resource profiles created with an aggregator.
+	ResourceProfileHighPerformanceGuaranteedDelivery = "high-performance-guaranteed-delivery"
+	// ResourceProfileHighPerformanceOptimalThroughput is one of the 3 default resource profiles created with an aggregator.
+	ResourceProfileHighPerformanceOptimalThroughput = "high-performance-optimal-throughput"
+	// ResourceProfileBestEffortLowResource is one of the 3 default resource profiles created with an aggregator. This is the default one.
+	ResourceProfileBestEffortLowResource = "best-effort-low-resource"
+)
+
+// DefaultResourceProfileName is the default resource profile used when creating pipelines.
+const DefaultResourceProfileName = ResourceProfileBestEffortLowResource
+
 // CreateResourceProfile request payload for creating a resource profile.
 type CreateResourceProfile struct {
 	Name                   string `json:"name"`

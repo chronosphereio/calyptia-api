@@ -21,13 +21,19 @@ type CreatePipelinePort struct {
 	Endpoint     string `json:"endpoint"`
 }
 
+// CreatedPipelinePort response payload after creating a pipeline port successfully.
+type CreatedPipelinePort struct {
+	ID        string    `json:"id"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
 // PipelinePortsParams request payload for querying the pipeline ports.
 type PipelinePortsParams struct {
 	Last *uint64
 }
 
-// UpdatePipelinePortOpts request payload for updating a pipeline port.
-type UpdatePipelinePortOpts struct {
+// UpdatePipelinePort request payload for updating a pipeline port.
+type UpdatePipelinePort struct {
 	Protocol     *string `json:"protocol"`
 	FrontendPort *uint   `json:"frontendPort"`
 	BackendPort  *uint   `json:"backendPort"`

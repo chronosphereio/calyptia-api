@@ -30,5 +30,6 @@ type PipelineSecretsParams struct {
 
 // UpdatePipelineSecret request payload for updating a pipeline secret.
 type UpdatePipelineSecret struct {
+	Key   *string `json:"name"`
 	Value *[]byte `json:"value"`
 }

@@ -1,0 +1,27 @@
+name: Integration tests
+on:
+  push:
+    tags: [v*]
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  run-integration-cloud-api:
+    name: run integration tests with cloud api
+    uses: calyptia/go-repo-template/.github/workflows/reusable-run-tests.yml@reusable
+    with:
+      cloud_image_registry: ghcr.io
+      cloud_image_name: niedbalski/cloud/pr-3
+      cloud_image_tag: latest
+      target_repository: ${{ github.repository }}
+      target_repository_ref: ${{ github.ref }}
+      go_version: 1.17
+      go_test_params: "-v -tags=integration ./..."
+    secrets:
+      fluentbit_config_validator_api_key: ${{ secrets.FLUENTBIT_CONFIG_VALIDATOR_API_KEY }}
+      fluentd_config_validator_api_key: ${{ secrets.FLUENTD_CONFIG_VALIDATOR_API_KEY }}
+      smtp_username: ${{ secrets.MAILTRAP_USERNAME }}
+      smtp_password: ${{ secrets.MAILTRAP_PASSWORD }}
+      image_registry_username: ${{ github.actor }}
+      image_registry_password: ${{ secrets.PERSONAL_TOKEN }}
