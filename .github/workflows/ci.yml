@@ -51,7 +51,7 @@ jobs:
     uses: niedbalski/go-repo-template-1/.github/workflows/reusable-integration-tests.yml@reusable
     with:
       cloud_image_registry: ghcr.io
-      cloud_image_name: calyptia/cloud/pr-3
+      cloud_image_name: niedbalski/cloud/pr-3
       cloud_image_tag: latest
       target_repository: ${{ github.repository }}
       #TODO: switch before merging
