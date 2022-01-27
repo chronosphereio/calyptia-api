@@ -45,18 +45,18 @@ jobs:
           args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  tests:
-    name: Run tests
+  run-tests:
+    name: Run CI tests
     #TODO: switch before merging
-    uses: niedbalski/go-repo-template-1/.github/workflows/reusable-integration-tests.yml@reusable
+    uses: calyptia/go-repo-template/.github/workflows/reusable-run-tests.yml@reusable
     with:
       cloud_image_registry: ghcr.io
       cloud_image_name: niedbalski/cloud/pr-3
       cloud_image_tag: latest
       target_repository: ${{ github.repository }}
-      #TODO: switch before merging
       target_repository_ref: ${{ github.ref }}
       go_version: "1.17"
+      use_kind: true
     secrets:
       fluentbit_config_validator_api_key: ${{ secrets.FLUENTBIT_CONFIG_VALIDATOR_API_KEY }}
       fluentd_config_validator_api_key: ${{ secrets.FLUENTD_CONFIG_VALIDATOR_API_KEY }}
