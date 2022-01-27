@@ -55,7 +55,7 @@ jobs:
       cloud_image_tag: latest
       target_repository: ${{ github.repository }}
       #TODO: switch before merging
-      target_repository_branch: ${{ github.ref }}
+      target_repository_ref: ${{ github.ref }}
       go_version: "1.17"
     secrets:
       fluentbit_config_validator_api_key: ${{ secrets.FLUENTBIT_CONFIG_VALIDATOR_API_KEY }}
