@@ -41,7 +41,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   run-tests:
     name: Run tests
-    uses: calyptia/go-repo-template/.github/workflows/reusable-run-tests.yml@main
+    uses: calyptia/go-repo-template/.github/workflows/reusable-run-tests.yml@reusable
     with:
       cloud_image_registry: ghcr.io
       cloud_image_name: calyptia/cloud/main
