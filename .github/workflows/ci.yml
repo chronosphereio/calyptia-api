@@ -7,22 +7,7 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      cloud_image_registry:
-        description: The cloud image registry to use.
-        type: string
-        required: false
-        default: ghcr.io
-      cloud_image_name:
-        description: The cloud image name to use.
-        type: string
-        required: false
-        default: calyptia/cloud
-      cloud_image_tag:
-        description: The image tag to use.
-        type: string
-        required: false
-        default: main
+
 env:
   DOCKER_HOST_IP: 172.17.0.1
 jobs:
@@ -78,8 +63,6 @@ jobs:
           go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
           go tool cover -html=coverage.out -o coverage.html
         env:
-          TEST_CLOUD_IMAGE: ${{ inputs.cloud_image_registry }}/${{ inputs.cloud_image_name }}
-          TEST_CLOUD_IMAGE_TAG: ${{ inputs.cloud_image_tag }}
           FLUENTBIT_CONFIG_VALIDATOR_API_KEY: ${{ secrets.FLUENTBIT_CONFIG_VALIDATOR_API_KEY }}
           FLUENTD_CONFIG_VALIDATOR_API_KEY: ${{ secrets.FLUENTD_CONFIG_VALIDATOR_API_KEY }}
           SMTP_USERNAME: ${{ secrets.MAILTRAP_USERNAME }}
