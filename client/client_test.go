@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	math_rand "math/rand"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -35,13 +36,17 @@ import (
 	"github.com/calyptia/api/types"
 )
 
+const (
+	dockerHostGateway = "host-gateway"
+)
+
 var (
 	testBearerTokenPrivateKey jwk.RSAPrivateKey
 	testCloudURL              string
 )
 
 var (
-	hostIP                             = env("HOST_IP", "host-gateway")
+	hostIP                             = env("HOST_IP", dockerHostGateway)
 	testCloudImage                     = env("TEST_CLOUD_IMAGE", "ghcr.io/calyptia/cloud")
 	testCloudImageTag                  = env("TEST_CLOUD_IMAGE_TAG", "main")
 	testCloudPort                      = env("TEST_CLOUD_PORT", "5000")
@@ -239,7 +244,24 @@ func setupJWKSServer() (*httptest.Server, jwk.RSAPrivateKey, error) {
 		}
 	})
 
-	srv := httptest.NewServer(mux)
+	srv := httptest.NewUnstartedServer(mux)
+
+	defer srv.Start()
+
+	// The behavior of httptest.NewServer differs from OS X / Linux
+	// the binding by default will do 127.0.0.1:0 and that is translatable
+	// as the host-gateway on containers, that fails on Linux as the scope
+	// of the binding is limited to local and doesn't expands to *:0 so
+	// we force a particular known address (172.17.0.1) as the default
+	// docker bridge address.
+	if hostIP != dockerHostGateway {
+		l, err := net.Listen("tcp", fmt.Sprintf("%s:0", hostIP))
+		if err != nil {
+			return nil, nil, err
+		}
+
+		srv.Listener = l
+	}
 
 	return srv, priv, nil
 }
