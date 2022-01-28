@@ -41,6 +41,7 @@ var (
 )
 
 var (
+	hostIP                             = env("HOST_IP", "host-gateway")
 	testCloudImage                     = env("TEST_CLOUD_IMAGE", "gcr.io/calyptia-infra/cloud")
 	testCloudImageTag                  = env("TEST_CLOUD_IMAGE_TAG", "latest")
 	testCloudPort                      = env("TEST_CLOUD_PORT", "5000")
@@ -431,7 +432,7 @@ func setupCloud(pool *dockertest.Pool, conf setupCloudConfig) (*dockertest.Resou
 			"DEBUG=true",
 		},
 		ExposedPorts: []string{conf.port},
-		ExtraHosts:   []string{"host.docker.internal:host-gateway"},
+		ExtraHosts:   []string{"host.docker.internal:" + hostIP},
 	}, func(hc *docker.HostConfig) {
 		hc.AutoRemove = true
 		hc.RestartPolicy = docker.RestartPolicy{Name: "no"}
