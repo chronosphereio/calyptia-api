@@ -7,7 +7,24 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
-
+    inputs:
+      cloud_image_registry:
+        description: The cloud image registry to use.
+        type: string
+        required: false
+        default: ghcr.io
+      cloud_image_name:
+        description: The cloud image name to use.
+        type: string
+        required: false
+        default: calyptia/cloud
+      cloud_image_tag:
+        description: The image tag to use.
+        type: string
+        required: false
+        default: main
+env:
+  DOCKER_HOST_IP: 172.17.0.1
 jobs:
   release:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -18,7 +35,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Setup
         uses: actions/setup-go@v2
@@ -37,7 +54,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Setup
         uses: actions/setup-go@v2
@@ -49,10 +66,26 @@ jobs:
         with:
           version: v1.43.0
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.PERSONAL_TOKEN }}
+
       - name: Test
         run: |
           go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
           go tool cover -html=coverage.out -o coverage.html
+        env:
+          TEST_CLOUD_IMAGE: ${{ inputs.cloud_image_registry }}/${{ inputs.cloud_image_name }}
+          TEST_CLOUD_IMAGE_TAG: ${{ inputs.cloud_image_tag }}
+          FLUENTBIT_CONFIG_VALIDATOR_API_KEY: ${{ secrets.FLUENTBIT_CONFIG_VALIDATOR_API_KEY }}
+          FLUENTD_CONFIG_VALIDATOR_API_KEY: ${{ secrets.FLUENTD_CONFIG_VALIDATOR_API_KEY }}
+          SMTP_USERNAME: ${{ secrets.MAILTRAP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.MAILTRAP_PASSWORD }}
+          # This is a known limitation with github actions runners as they don't expose host.docker.internal properly.
+          HOST_IP: ${{ env.DOCKER_HOST_IP }}
 
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v2
@@ -61,6 +94,7 @@ jobs:
           path: |
             coverage.out
             coverage.html
+        continue-on-error: true
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2.1.0
