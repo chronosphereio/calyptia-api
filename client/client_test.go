@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	math_rand "math/rand"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -35,13 +36,17 @@ import (
 	"github.com/calyptia/api/types"
 )
 
+const (
+	dockerHostGateway = "host-gateway"
+)
+
 var (
 	testBearerTokenPrivateKey jwk.RSAPrivateKey
 	testCloudURL              string
 )
 
 var (
-	hostIP                             = env("HOST_IP", "host-gateway")
+	hostIP                             = env("HOST_IP", dockerHostGateway)
 	testCloudImage                     = env("TEST_CLOUD_IMAGE", "ghcr.io/calyptia/cloud")
 	testCloudImageTag                  = env("TEST_CLOUD_IMAGE_TAG", "main")
 	testCloudPort                      = env("TEST_CLOUD_PORT", "5000")
@@ -239,7 +244,19 @@ func setupJWKSServer() (*httptest.Server, jwk.RSAPrivateKey, error) {
 		}
 	})
 
-	srv := httptest.NewServer(mux)
+	var srv *httptest.Server
+
+	srv = httptest.NewServer(mux)
+
+	if hostIP != dockerHostGateway {
+		l, err := net.Listen("tcp", fmt.Sprintf("%s:0", hostIP))
+		if err != nil {
+			return nil, nil, err
+		}
+
+		srv.Listener = l
+		defer srv.Start()
+	}
 
 	return srv, priv, nil
 }
