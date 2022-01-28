@@ -41,39 +41,16 @@ var (
 	testCloudURL              string
 )
 
-var testCloudImage = func() string {
-	if v, ok := os.LookupEnv("TEST_CLOUD_IMAGE"); ok {
-		return v
-	}
-
-	return "gcr.io/calyptia-infra/cloud"
-}()
-
-var testCloudImageTag = func() string {
-	if v, ok := os.LookupEnv("TEST_CLOUD_IMAGE_TAG"); ok {
-		return v
-	}
-
-	return "latest"
-}()
-
-var testCloudPort = func() string {
-	if v, ok := os.LookupEnv("TEST_CLOUD_PORT"); ok {
-		return v
-	}
-	return "5000"
-}()
-
 var (
+	testCloudImage                     = env("TEST_CLOUD_IMAGE", "gcr.io/calyptia-infra/cloud")
+	testCloudImageTag                  = env("TEST_CLOUD_IMAGE_TAG", "latest")
+	testCloudPort                      = env("TEST_CLOUD_PORT", "5000")
 	testFluentbitConfigValidatorAPIKey = os.Getenv("TEST_FLUENTBIT_CONFIG_VALIDATOR_API_KEY")
 	testFluentdConfigValidatorAPIKey   = os.Getenv("TEST_FLUENTD_CONFIG_VALIDATOR_API_KEY")
-)
-
-var (
-	testSMTPHost     = env("TEST_SMTP_HOST", "smtp.mailtrap.io")
-	testSMTPPort     = env("TEST_SMTP_PORT", "465")
-	testSMTPUsername = env("TEST_SMTP_USERNAME", "")
-	testSMTPPassword = env("TEST_SMTP_PASSWORD", "")
+	testSMTPHost                       = env("TEST_SMTP_HOST", "smtp.mailtrap.io")
+	testSMTPPort                       = env("TEST_SMTP_PORT", "465")
+	testSMTPUsername                   = os.Getenv("TEST_SMTP_USERNAME")
+	testSMTPPassword                   = os.Getenv("TEST_SMTP_PASSWORD")
 )
 
 func TestMain(m *testing.M) {
