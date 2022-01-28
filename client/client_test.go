@@ -244,9 +244,7 @@ func setupJWKSServer() (*httptest.Server, jwk.RSAPrivateKey, error) {
 		}
 	})
 
-	srv := httptest.Server{
-		Config: &http.Server{Handler: mux},
-	}
+	srv := httptest.NewUnstartedServer(mux)
 
 	defer srv.Start()
 
@@ -259,7 +257,7 @@ func setupJWKSServer() (*httptest.Server, jwk.RSAPrivateKey, error) {
 		srv.Listener = l
 	}
 
-	return &srv, priv, nil
+	return srv, priv, nil
 }
 
 type bearerTokenClaims struct {
