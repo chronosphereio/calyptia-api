@@ -426,7 +426,7 @@ func getAuthConfigForImage(image string) (docker.AuthConfiguration, error) {
 
 	authConfig, ok := authConfs.Configs[parsedURL.Host]
 	if !ok {
-		return authConfig, fmt.Errorf("not found auth config for host: %s", parsedURL.Host)
+		return authConfig, fmt.Errorf("not found auth config for host: %q", parsedURL.Host)
 	}
 
 	return authConfig, nil
