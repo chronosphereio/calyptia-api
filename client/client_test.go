@@ -244,9 +244,11 @@ func setupJWKSServer() (*httptest.Server, jwk.RSAPrivateKey, error) {
 		}
 	})
 
-	var srv *httptest.Server
+	srv := httptest.Server{
+		Config: &http.Server{Handler: mux},
+	}
 
-	srv = httptest.NewServer(mux)
+	defer srv.Start()
 
 	if hostIP != dockerHostGateway {
 		l, err := net.Listen("tcp", fmt.Sprintf("%s:0", hostIP))
@@ -255,10 +257,9 @@ func setupJWKSServer() (*httptest.Server, jwk.RSAPrivateKey, error) {
 		}
 
 		srv.Listener = l
-		defer srv.Start()
 	}
 
-	return srv, priv, nil
+	return &srv, priv, nil
 }
 
 type bearerTokenClaims struct {
