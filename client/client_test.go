@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"io"
 	math_rand "math/rand"
-	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -239,18 +238,9 @@ func setupJWKSServer() (*httptest.Server, jwk.RSAPrivateKey, error) {
 		}
 	})
 
-	l, err := net.Listen("tcp", "172.17.0.1:0")
-	if err != nil {
-		return nil, nil, err
-	}
+	srv := httptest.NewServer(mux)
 
-	srv := httptest.Server{
-		Listener: l,
-		Config:   &http.Server{Handler: mux},
-	}
-
-	defer srv.Start()
-	return &srv, priv, nil
+	return srv, priv, nil
 }
 
 type bearerTokenClaims struct {
