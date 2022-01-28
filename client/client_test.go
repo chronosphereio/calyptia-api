@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"io"
 	math_rand "math/rand"
-	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -41,39 +40,17 @@ var (
 	testCloudURL              string
 )
 
-var testCloudImage = func() string {
-	if v, ok := os.LookupEnv("TEST_CLOUD_IMAGE"); ok {
-		return v
-	}
-
-	return "gcr.io/calyptia-infra/cloud"
-}()
-
-var testCloudImageTag = func() string {
-	if v, ok := os.LookupEnv("TEST_CLOUD_IMAGE_TAG"); ok {
-		return v
-	}
-
-	return "latest"
-}()
-
-var testCloudPort = func() string {
-	if v, ok := os.LookupEnv("TEST_CLOUD_PORT"); ok {
-		return v
-	}
-	return "5000"
-}()
-
 var (
+	hostIP                             = env("HOST_IP", "host-gateway")
+	testCloudImage                     = env("TEST_CLOUD_IMAGE", "ghcr.io/calyptia/cloud")
+	testCloudImageTag                  = env("TEST_CLOUD_IMAGE_TAG", "main")
+	testCloudPort                      = env("TEST_CLOUD_PORT", "5000")
 	testFluentbitConfigValidatorAPIKey = os.Getenv("TEST_FLUENTBIT_CONFIG_VALIDATOR_API_KEY")
 	testFluentdConfigValidatorAPIKey   = os.Getenv("TEST_FLUENTD_CONFIG_VALIDATOR_API_KEY")
-)
-
-var (
-	testSMTPHost     = env("TEST_SMTP_HOST", "smtp.mailtrap.io")
-	testSMTPPort     = env("TEST_SMTP_PORT", "465")
-	testSMTPUsername = env("TEST_SMTP_USERNAME", "")
-	testSMTPPassword = env("TEST_SMTP_PASSWORD", "")
+	testSMTPHost                       = env("TEST_SMTP_HOST", "smtp.mailtrap.io")
+	testSMTPPort                       = env("TEST_SMTP_PORT", "465")
+	testSMTPUsername                   = os.Getenv("TEST_SMTP_USERNAME")
+	testSMTPPassword                   = os.Getenv("TEST_SMTP_PASSWORD")
 )
 
 func TestMain(m *testing.M) {
@@ -262,18 +239,9 @@ func setupJWKSServer() (*httptest.Server, jwk.RSAPrivateKey, error) {
 		}
 	})
 
-	l, err := net.Listen("tcp", "172.17.0.1:0")
-	if err != nil {
-		return nil, nil, err
-	}
+	srv := httptest.NewServer(mux)
 
-	srv := httptest.Server{
-		Listener: l,
-		Config:   &http.Server{Handler: mux},
-	}
-
-	defer srv.Start()
-	return &srv, priv, nil
+	return srv, priv, nil
 }
 
 type bearerTokenClaims struct {
@@ -464,7 +432,7 @@ func setupCloud(pool *dockertest.Pool, conf setupCloudConfig) (*dockertest.Resou
 			"DEBUG=true",
 		},
 		ExposedPorts: []string{conf.port},
-		ExtraHosts:   []string{"host.docker.internal:host-gateway"},
+		ExtraHosts:   []string{"host.docker.internal:" + hostIP},
 	}, func(hc *docker.HostConfig) {
 		hc.AutoRemove = true
 		hc.RestartPolicy = docker.RestartPolicy{Name: "no"}
