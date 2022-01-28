@@ -248,6 +248,12 @@ func setupJWKSServer() (*httptest.Server, jwk.RSAPrivateKey, error) {
 
 	defer srv.Start()
 
+	// The behavior of httptest.NewServer differs from OS X / Linux
+	// the binding by default will do 127.0.0.1:0 and that is translatable
+	// as the host-gateway on containers, that fails on Linux as the scope
+	// of the binding is limited to local and doesn't expands to *:0 so
+	// we force a particular known address (172.17.0.1) as the default
+	// docker bridge address.
 	if hostIP != dockerHostGateway {
 		l, err := net.Listen("tcp", fmt.Sprintf("%s:0", hostIP))
 		if err != nil {
