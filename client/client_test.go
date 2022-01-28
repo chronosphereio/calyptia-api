@@ -16,6 +16,7 @@ import (
 	"net/url"
 	"os"
 	"reflect"
+	"strings"
 	"syscall"
 	"testing"
 	"time"
@@ -414,6 +415,9 @@ type setupCloudConfig struct {
 
 func getAuthConfigForImage(image string) (docker.AuthConfiguration, error) {
 	var authConfig docker.AuthConfiguration
+	if !strings.Contains(image, "://") {
+		image = "//" + image
+	}
 	parsedURL, err := url.Parse(image)
 	if err != nil {
 		return authConfig, errors.New("local image, skipping auth config")
