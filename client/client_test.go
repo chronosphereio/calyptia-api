@@ -42,8 +42,8 @@ var (
 
 var (
 	hostIP                             = env("HOST_IP", "host-gateway")
-	testCloudImage                     = env("TEST_CLOUD_IMAGE", "gcr.io/calyptia-infra/cloud")
-	testCloudImageTag                  = env("TEST_CLOUD_IMAGE_TAG", "latest")
+	testCloudImage                     = env("TEST_CLOUD_IMAGE", "ghcr.io/calyptia/cloud")
+	testCloudImageTag                  = env("TEST_CLOUD_IMAGE_TAG", "main")
 	testCloudPort                      = env("TEST_CLOUD_PORT", "5000")
 	testFluentbitConfigValidatorAPIKey = os.Getenv("TEST_FLUENTBIT_CONFIG_VALIDATOR_API_KEY")
 	testFluentdConfigValidatorAPIKey   = os.Getenv("TEST_FLUENTD_CONFIG_VALIDATOR_API_KEY")
