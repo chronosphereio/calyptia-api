@@ -16,6 +16,7 @@ import (
 	"net/url"
 	"os"
 	"reflect"
+	"strings"
 	"syscall"
 	"testing"
 	"time"
@@ -412,8 +413,37 @@ type setupCloudConfig struct {
 	smtpPassword                   string
 }
 
+func getAuthConfigForImage(image string) (docker.AuthConfiguration, error) {
+	var authConfig docker.AuthConfiguration
+	if !strings.Contains(image, "://") {
+		image = "//" + image
+	}
+	parsedURL, err := url.Parse(image)
+	if err != nil {
+		return authConfig, errors.New("local image, skipping auth config")
+	}
+
+	authConfs, err := docker.NewAuthConfigurationsFromDockerCfg()
+	if err != nil {
+		return authConfig, fmt.Errorf("could not read auth config: %w", err)
+	}
+
+	authConfig, ok := authConfs.Configs[parsedURL.Host]
+	if !ok {
+		return authConfig, fmt.Errorf("not found auth config for host: %q", parsedURL.Host)
+	}
+
+	return authConfig, nil
+}
+
 func setupCloud(pool *dockertest.Pool, conf setupCloudConfig) (*dockertest.Resource, error) {
+	authConfig, err := getAuthConfigForImage(testCloudImage)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
 	return pool.RunWithOptions(&dockertest.RunOptions{
+		Auth:       authConfig,
 		Repository: testCloudImage,
 		Tag:        testCloudImageTag,
 		Env: []string{
