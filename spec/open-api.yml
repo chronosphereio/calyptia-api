@@ -1,0 +1,520 @@
+openapi: 3.0.3
+info:
+  title: Calyptia Cloud API
+  version: "1.0"
+  description: HTTP API service of Calyptia Cloud
+  contact:
+    name: Calyptia
+    email: hello@calyptia.com
+    url: "https://cloud.calyptia.com"
+  termsOfService: "https://calyptia.com/terms/"
+servers:
+  - url: "http://localhost:{port}"
+    description: local
+    variables:
+      port:
+        default: "5000"
+  - url: "https://cloud-api-dev.calyptia.com"
+    description: dev
+  - url: "https://cloud-api-prod.calyptia.com"
+    description: prod
+components:
+  securitySchemes:
+    user:
+      type: http
+      scheme: bearer
+    project:
+      name: X-Project-Token
+      type: apiKey
+      in: header
+  schemas:
+    User:
+      title: User
+      type: object
+      description: User model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+          example: user
+        avatarURL:
+          type: string
+          nullable: true
+          format: uri
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - email
+        - name
+        - avatarURL
+        - createdAt
+        - updatedAt
+    Project:
+      title: Project
+      type: object
+      description: Project model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: my-project
+        membersCount:
+          type: integer
+          minimum: 1
+          format: int64
+        agentsCount:
+          type: integer
+          format: int64
+          minimum: 0
+        aggregatorsCount:
+          type: integer
+          format: int64
+          maximum: 0
+        createdAt:
+          type: string
+          format: date-time
+        membership:
+          $ref: "#/components/schemas/Membership"
+      required:
+        - id
+        - name
+        - membersCount
+        - agentsCount
+        - aggregatorsCount
+        - createdAt
+    Token:
+      title: Token
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        token:
+          type: string
+          example: redacted
+        name:
+          type: string
+          example: my-token
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - token
+        - name
+        - createdAt
+      description: Token model.
+    Membership:
+      title: Membership
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        roles:
+          type: array
+          nullable: true
+          uniqueItems: true
+          items:
+            type: string
+            enum:
+              - creator
+              - admin
+        createdAt:
+          type: string
+          format: date-time
+        user:
+          $ref: "#/components/schemas/User"
+      required:
+        - id
+        - roles
+        - createdAt
+      description: Membership of a user in a project.
+    Invitation:
+      title: Invitation
+      type: object
+      description: Invitation to a project.
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - email
+        - createdAt
+    Agent:
+      title: Agent
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        token:
+          type: string
+          example: redacted
+        name:
+          type: string
+          example: my-agent
+          format: hostname
+        machineID:
+          type: string
+        type:
+          type: string
+          enum:
+            - fluentbit
+            - fluentd
+        version:
+          type: string
+          example: v1.8.6
+        edition:
+          type: string
+          enum:
+            - community
+            - enterprise
+        flags:
+          type: array
+          nullable: true
+          uniqueItems: true
+          items:
+            type: string
+        rawConfig:
+          type: string
+        metadata:
+          type: object
+          nullable: true
+        firstMetricsAddedAt:
+          type: string
+          format: date-time
+        lastMetricsAddedAt:
+          type: string
+          format: date-time
+        metricsCount:
+          type: integer
+          format: int64
+          minimum: 0
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - token
+        - name
+        - machineID
+        - type
+        - version
+        - edition
+        - flags
+        - rawConfig
+        - metadata
+        - firstMetricsAddedAt
+        - lastMetricsAddedAt
+        - metricsCount
+        - createdAt
+        - updatedAt
+      description: Agent model.
+    AgentConfig:
+      title: AgentConfig
+      type: object
+      description: Agent configuration history entry.
+      properties:
+        id:
+          type: string
+          format: uuid
+        rawConfig:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - rawConfig
+        - createdAt
+    Aggregator:
+      title: Aggregator
+      type: object
+      description: Aggregator model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        token:
+          type: string
+          example: redacted
+        name:
+          type: string
+          example: my-aggregator
+        pipelinesCount:
+          type: integer
+          format: int64
+          minimum: 0
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - token
+        - name
+        - pipelinesCount
+        - createdAt
+        - updatedAt
+    ResourceProfile:
+      title: ResourceProfile
+      type: object
+      description: Resource profile model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: my-resource-profile
+        storageMaxChunksUp:
+          type: integer
+          format: int32
+        storageSyncFull:
+          type: boolean
+        storageBacklogMemLimit:
+          type: string
+          example: 1Mi
+        storageVolumeSize:
+          type: string
+          example: 2Mi
+        storageMaxChunksPause:
+          type: boolean
+        cpuBufferWorkers:
+          type: integer
+          format: int32
+        cpuLimit:
+          type: string
+          example: 3Mi
+        cpuRequest:
+          type: string
+          example: 4Mi
+        memoryLimit:
+          type: string
+          example: 5Mi
+        memoryRequest:
+          type: string
+          example: 6Mi
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - storageMaxChunksUp
+        - storageSyncFull
+        - storageBacklogMemLimit
+        - storageVolumeSize
+        - storageMaxChunksPause
+        - cpuBufferWorkers
+        - cpuLimit
+        - cpuRequest
+        - memoryLimit
+        - memoryRequest
+        - createdAt
+        - updatedAt
+    Pipeline:
+      title: Pipeline
+      type: object
+      description: Pipeline model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: my-pipeline
+        config:
+          $ref: "#/components/schemas/PipelineConfig"
+        status:
+          $ref: "#/components/schemas/PipelineStatus"
+        resourceProfile:
+          $ref: "#/components/schemas/ResourceProfile"
+        replicasCount:
+          type: integer
+          format: int64
+          minimum: 0
+        metadata:
+          type: object
+          nullable: true
+          properties:
+            nodeSelector:
+              type: object
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - config
+        - status
+        - resourceProfile
+        - replicasCount
+        - metadata
+        - createdAt
+        - updatedAt
+    PipelineConfig:
+      title: PipelineConfig
+      type: object
+      description: Pipeline configuration history entry.
+      properties:
+        id:
+          type: string
+          format: uuid
+        rawConfig:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - rawConfig
+        - createdAt
+    PipelineStatus:
+      title: PipelineStatus
+      type: object
+      description: Pipeline status history entry.
+      properties:
+        id:
+          type: string
+          format: uuid
+        config:
+          $ref: "#/components/schemas/AgentConfig"
+        status:
+          type: string
+          enum:
+            - NEW
+            - FAILED
+            - STARTING
+            - STARTED
+            - DELETED
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - config
+        - status
+        - createdAt
+    PipelineFile:
+      title: PipelineFile
+      type: object
+      description: Pipeline file model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: myfile
+        contents:
+          type: string
+          format: byte
+        encrypted:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - contents
+        - encrypted
+        - createdAt
+        - updatedAt
+    PipelineSecret:
+      title: PipelineSecret
+      type: object
+      description: Pipeline secret model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        key:
+          type: string
+          example: mysecret
+        value:
+          type: string
+          format: byte
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - key
+        - value
+        - createdAt
+        - updatedAt
+    PipelinePort:
+      title: PipelinePort
+      type: object
+      description: Pipeline port model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        protocol:
+          type: string
+          example: tcp
+        frontendPort:
+          type: integer
+          format: int32
+          minimum: 0
+        backendPort:
+          type: integer
+          format: int32
+          minimum: 0
+        endpoint:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - protocol
+        - frontendPort
+        - backendPort
+        - endpoint
+        - createdAt
+        - updatedAt
+paths: {}
