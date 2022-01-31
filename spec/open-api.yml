@@ -517,4 +517,91 @@ components:
         - endpoint
         - createdAt
         - updatedAt
+    ProjectMetrics:
+      title: ProjectMetrics
+      type: object
+      description: Project metrics model.
+      properties:
+        measurements:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              totals:
+                type: object
+                additionalProperties:
+                  type: number
+                  nullable: true
+                  format: float
+              plugins:
+                type: object
+                additionalProperties:
+                  $ref: "#/components/schemas/Metrics"
+            required:
+              - totals
+              - plugins
+        topPlugins:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: number
+              nullable: true
+              format: float
+      required:
+        - measurements
+        - topPlugins
+    AgentMetrics:
+      title: AgentMetrics
+      type: object
+      description: Agent metrics model.
+      properties:
+        measurements:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              plugins:
+                type: object
+                additionalProperties:
+                  $ref: "#/components/schemas/Metrics"
+              totals:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/MetricFields"
+            required:
+              - plugins
+              - totals
+      required:
+        - measurements
+    Metrics:
+      title: Metrics
+      type: object
+      description: Metrics model.
+      properties:
+        metrics:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/MetricFields"
+      required:
+        - metrics
+    MetricFields:
+      title: MetricFields
+      type: object
+      description: Metric fields model.
+      properties:
+        time:
+          type: string
+          format: date-time
+        value:
+          type: number
+          nullable: true
+          format: float
+      required:
+        - time
+        - value
 paths: {}
