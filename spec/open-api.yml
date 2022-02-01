@@ -29,7 +29,6 @@ components:
       in: header
   schemas:
     User:
-      title: User
       type: object
       description: User model.
       properties:
@@ -60,7 +59,6 @@ components:
         - createdAt
         - updatedAt
     Project:
-      title: Project
       type: object
       description: Project model.
       properties:
@@ -95,7 +93,6 @@ components:
         - aggregatorsCount
         - createdAt
     Token:
-      title: Token
       type: object
       properties:
         id:
@@ -117,7 +114,6 @@ components:
         - createdAt
       description: Token model.
     Membership:
-      title: Membership
       type: object
       properties:
         id:
@@ -143,7 +139,6 @@ components:
         - createdAt
       description: Membership of a user in a project.
     Invitation:
-      title: Invitation
       type: object
       description: Invitation to a project.
       properties:
@@ -161,7 +156,6 @@ components:
         - email
         - createdAt
     Agent:
-      title: Agent
       type: object
       properties:
         id:
@@ -234,7 +228,6 @@ components:
         - updatedAt
       description: Agent model.
     AgentConfig:
-      title: AgentConfig
       type: object
       description: Agent configuration history entry.
       properties:
@@ -251,7 +244,6 @@ components:
         - rawConfig
         - createdAt
     Aggregator:
-      title: Aggregator
       type: object
       description: Aggregator model.
       properties:
@@ -282,7 +274,6 @@ components:
         - createdAt
         - updatedAt
     ResourceProfile:
-      title: ResourceProfile
       type: object
       description: Resource profile model.
       properties:
@@ -342,7 +333,6 @@ components:
         - createdAt
         - updatedAt
     Pipeline:
-      title: Pipeline
       type: object
       description: Pipeline model.
       properties:
@@ -386,7 +376,6 @@ components:
         - createdAt
         - updatedAt
     PipelineConfig:
-      title: PipelineConfig
       type: object
       description: Pipeline configuration history entry.
       properties:
@@ -403,7 +392,6 @@ components:
         - rawConfig
         - createdAt
     PipelineStatus:
-      title: PipelineStatus
       type: object
       description: Pipeline status history entry.
       properties:
@@ -429,7 +417,6 @@ components:
         - status
         - createdAt
     PipelineFile:
-      title: PipelineFile
       type: object
       description: Pipeline file model.
       properties:
@@ -458,7 +445,6 @@ components:
         - createdAt
         - updatedAt
     PipelineSecret:
-      title: PipelineSecret
       type: object
       description: Pipeline secret model.
       properties:
@@ -484,7 +470,6 @@ components:
         - createdAt
         - updatedAt
     PipelinePort:
-      title: PipelinePort
       type: object
       description: Pipeline port model.
       properties:
@@ -519,7 +504,6 @@ components:
         - createdAt
         - updatedAt
     ProjectMetrics:
-      title: ProjectMetrics
       type: object
       description: Project metrics model.
       properties:
@@ -553,7 +537,6 @@ components:
         - measurements
         - topPlugins
     AgentMetrics:
-      title: AgentMetrics
       type: object
       description: Agent metrics model.
       properties:
@@ -578,7 +561,6 @@ components:
       required:
         - measurements
     Metrics:
-      title: Metrics
       type: object
       description: Metrics model.
       properties:
@@ -591,7 +573,6 @@ components:
       required:
         - metrics
     MetricFields:
-      title: MetricFields
       type: object
       description: Metric fields model.
       properties:
@@ -605,429 +586,288 @@ components:
       required:
         - time
         - value
-  requestBodies:
     CreateProject:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-                example: new-project
-            required:
-              - name
       description: Create project request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: new-project
+      required:
+        - name
     UpdateProject:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-                example: new-project
-                nullable: true
       description: Update project request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: new-project
+          nullable: true
     CreateToken:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-                example: new-token
-            required:
-              - name
       description: Create token request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: new-token
+      required:
+        - name
     UpdateToken:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-                example: new-token
-                nullable: true
       description: Update token request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: new-token
+          nullable: true
     CreateInvitation:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              email:
-                type: string
-                format: email
-              redirectURI:
-                type: string
-                format: uri
-            required:
-              - email
-              - redirectURI
       description: Create invitation request body.
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        redirectURI:
+          type: string
+          format: uri
+      required:
+        - email
+        - redirectURI
     AcceptInvitation:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              token:
-                type: string
-                example: redacted
-            required:
-              - token
       description: Accept invitation request body.
+      type: object
+      properties:
+        token:
+          type: string
+          example: redacted
+      required:
+        - token
     RegisterAgent:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-                example: new-agent
-                format: hostname
-              machineID:
-                type: string
-              type:
-                type: string
-                enum:
-                  - fluentbit
-                  - fluentd
-              version:
-                type: string
-                example: v1.8.6
-              edition:
-                type: string
-                enum:
-                  - community
-                  - enterprise
-              flags:
-                type: array
-                nullable: true
-                items:
-                  type: string
-              rawConfig:
-                type: string
-              metadata:
-                type: object
-                nullable: true
-            required:
-              - name
-              - machineID
-              - type
-              - version
-              - edition
-              - flags
-              - rawConfig
       description: Register agent request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: new-agent
+          format: hostname
+        machineID:
+          type: string
+        type:
+          type: string
+          enum:
+            - fluentbit
+            - fluentd
+        version:
+          type: string
+          example: v1.8.6
+        edition:
+          type: string
+          enum:
+            - community
+            - enterprise
+        flags:
+          type: array
+          nullable: true
+          items:
+            type: string
+        rawConfig:
+          type: string
+        metadata:
+          type: object
+          nullable: true
+      required:
+        - name
+        - machineID
+        - type
+        - version
+        - edition
+        - flags
+        - rawConfig
     UpdateAgent:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-                example: new-agent
-                format: hostname
-                nullable: true
-              version:
-                type: string
-                example: v1.8.6
-                nullable: true
-              edition:
-                type: string
-                enum:
-                  - community
-                  - enterprise
-                nullable: true
-              flags:
-                type: array
-                nullable: true
-                items:
-                  type: string
-              rawConfig:
-                type: string
-                nullable: true
-              metadata:
-                type: object
-                nullable: true
       description: Update agent request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: new-agent
+          format: hostname
+          nullable: true
+        version:
+          type: string
+          example: v1.8.6
+          nullable: true
+        edition:
+          type: string
+          enum:
+            - community
+            - enterprise
+          nullable: true
+        flags:
+          type: array
+          nullable: true
+          items:
+            type: string
+        rawConfig:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          nullable: true
     CreateAggregator:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-                example: new-aggregator
-              addHealthCheckPipeline:
-                type: boolean
-              healthCheckPipelinePort:
-                type: integer
-                format: int32
-                minimum: 0
-            required:
-              - name
-              - addHealthCheckPipeline
-              - healthCheckPipelinePort
       description: Create aggregator request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: new-aggregator
+        addHealthCheckPipeline:
+          type: boolean
+        healthCheckPipelinePort:
+          type: integer
+          format: int32
+          minimum: 0
+      required:
+        - name
+        - addHealthCheckPipeline
+        - healthCheckPipelinePort
     UpdateAggregator:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-                example: new-aggregator
-                nullable: true
       description: Update aggregator request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: new-aggregator
+          nullable: true
     CreateResourceProfile:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-                example: my-resource-profile
-              storageMaxChunksUp:
-                type: integer
-                format: int32
-              storageSyncFull:
-                type: boolean
-              storageBacklogMemLimit:
-                type: string
-                example: 1Mi
-              storageVolumeSize:
-                type: string
-                example: 2Mi
-              storageMaxChunksPause:
-                type: boolean
-              cpuBufferWorkers:
-                type: integer
-                format: int32
-              cpuLimit:
-                type: string
-                example: 3Mi
-              cpuRequest:
-                type: string
-                example: 4Mi
-              memoryLimit:
-                type: string
-                example: 5Mi
-              memoryRequest:
-                type: string
-                example: 6Mi
-            required:
-              - name
-              - storageMaxChunksUp
-              - storageSyncFull
-              - storageBacklogMemLimit
-              - storageVolumeSize
-              - storageMaxChunksPause
-              - cpuBufferWorkers
-              - cpuLimit
-              - cpuRequest
-              - memoryLimit
-              - memoryRequest
       description: Create resource profile request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: my-resource-profile
+        storageMaxChunksUp:
+          type: integer
+          format: int32
+        storageSyncFull:
+          type: boolean
+        storageBacklogMemLimit:
+          type: string
+          example: 1Mi
+        storageVolumeSize:
+          type: string
+          example: 2Mi
+        storageMaxChunksPause:
+          type: boolean
+        cpuBufferWorkers:
+          type: integer
+          format: int32
+        cpuLimit:
+          type: string
+          example: 3Mi
+        cpuRequest:
+          type: string
+          example: 4Mi
+        memoryLimit:
+          type: string
+          example: 5Mi
+        memoryRequest:
+          type: string
+          example: 6Mi
+      required:
+        - name
+        - storageMaxChunksUp
+        - storageSyncFull
+        - storageBacklogMemLimit
+        - storageVolumeSize
+        - storageMaxChunksPause
+        - cpuBufferWorkers
+        - cpuLimit
+        - cpuRequest
+        - memoryLimit
+        - memoryRequest
     UpdateResourceProfile:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-                example: my-resource-profile
-                nullable: true
-              storageMaxChunksUp:
-                type: integer
-                format: int32
-                nullable: true
-              storageSyncFull:
-                type: boolean
-                nullable: true
-              storageBacklogMemLimit:
-                type: string
-                example: 1Mi
-                nullable: true
-              storageVolumeSize:
-                type: string
-                example: 2Mi
-                nullable: true
-              storageMaxChunksPause:
-                type: boolean
-                nullable: true
-              cpuBufferWorkers:
-                type: integer
-                format: int32
-                nullable: true
-              cpuLimit:
-                type: string
-                example: 3Mi
-                nullable: true
-              cpuRequest:
-                type: string
-                example: 4Mi
-                nullable: true
-              memoryLimit:
-                type: string
-                example: 5Mi
-                nullable: true
-              memoryRequest:
-                type: string
-                example: 6Mi
-                nullable: true
       description: Update resource profile request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: my-resource-profile
+          nullable: true
+        storageMaxChunksUp:
+          type: integer
+          format: int32
+          nullable: true
+        storageSyncFull:
+          type: boolean
+          nullable: true
+        storageBacklogMemLimit:
+          type: string
+          example: 1Mi
+          nullable: true
+        storageVolumeSize:
+          type: string
+          example: 2Mi
+          nullable: true
+        storageMaxChunksPause:
+          type: boolean
+          nullable: true
+        cpuBufferWorkers:
+          type: integer
+          format: int32
+          nullable: true
+        cpuLimit:
+          type: string
+          example: 3Mi
+          nullable: true
+        cpuRequest:
+          type: string
+          example: 4Mi
+          nullable: true
+        memoryLimit:
+          type: string
+          example: 5Mi
+          nullable: true
+        memoryRequest:
+          type: string
+          example: 6Mi
+          nullable: true
     CreatePipeline:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-                example: new-pipeline
-              replicasCount:
-                type: integer
-                format: int64
-                minimum: 0
-              rawConfig:
-                type: string
-              secrets:
-                type: array
-                nullable: true
-                items:
-                  type: object
-                  properties:
-                    key:
-                      type: string
-                      example: mysecret
-                    value:
-                      type: string
-                      format: byte
-                  required:
-                    - key
-                    - value
-              files:
-                type: array
-                nullable: true
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                      example: myfile
-                    contents:
-                      type: string
-                      format: byte
-                    encrypted:
-                      type: boolean
-                  required:
-                    - name
-                    - contents
-                    - encrypted
-              resourceProfile:
-                type: string
-                example: my-resource-profile
-              autoCreatePortsFromConfig:
-                type: boolean
-              metadata:
-                type: object
-                nullable: true
-                properties:
-                  nodeSelector:
-                    type: object
-                    nullable: true
-            required:
-              - name
-              - replicasCount
-              - rawConfig
-              - secrets
-              - files
-              - resourceProfile
-              - autoCreatePortsFromConfig
       description: Create pipeline request body.
-    UpdatePipeline:
-      content:
-        application/json:
-          schema:
+      type: object
+      properties:
+        name:
+          type: string
+          example: new-pipeline
+        replicasCount:
+          type: integer
+          format: int64
+          minimum: 0
+        rawConfig:
+          type: string
+        secrets:
+          type: array
+          nullable: true
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+                example: mysecret
+              value:
+                type: string
+                format: byte
+            required:
+              - key
+              - value
+        files:
+          type: array
+          nullable: true
+          items:
             type: object
             properties:
               name:
                 type: string
-                example: new-pipeline
-                nullable: true
-              replicasCount:
-                type: integer
-                format: int64
-                nullable: true
-              rawConfig:
-                type: string
-                nullable: true
-              secrets:
-                type: array
-                nullable: true
-                items:
-                  type: object
-                  properties:
-                    key:
-                      type: string
-                      example: mysecret
-                      nullable: true
-                    value:
-                      type: string
-                      format: byte
-                      nullable: true
-              files:
-                type: array
-                nullable: true
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                      example: myfile
-                      nullable: true
-                    contents:
-                      type: string
-                      format: byte
-                      nullable: true
-                    encrypted:
-                      type: boolean
-                      nullable: true
-              resourceProfile:
-                type: string
-                example: my-resource-profile
-                nullable: true
-              autoCreatePortsFromConfig:
-                type: boolean
-                nullable: true
-              metadata:
-                type: object
-                nullable: true
-                properties:
-                  nodeSelector:
-                    type: object
-                    nullable: true
-      description: Update pipeline request body.
-    CreatePipelineFile:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-                example: newfile
+                example: myfile
               contents:
                 type: string
                 format: byte
@@ -1037,16 +877,64 @@ components:
               - name
               - contents
               - encrypted
-      description: Create pipeline file request body.
-    UpdatePipelineFile:
-      content:
-        application/json:
-          schema:
+        resourceProfile:
+          type: string
+          example: my-resource-profile
+        autoCreatePortsFromConfig:
+          type: boolean
+        metadata:
+          type: object
+          nullable: true
+          properties:
+            nodeSelector:
+              type: object
+              nullable: true
+      required:
+        - name
+        - replicasCount
+        - rawConfig
+        - secrets
+        - files
+        - resourceProfile
+        - autoCreatePortsFromConfig
+    UpdatePipeline:
+      description: Update pipeline request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: new-pipeline
+          nullable: true
+        replicasCount:
+          type: integer
+          format: int64
+          nullable: true
+        rawConfig:
+          type: string
+          nullable: true
+        secrets:
+          type: array
+          nullable: true
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+                example: mysecret
+                nullable: true
+              value:
+                type: string
+                format: byte
+                nullable: true
+        files:
+          type: array
+          nullable: true
+          items:
             type: object
             properties:
               name:
                 type: string
-                example: newfile
+                example: myfile
                 nullable: true
               contents:
                 type: string
@@ -1055,83 +943,115 @@ components:
               encrypted:
                 type: boolean
                 nullable: true
+        resourceProfile:
+          type: string
+          example: my-resource-profile
+          nullable: true
+        autoCreatePortsFromConfig:
+          type: boolean
+          nullable: true
+        metadata:
+          type: object
+          nullable: true
+          properties:
+            nodeSelector:
+              type: object
+              nullable: true
+    CreatePipelineFile:
+      description: Create pipeline file request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: newfile
+        contents:
+          type: string
+          format: byte
+        encrypted:
+          type: boolean
+      required:
+        - name
+        - contents
+        - encrypted
+    UpdatePipelineFile:
       description: Update pipeline file request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: newfile
+          nullable: true
+        contents:
+          type: string
+          format: byte
+          nullable: true
+        encrypted:
+          type: boolean
+          nullable: true
     CreatePipelineSecret:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              key:
-                type: string
-                example: newsecret
-              value:
-                type: string
-                format: byte
-            required:
-              - key
-              - value
       description: Create pipeline secret request body.
+      type: object
+      properties:
+        key:
+          type: string
+          example: newsecret
+        value:
+          type: string
+          format: byte
+      required:
+        - key
+        - value
     UpdatePipelineSecret:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              key:
-                type: string
-                example: newsecret
-                nullable: true
-              value:
-                type: string
-                format: byte
-                nullable: true
       description: Update pipeline secret request body.
+      type: object
+      properties:
+        key:
+          type: string
+          example: newsecret
+          nullable: true
+        value:
+          type: string
+          format: byte
+          nullable: true
     CreatePipelinePort:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              protocol:
-                type: string
-                example: tcp
-              frontendPort:
-                type: integer
-                format: int32
-                minimum: 0
-              backendPort:
-                type: integer
-                format: int32
-                minimum: 0
-              endpoint:
-                type: string
-            required:
-              - protocol
-              - frontendPort
-              - backendPort
-              - endpoint
       description: Create pipeline port request body.
+      type: object
+      properties:
+        protocol:
+          type: string
+          example: tcp
+        frontendPort:
+          type: integer
+          format: int32
+          minimum: 0
+        backendPort:
+          type: integer
+          format: int32
+          minimum: 0
+        endpoint:
+          type: string
+      required:
+        - protocol
+        - frontendPort
+        - backendPort
+        - endpoint
     UpdatePipelinePort:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              protocol:
-                type: string
-                example: tcp
-                nullable: true
-              frontendPort:
-                type: integer
-                format: int32
-                nullable: true
-              backendPort:
-                type: integer
-                format: int32
-                nullable: true
-              endpoint:
-                type: string
-                nullable: true
       description: Update pipeline port request body.
+      type: object
+      properties:
+        protocol:
+          type: string
+          example: tcp
+          nullable: true
+        frontendPort:
+          type: integer
+          format: int32
+          nullable: true
+        backendPort:
+          type: integer
+          format: int32
+          nullable: true
+        endpoint:
+          type: string
+          nullable: true
 paths: {}
