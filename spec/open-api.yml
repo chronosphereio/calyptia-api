@@ -18,6 +18,23 @@ servers:
     description: dev
   - url: "https://cloud-api-prod.calyptia.com"
     description: prod
+tags:
+  - name: user
+  - name: project
+  - name: token
+  - name: membership
+  - name: invitation
+  - name: agent
+  - name: agent_config
+  - name: aggregator
+  - name: resource_profile
+  - name: pipeline
+  - name: pipeline_config
+  - name: pipeline_status
+  - name: pipeline_file
+  - name: pipeline_secret
+  - name: pipeline_port
+  - name: metric
 components:
   securitySchemes:
     user:
@@ -1177,4 +1194,114 @@ components:
       required:
         - id
         - createdAt
-paths: {}
+paths:
+  /v1/verification_email:
+    post:
+      tags:
+        - user
+      summary: Send verification email
+      operationId: sendVerificationEmail
+      description: |-
+        Sends a verification email to the user.
+        When a new user registers within Calyptia Cloud with password, it should receive a verification email, in the case it didn't receive it, or the email expired already, use this endpoint to request a new one.
+      security:
+        - user: []
+      responses:
+        "204":
+          description: No Content
+  /v1/projects:
+    get:
+      tags:
+        - project
+      summary: Projects
+      operationId: projects
+      description: Projects you are a member of in descending order.
+      security:
+        - user: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last projects
+        - schema:
+            type: string
+          in: query
+          name: name
+          description: Name matching projects
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+    post:
+      tags:
+        - project
+      summary: Create project
+      operationId: createProject
+      description: |-
+        Creates a new project.
+        A project is the base unit of work at Calyptia Cloud.
+        You can register agents here, create aggregators in which you can deploy an entire set of pipelines, and monitor them.
+        You can even invite other people to the project and have a team.
+      security:
+        - user: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProject"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedProject"
+  "/v1/projects/{projectID}":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: projectID
+        in: path
+        required: true
+    get:
+      tags:
+        - project
+      summary: Project
+      operationId: Project
+      description: Project by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+    patch:
+      tags:
+        - project
+      summary: Update project
+      operationId: updateProject
+      description: Update project by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProject"
+      responses:
+        "204":
+          description: No Content
