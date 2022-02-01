@@ -1010,4 +1010,171 @@ components:
         endpoint:
           type: string
           nullable: true
+    CreatedProject:
+      type: object
+      description: Created project response body.
+      properties:
+        id:
+          type: string
+        token:
+          type: string
+          example: redacted
+        createdAt:
+          type: string
+          format: date-time
+        membership:
+          $ref: "#/components/schemas/Membership"
+      required:
+        - id
+        - token
+        - createdAt
+        - membership
+    RegisteredAgent:
+      type: object
+      description: Registered agent response body.
+      properties:
+        id:
+          type: string
+          format: uuid
+        token:
+          type: string
+          example: redacted
+        name:
+          type: string
+          example: my-agent
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - token
+        - name
+        - createdAt
+    CreatedAggregator:
+      type: object
+      description: Created aggregator response body.
+      properties:
+        id:
+          type: string
+          format: uuid
+        token:
+          type: string
+          example: redacted
+        privateRSAKey:
+          type: string
+          format: byte
+        publicRSAKey:
+          type: string
+          format: byte
+        name:
+          type: string
+          example: my-aggregator
+        createdAt:
+          type: string
+          format: date-time
+        healthCheckPipeline:
+          $ref: "#/components/schemas/Pipeline"
+        resourceProfiles:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResourceProfile"
+      required:
+        - id
+        - token
+        - privateRSAKey
+        - publicRSAKey
+        - name
+        - createdAt
+        - resourceProfiles
+    CreatedResourceProfile:
+      type: object
+      description: Created resource profile response body.
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - createdAt
+    CreatedPipeline:
+      type: object
+      description: Created pipeline response body.
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: my-pipeline
+        config:
+          $ref: "#/components/schemas/PipelineConfig"
+        secrets:
+          type: array
+          items:
+            $ref: "#/components/schemas/PipelineSecret"
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/PipelineFile"
+        status:
+          $ref: "#/components/schemas/PipelineStatus"
+        resourceProfile:
+          $ref: "#/components/schemas/ResourceProfile"
+        replicasCount:
+          type: integer
+          format: int64
+          minimum: 0
+        createdAt:
+          type: string
+          format: date-time
+    UpdatedPipeline:
+      type: object
+      description: Updated pipeline response body.
+      properties:
+        addedPorts:
+          type: array
+          items:
+            $ref: "#/components/schemas/PipelinePort"
+    CreatedPipelineFile:
+      type: object
+      description: Created pipeline file response body.
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - createdAt
+    CreatedPipelineSecret:
+      type: object
+      description: Created pipeline secret response body.
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - createdAt
+    CreatedPipelinePort:
+      type: object
+      description: Created pipeline port response body.
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - createdAt
 paths: {}
