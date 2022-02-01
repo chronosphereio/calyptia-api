@@ -848,35 +848,12 @@ components:
           type: array
           nullable: true
           items:
-            type: object
-            properties:
-              key:
-                type: string
-                example: mysecret
-              value:
-                type: string
-                format: byte
-            required:
-              - key
-              - value
+            $ref: "#/components/schemas/CreatePipelineSecret"
         files:
           type: array
           nullable: true
           items:
-            type: object
-            properties:
-              name:
-                type: string
-                example: myfile
-              contents:
-                type: string
-                format: byte
-              encrypted:
-                type: boolean
-            required:
-              - name
-              - contents
-              - encrypted
+            $ref: "#/components/schemas/CreatePipelineFile"
         resourceProfile:
           type: string
           example: my-resource-profile
@@ -916,33 +893,12 @@ components:
           type: array
           nullable: true
           items:
-            type: object
-            properties:
-              key:
-                type: string
-                example: mysecret
-                nullable: true
-              value:
-                type: string
-                format: byte
-                nullable: true
+            $ref: "#/components/schemas/UpdatePipelineSecret"
         files:
           type: array
           nullable: true
           items:
-            type: object
-            properties:
-              name:
-                type: string
-                example: myfile
-                nullable: true
-              contents:
-                type: string
-                format: byte
-                nullable: true
-              encrypted:
-                type: boolean
-                nullable: true
+            $ref: "#/components/schemas/UpdatePipelineFile"
         resourceProfile:
           type: string
           example: my-resource-profile
