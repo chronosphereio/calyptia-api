@@ -1483,7 +1483,7 @@ paths:
       responses:
         "204":
           description: No Content
-  "/v1/join_project":
+  /v1/join_project:
     post:
       tags:
         - invitation
@@ -1503,7 +1503,7 @@ paths:
       responses:
         "204":
           description: No Content
-  "/v1/agents":
+  /v1/agents:
     post:
       tags:
         - agent
@@ -1527,6 +1527,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RegisteredAgent"
+      parameters:
+        - schema:
+            type: string
+          in: query
   "/v1/projects/{projectID}/agents":
     parameters:
       - schema:
@@ -1655,7 +1659,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/AgentConfig"
-  "/v1/aggregators":
+  /v1/aggregators:
     post:
       tags:
         - aggregator
@@ -2457,3 +2461,126 @@ paths:
       responses:
         "204":
           description: No Content
+  "/v1/projects/{projectID}/metrics":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: projectID
+        in: path
+        required: true
+    get:
+      tags:
+        - metric
+      summary: Project metrics
+      operationId: projectMetrics
+      description: |-
+        Contains an overview of the aggregated metrics for a project.
+        It includes metrics link the amount of records, bytes, and errors per plugin.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: string
+            format: duration
+            default: -24h
+          name: start
+          in: path
+          required: true
+        - schema:
+            type: string
+            format: duration
+            default: 1h
+          name: interval
+          in: path
+          required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectMetrics"
+  "/v1/agents/{agentID}/metrics":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: agentID
+        in: path
+        required: true
+    get:
+      tags:
+        - metric
+      summary: Agent metrics
+      operationId: agentMetrics
+      description: |-
+        Contains an overview of the aggregated metrics for an agent.
+        It includes metrics link the amount of records, bytes, and errors per plugin.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: string
+            format: duration
+            default: -24h
+          name: start
+          in: path
+          required: true
+        - schema:
+            type: string
+            format: duration
+            default: 1h
+          name: interval
+          in: path
+          required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentMetrics"
+  "/v1/pipeline_metrics/{pipelineID}":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: pipelineID
+        in: path
+        required: true
+    get:
+      tags:
+        - metric
+      summary: Pipeline metrics
+      operationId: pipelineMetrics
+      description: |-
+        Contains an overview of the aggregated metrics for a pipeline.
+        It includes metrics link the amount of records, bytes, and errors per plugin.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: string
+            format: duration
+            default: -24h
+          name: start
+          in: path
+          required: true
+        - schema:
+            type: string
+            format: duration
+            default: 1h
+          name: interval
+          in: path
+          required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentMetrics"
