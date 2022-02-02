@@ -1949,6 +1949,45 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Pipeline"
+  "/v1/projects/{projectID}/pipelines":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: projectID
+        in: path
+        required: true
+    get:
+      tags:
+        - pipeline
+      summary: Project pipelines
+      operationId: projectPipelines
+      description: Pipelines from a project.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last pipelines.
+        - schema:
+            type: string
+          in: query
+          name: name
+          description: Name matching pipelines.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Pipeline"
   "/v1/aggregator_pipelines/{pipelineID}":
     parameters:
       - schema:
