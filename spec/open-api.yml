@@ -2045,3 +2045,75 @@ paths:
       responses:
         "204":
           description: No Content
+  "/v1/aggregator_pipelines/{pipeline}/config_history":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: pipeline
+        in: path
+        required: true
+    get:
+      tags:
+        - pipeline_config
+      summary: Pipeline configuration history
+      operationId: pipelineConfigHistory
+      description: |-
+        Configuration history from a pipeline.
+        Every time a pipeline config is updated, a new history entry with the change is created.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last history entries.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PipelineConfig"
+  "/v1/aggregator_pipelines/{pipeline}/status_history":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: pipeline
+        in: path
+        required: true
+    get:
+      tags:
+        - pipeline_status
+      summary: Pipeline status history
+      operationId: pipelineStatusHistory
+      description: |-
+        Status history from a pipeline.
+        Every time a pipeline status is changed, a new history entry with the change is created.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last history entries.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PipelineStatus"
