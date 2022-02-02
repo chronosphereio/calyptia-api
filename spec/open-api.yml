@@ -2117,3 +2117,343 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/PipelineStatus"
+  "/v1/aggregator_pipelines/{pipelineID}/files":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: pipelineID
+        in: path
+        required: true
+    post:
+      tags:
+        - pipeline_file
+      summary: Create pipeline file
+      operationId: createPipelineFile
+      description: |-
+        Create file within a pipeline.
+        The given name is unique within the pipeline.
+        These files can be referenced by their name within a fluentbit configuration file like so `{{files.thename}}`.
+        Use them to share common stuff like parsers.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePipelineFile"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedPipelineFile"
+    get:
+      tags:
+        - pipeline_file
+      summary: Pipeline files
+      operationId: pipelineFiles
+      description: Files from a pipeline.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last files.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PipelineFile"
+  "/v1/pipeline_files/{fileID}":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: fileID
+        in: path
+        required: true
+    get:
+      tags:
+        - pipeline_file
+      summary: Pipeline file
+      operationId: pipelineFile
+      description: File by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PipelineFile"
+    patch:
+      tags:
+        - pipeline_file
+      summary: Update pipeline file
+      operationId: updatePipelineFile
+      description: Update file by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePipelineFile"
+      responses:
+        "204":
+          description: No Content
+    delete:
+      tags:
+        - pipeline_file
+      summary: Delete pipeline file
+      operationId: deletePipelineFile
+      description: |-
+        Delete pipeline file by its ID.
+        The file cannot be deleted if some pipeline config is still referencing it;
+        you must delete the pipeline first if you want to delete the file.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "204":
+          description: No Content
+  "/v1/aggregator_pipelines/{pipelineID}/secrets":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: pipelineID
+        in: path
+        required: true
+    post:
+      tags:
+        - pipeline_secret
+      summary: Create pipeline secret
+      operationId: createPipelineSecret
+      description: |-
+        Create secret within a pipeline.
+        The given name is unique within the pipeline.
+        These secrets can be referenced by their name within a fluentbit configuration file like so `{{secrets.thename}}`.
+        Use them to hide sensible values from your config file.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePipelineSecret"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedPipelineSecret"
+    get:
+      tags:
+        - pipeline_secret
+      summary: Pipeline secrets
+      operationId: pipelineSecrets
+      description: Secrets from a pipeline.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last secrets.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PipelineSecret"
+  "/v1/pipeline_secrets/{secretID}":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: secretID
+        in: path
+        required: true
+    get:
+      tags:
+        - pipeline_secret
+      summary: Pipeline secret
+      operationId: pipelineSecret
+      description: Secret by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PipelineSecret"
+    patch:
+      tags:
+        - pipeline_secret
+      summary: Update pipeline secret
+      operationId: updatePipelineSecret
+      description: Update secret by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePipelineSecret"
+      responses:
+        "204":
+          description: No Content
+    delete:
+      tags:
+        - pipeline_secret
+      summary: Delete pipeline secret
+      operationId: deletePipelineSecret
+      description: |-
+        Delete pipeline secret by its ID.
+        The secret cannot be deleted if some pipeline config is still referencing it;
+        you must delete the pipeline first if you want to delete the secret.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "204":
+          description: No Content
+  "/v1/aggregator_pipelines/{pipelineID}/ports":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: pipelineID
+        in: path
+        required: true
+    post:
+      tags:
+        - pipeline_port
+      summary: Create pipeline port
+      operationId: createPipelinePort
+      description: |-
+        Create port within a pipeline.
+        Ports can automatically be parsed from a config file, but this action allows you to programatically add more.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePipelinePort"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedPipelinePort"
+    get:
+      tags:
+        - pipeline_port
+      summary: Pipeline ports
+      operationId: pipelinePorts
+      description: Ports from a pipeline.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last ports.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PipelinePort"
+  "/v1/pipeline_ports/{portID}":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: portID
+        in: path
+        required: true
+    get:
+      tags:
+        - pipeline_port
+      summary: Pipeline port
+      operationId: pipelinePort
+      description: Port by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PipelinePort"
+    patch:
+      tags:
+        - pipeline_port
+      summary: Update pipeline port
+      operationId: updatePipelinePort
+      description: Update port by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePipelinePort"
+      responses:
+        "204":
+          description: No Content
+    delete:
+      tags:
+        - pipeline_port
+      summary: Delete pipeline port
+      operationId: deletePipelinePort
+      description: Delete port by its ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "204":
+          description: No Content
