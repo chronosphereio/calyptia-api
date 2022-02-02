@@ -9,7 +9,7 @@ import (
 	"github.com/calyptia/api/types"
 )
 
-// CreateToken withint a project.
+// CreateToken within a project.
 // These tokens are to authorize other applications to access the project.
 // For example:
 // - an agent might use it to register itself to the project.
