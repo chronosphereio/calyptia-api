@@ -1210,36 +1210,6 @@ paths:
         "204":
           description: No Content
   /v1/projects:
-    get:
-      tags:
-        - project
-      summary: Projects
-      operationId: projects
-      description: Projects you are a member of in descending order.
-      security:
-        - user: []
-      parameters:
-        - schema:
-            type: integer
-            format: int64
-            minimum: 0
-          in: query
-          name: last
-          description: Last projects
-        - schema:
-            type: string
-          in: query
-          name: name
-          description: Name matching projects
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Project"
     post:
       tags:
         - project
@@ -1264,6 +1234,36 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreatedProject"
+    get:
+      tags:
+        - project
+      summary: Projects
+      operationId: projects
+      description: Projects you are a member of.
+      security:
+        - user: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last projects.
+        - schema:
+            type: string
+          in: query
+          name: name
+          description: Name matching projects.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
   "/v1/projects/{projectID}":
     parameters:
       - schema:
@@ -1276,7 +1276,7 @@ paths:
       tags:
         - project
       summary: Project
-      operationId: Project
+      operationId: project
       description: Project by ID.
       security:
         - user: []
@@ -1302,6 +1302,707 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/UpdateProject"
+      responses:
+        "204":
+          description: No Content
+  "/v1/projects/{projectID}/tokens":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: projectID
+        in: path
+        required: true
+    post:
+      tags:
+        - token
+      summary: Create token
+      operationId: createToken
+      description: |-
+        Create token within a project.
+        These tokens are to authorize other applications to access the project.
+        For example:
+         - an agent might use it to register itself to the project.
+         - you might create a new aggregator in the project using the aggregator CLI.
+         - you might use it within the Calyptia CLI to grant access to your project.
+      security:
+        - user: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateToken"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
+    get:
+      tags:
+        - token
+      summary: Tokens
+      operationId: tokens
+      description: Tokens from a project.
+      security:
+        - user: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last tokens.
+        - schema:
+            type: string
+          in: query
+          name: name
+          description: Name matching tokens.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Token"
+  "/v1/project_tokens/{tokenID}":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: tokenID
+        in: path
+        required: true
+    get:
+      tags:
+        - token
+      summary: Token
+      operationId: token
+      description: Token by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
+    patch:
+      tags:
+        - token
+      summary: Update token
+      operationId: updateToken
+      description: Update token by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateToken"
+      responses:
+        "204":
+          description: No Content
+    delete:
+      tags:
+        - token
+      summary: Delete token
+      operationId: deleteToken
+      description: Delete token by its ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "204":
+          description: No Content
+  "/v1/projects/{projectID}/members":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: projectID
+        in: path
+        required: true
+    get:
+      tags:
+        - membership
+      summary: Members
+      operationId: members
+      description: Members from a project.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last members.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Membership"
+  "/v1/projects/{projectID}/invite":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: projectID
+        in: path
+        required: true
+    post:
+      tags:
+        - invitation
+      summary: Create invitation
+      operationId: createInvitation
+      description: |-
+        Create invitation to a project.
+        This will send an invitation email with a link to join to the email address provided.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateInvitation"
+      responses:
+        "204":
+          description: No Content
+  "/v1/join_project":
+    post:
+      tags:
+        - invitation
+      summary: Accept invitation
+      operationId: acceptInvitation
+      description: |-
+        Accept invitation to a project.
+        The project to which you join is parsed from the token.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptInvitation"
+      responses:
+        "204":
+          description: No Content
+  "/v1/agents":
+    post:
+      tags:
+        - agent
+      summary: Register agent
+      operationId: registerAgent
+      description: |-
+        Register agent within a project.
+        The project in which the agent is registered is parsed from the authorization token.
+        Users are not allowed to register agents.
+      security:
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterAgent"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisteredAgent"
+  "/v1/projects/{projectID}/agents":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: projectID
+        in: path
+        required: true
+    get:
+      tags:
+        - agent
+      summary: Agents
+      operationId: agents
+      description: Agents from a project.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last agents.
+        - schema:
+            type: string
+          in: query
+          name: name
+          description: Name matching agents.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Agent"
+  "/v1/agents/{agentID}":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: agentID
+        in: path
+        required: true
+    get:
+      tags:
+        - agent
+      summary: Agent
+      operationId: agent
+      description: Agents by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Agent"
+    patch:
+      tags:
+        - agent
+      summary: Update agent
+      operationId: updateAgent
+      description: Update agent by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAgent"
+      responses:
+        "204":
+          description: No Content
+    delete:
+      tags:
+        - agent
+      summary: Delete agent
+      operationId: deleteAgent
+      description: Delete agent by its ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "204":
+          description: No Content
+  "/v1/agents/{agentID}/config_history":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: agentID
+        in: path
+        required: true
+    get:
+      tags:
+        - agent_config
+      summary: Agent configuration history
+      operationId: agentConfigHistory
+      description: |-
+        Configuration history from an agent.
+        Every time an agent config is updated, a new history entry with the change is created.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last config history entries.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgentConfig"
+  "/v1/aggregators":
+    post:
+      tags:
+        - aggregator
+      summary: Create aggregator
+      operationId: createAggregator
+      description: |-
+        Create aggregator within a project.
+        The project in which the aggregator is created is parser from the authorization token.
+        Users are not allowed to create aggregators.
+      security:
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAggregator"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedAggregator"
+  "/v1/projects/{projectID}/aggregators":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: projectID
+        in: path
+        required: true
+    get:
+      tags:
+        - aggregator
+      summary: Aggregators
+      operationId: aggregators
+      description: Aggregators from a project.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last aggregators.
+        - schema:
+            type: string
+          in: query
+          name: name
+          description: Name matching aggregators.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Aggregator"
+  "/v1/aggregators/{aggregatorID}":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: aggregatorID
+        in: path
+        required: true
+    get:
+      tags:
+        - aggregator
+      summary: Aggregator
+      operationId: aggregator
+      description: Aggregator by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Aggregator"
+    patch:
+      tags:
+        - aggregator
+      summary: Update aggregator
+      operationId: updateAggregator
+      description: Update aggregator by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAggregator"
+      responses:
+        "204":
+          description: No Content
+    delete:
+      tags:
+        - aggregator
+      summary: Delete aggregator
+      operationId: deleteAggregator
+      description: Delete aggregator by its ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "204":
+          description: No Content
+  "/v1/aggregators/{aggregatorID}/resource_profiles":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: aggregatorID
+        in: path
+        required: true
+    post:
+      tags:
+        - resource_profile
+      summary: Create resource profile
+      operationId: createResourceProfile
+      description: |-
+        Create resource profile within an aggregator.
+        A resource profile is a specification of a resource used during the deployment of a pipeline.
+        By default, when you setup an aggregator, Calyptia Cloud will generate 3 resource profiles for you:
+         - high-performance-guaranteed-delivery.
+         - high-performance-optimal-throughput.
+         - best-effort-low-resource.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateResourceProfile"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedResourceProfile"
+    get:
+      tags:
+        - resource_profile
+      summary: Resource profiles
+      operationId: resourceProfiles
+      description: Resource profiles from an aggregator.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last tokens.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ResourceProfile"
+  "/v1/resource_profiles/{resourceProfileID}":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: resourceProfileID
+        in: path
+        required: true
+    get:
+      tags:
+        - resource_profile
+      summary: Resource profile
+      operationId: resourceProfile
+      description: Resource profile by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceProfile"
+    patch:
+      tags:
+        - resource_profile
+      summary: Update resource profile
+      operationId: updateResourceProfile
+      description: Update resource profile by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateResourceProfile"
+      responses:
+        "204":
+          description: No Content
+    delete:
+      tags:
+        - resource_profile
+      summary: Delete resource profile
+      operationId: deleteResourceProfile
+      description: Delete resource profile by its ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "204":
+          description: No Content
+  "/v1/aggregators/{aggregatorID}/pipelines":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: aggregatorID
+        in: path
+        required: true
+    post:
+      tags:
+        - pipeline
+      summary: Create pipeline
+      operationId: createPipeline
+      description: |-
+        Create pipeline within an aggregator.
+        The pipeline name must be unique within the aggregator.
+        The resource profile must exist already. If you don't provide one, it will default to "best-effort-low-resource".
+        Use them to easily deploy configured agents to the aggregator.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePipeline"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedPipeline"
+    get:
+      tags:
+        - pipeline
+      summary: Pipelines
+      operationId: pipelines
+      description: Pipelines from an aggregator.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last pipelines.
+        - schema:
+            type: string
+          in: query
+          name: name
+          description: Name matching pipelines.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Pipeline"
+  "/v1/aggregator_pipelines/{pipelineID}":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: pipelineID
+        in: path
+        required: true
+    get:
+      tags:
+        - pipeline
+      summary: Pipeline
+      operationId: pipeline
+      description: Pipeline by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pipeline"
+    patch:
+      tags:
+        - pipeline
+      summary: Update pipeline
+      operationId: updatePipeline
+      description: Update pipeline by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePipeline"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatedPipeline"
+    delete:
+      tags:
+        - pipeline
+      summary: Delete pipeline
+      operationId: deletePipeline
+      description: Delete pipeline by its ID.
+      security:
+        - user: []
+        - project: []
       responses:
         "204":
           description: No Content
