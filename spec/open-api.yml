@@ -34,6 +34,7 @@ tags:
   - name: pipeline_file
   - name: pipeline_secret
   - name: pipeline_port
+  - name: config_validator
   - name: metric
 components:
   securitySchemes:
@@ -1010,6 +1011,32 @@ components:
         endpoint:
           type: string
           nullable: true
+    ValidatingConfig:
+      description: Validating configuration request body.
+      type: object
+      properties:
+        config:
+          type: array
+          items:
+            type: object
+            properties:
+              command:
+                type: string
+              name:
+                type: string
+              optional:
+                type: object
+                additionalProperties:
+                  type: string
+                nullable: true
+              id:
+                type: string
+            required:
+              - command
+              - name
+              - id
+      required:
+        - config
     CreatedProject:
       type: object
       description: Created project response body.
@@ -1177,6 +1204,42 @@ components:
       required:
         - id
         - createdAt
+    ValidatedConfig:
+      type: object
+      description: Validate config response body.
+      properties:
+        errors:
+          type: object
+          properties:
+            runtime:
+              type: array
+              items:
+                type: string
+            input:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+            output:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+            filter:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+          required:
+            - runtime
+            - input
+            - output
+            - filter
+      required:
+        - errors
 paths:
   /v1/verification_email:
     post:
@@ -2440,6 +2503,39 @@ paths:
       responses:
         "204":
           description: No Content
+  "/v1/config_validate/{agentType}":
+    parameters:
+      - schema:
+          type: string
+          enum:
+            - fluentbit
+            - fluentd
+        name: agentType
+        in: path
+        required: true
+    get:
+      tags:
+        - config_validator
+      summary: Validate configuration
+      operationId: validateConfig
+      description: |-
+        Validates that an already parsed fluentbit or fluentd config is semantically valid.
+        To parse the raw agent config take a look at https://github.com/calyptia/fluent-bit-config-parser.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValidatingConfig"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidatedConfig"
   "/v1/projects/{projectID}/metrics":
     parameters:
       - schema:
