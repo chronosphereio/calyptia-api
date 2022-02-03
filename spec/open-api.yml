@@ -343,7 +343,7 @@ components:
           format: uuid
         name:
           type: string
-          description: DNS label
+          description: DNS label foprmat as of defined on RFC1123
           example: my-pipeline
         config:
           $ref: "#/components/schemas/PipelineConfig"
@@ -842,7 +842,7 @@ components:
       properties:
         name:
           type: string
-          description: DNS label
+          description: DNS label foprmat as of defined on RFC1123
           example: new-pipeline
         replicasCount:
           type: integer
@@ -886,7 +886,7 @@ components:
       properties:
         name:
           type: string
-          description: DNS label
+          description: DNS label foprmat as of defined on RFC1123
           example: new-pipeline
           nullable: true
         replicasCount:
