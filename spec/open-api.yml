@@ -343,7 +343,7 @@ components:
           format: uuid
         name:
           type: string
-          format: hostname
+          description: DNS label
           example: my-pipeline
         config:
           $ref: "#/components/schemas/PipelineConfig"
@@ -842,7 +842,7 @@ components:
       properties:
         name:
           type: string
-          format: hostname
+          description: DNS label
           example: new-pipeline
         replicasCount:
           type: integer
@@ -886,7 +886,7 @@ components:
       properties:
         name:
           type: string
-          format: hostname
+          description: DNS label
           example: new-pipeline
           nullable: true
         replicasCount:
