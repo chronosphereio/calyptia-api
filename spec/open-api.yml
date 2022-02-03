@@ -256,6 +256,7 @@ components:
           example: redacted
         name:
           type: string
+          format: hostname
           example: my-aggregator
         pipelinesCount:
           type: integer
@@ -342,6 +343,7 @@ components:
           format: uuid
         name:
           type: string
+          format: hostname
           example: my-pipeline
         config:
           $ref: "#/components/schemas/PipelineConfig"
@@ -720,6 +722,7 @@ components:
       properties:
         name:
           type: string
+          format: hostname
           example: new-aggregator
         addHealthCheckPipeline:
           type: boolean
@@ -737,6 +740,7 @@ components:
       properties:
         name:
           type: string
+          format: hostname
           example: new-aggregator
           nullable: true
     CreateResourceProfile:
@@ -838,6 +842,7 @@ components:
       properties:
         name:
           type: string
+          format: hostname
           example: new-pipeline
         replicasCount:
           type: integer
@@ -881,6 +886,7 @@ components:
       properties:
         name:
           type: string
+          format: hostname
           example: new-pipeline
           nullable: true
         replicasCount:
@@ -1095,6 +1101,7 @@ components:
           format: byte
         name:
           type: string
+          format: hostname
           example: my-aggregator
         createdAt:
           type: string
