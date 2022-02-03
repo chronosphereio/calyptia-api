@@ -2536,6 +2536,39 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ValidatedConfig"
+  "/v1/agent_metrics":
+    post:
+      tags:
+        - metric
+      summary: Add agent metrics
+      operationId: addAgentMetrics
+      description: |-
+        Store the incomming metrics from the agent.
+      security:
+        - project: []
+      requestBody:
+        content:
+          application/x-msgpack:
+            schema:
+              type: string
+              format: binary
+              description: |-
+                Msgpack encoded metrics using cmetrics library.
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Total number of inserted metrics.
+                properties:
+                  totalInserted:
+                    type: integer
+                    format: int64
+                    minimum: 0
+                required:
+                  - totalInserted
   "/v1/projects/{projectID}/metrics":
     parameters:
       - schema:
