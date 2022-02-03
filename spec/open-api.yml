@@ -155,23 +155,6 @@ components:
         - roles
         - createdAt
       description: Membership of a user in a project.
-    Invitation:
-      type: object
-      description: Invitation to a project.
-      properties:
-        id:
-          type: string
-          format: uuid
-        email:
-          type: string
-          format: email
-        createdAt:
-          type: string
-          format: date-time
-      required:
-        - id
-        - email
-        - createdAt
     Agent:
       type: object
       properties:
