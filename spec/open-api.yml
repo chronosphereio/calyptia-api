@@ -2562,7 +2562,7 @@ paths:
               description: |-
                 Msgpack encoded metrics using cmetrics library.
       responses:
-        201:
+        "201":
           description: Created
           content:
             application/json:
