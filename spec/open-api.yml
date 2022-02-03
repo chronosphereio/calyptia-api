@@ -2480,17 +2480,15 @@ paths:
         - schema:
             type: string
             format: duration
-            default: -24h
+            default: "-24h"
           name: start
-          in: path
-          required: true
+          in: query
         - schema:
             type: string
             format: duration
             default: 1h
           name: interval
-          in: path
-          required: true
+          in: query
       responses:
         "200":
           description: OK
@@ -2521,17 +2519,15 @@ paths:
         - schema:
             type: string
             format: duration
-            default: -24h
+            default: "-24h"
           name: start
-          in: path
-          required: true
+          in: query
         - schema:
             type: string
             format: duration
             default: 1h
           name: interval
-          in: path
-          required: true
+          in: query
       responses:
         "200":
           description: OK
@@ -2562,17 +2558,15 @@ paths:
         - schema:
             type: string
             format: duration
-            default: -24h
+            default: "-24h"
           name: start
-          in: path
-          required: true
+          in: query
         - schema:
             type: string
             format: duration
             default: 1h
           name: interval
-          in: path
-          required: true
+          in: query
       responses:
         "200":
           description: OK
