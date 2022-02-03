@@ -1527,10 +1527,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RegisteredAgent"
-      parameters:
-        - schema:
-            type: string
-          in: query
   "/v1/projects/{projectID}/agents":
     parameters:
       - schema:
