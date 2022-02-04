@@ -71,6 +71,7 @@ jobs:
           HOST_IP: ${{ env.DOCKER_HOST_IP }}
 
       - name: Upload coverage artifacts
+        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v2
         with:
           name: coverage reports
@@ -80,6 +81,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload coverage to Codecov
+        if: github.event_name != 'pull_request'
         uses: codecov/codecov-action@v2.1.0
         with:
           file: ./coverage.out
@@ -104,3 +106,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         continue-on-error: true
+  docs:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    needs:
+      - ci
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - uses: readmeio/github-readme-sync@v2
+        with:
+          readme-oas-key: ${{ secrets.README_API_KEY }}
+          oas-file-path: './spec/open-api.yml'
