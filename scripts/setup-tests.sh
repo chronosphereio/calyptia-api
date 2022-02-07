@@ -26,7 +26,17 @@ if [[ ! -f "$CLOUD_DIR/docker-compose.yml" ]]; then
     exit 1
 fi
 
-docker-compose -f "$CLOUD_DIR/docker-compose.yml" up -d
+docker-compose --project-name api_cloud_test -f "$CLOUD_DIR/docker-compose.yml" up -d --force-recreate
+
+# This actually takes a while to come up on the runners sometimes so a compose stack is not great for it.
+echo "Waiting for Postgresql to be ready"
+until docker exec -it api_cloud_test_postgres_1 pg_isready ; do
+    echo -n "."
+    sleep 1
+done
+echo
+echo "Databases set up"
+
 # END OF TODO
 
 # TODO: only due to permissions issues: https://github.com/calyptia/cloud/issues/309
@@ -36,6 +46,7 @@ touch "$TOKENFILE"
 chmod a+r "$TOKENFILE"
 # END OF TODO
 
+docker rm -f cloud
 docker run -d --network=host \
     --name cloud \
     -e DEBUG=true \
