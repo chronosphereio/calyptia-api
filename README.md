@@ -39,3 +39,14 @@ tokSrc := oauth2.StaticTokenSource(tok)
 c.Client = oauth2.NewClient(ctx, tokSrc)
 ```
 Refer to [client/client_test.go](https://github.com/calyptia/api/blob/eec74522b60638539bdb7f2334548d3c4cda813d/client/client_test.go#L528-L531) for a testing example.
+
+## Spec
+
+The `/spec` directory contains an OpenAPI specification. You can use it to generate clients for your favorite programming language. Or preview it using [SwaggerUI](https://editor.swagger.io/?url=https://raw.githubusercontent.com/calyptia/api/main/spec/open-api.yml).
+
+### Typescript codegen
+
+Example using [openapi-typescript-codegen](https://www.npmjs.com/package/openapi-typescript-codegen).
+```
+npx openapi-typescript-codegen --input ./spec/open-api.yml --output ./ts-client
+```
