@@ -26,7 +26,7 @@ if [[ ! -f "$CLOUD_DIR/docker-compose.yml" ]]; then
     exit 1
 fi
 
-docker-compose up -d --project-dir="$CLOUD_DIR"
+docker-compose -f "$CLOUD_DIR/docker-compose.yml" up -d
 # END OF TODO
 
 # TODO: only due to permissions issues: https://github.com/calyptia/cloud/issues/309
