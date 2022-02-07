@@ -18,15 +18,6 @@ if [[ -z "${TOKEN:-}" ]]; then
     exit 1
 fi
 
-echo "Waiting for Cloud container to be ready"
-until [[ $(curl -sL --write-out '%{http_code}' "$CLOUD_URL/healthz" -o /dev/null) -eq 200 ]]
-do
-    echo -n "."
-    sleep 1
-done
-echo
-echo "Container responding"
-
 docker run --rm --network=host -v "$SPEC_DIR/":/spec:ro \
     schemathesis/schemathesis:stable \
         run \
