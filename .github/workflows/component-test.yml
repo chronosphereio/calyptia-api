@@ -19,7 +19,7 @@ on:
         description: The image tag for the ghcr.io/calyptia/cloud image.
         type: string
         required: false
-        default: ${{ inputs.cloud-ref }}
+        default: 'main' #${{ inputs.cloud-ref }}
 
 jobs:
   schema-lint:
