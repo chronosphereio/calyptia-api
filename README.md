@@ -48,7 +48,8 @@ tokSrc := oauth2.StaticTokenSource(tok)
 c.Client = oauth2.NewClient(ctx, tokSrc)
 ```
 
-Refer to [client/client_test.go](https://github.com/calyptia/api/blob/eec74522b60638539bdb7f2334548d3c4cda813d/client/client_test.go#L528-L531) for a testing example.
+Refer to [client/client_test.go](https://github.com/calyptia/api/blob/eec74522b60638539bdb7f2334548d3c4cda813d/client/client_test.go#L528-L531)
+for a testing example.
 
 ## Spec
 
