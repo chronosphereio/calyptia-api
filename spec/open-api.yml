@@ -563,6 +563,175 @@ components:
               - totals
       required:
         - measurements
+    AggregatorMetrics:
+      type: object
+      description: Agent metrics model.
+      properties:
+        measurements:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              metrics:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/MetricFields"
+              totals:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/MetricFields"
+            required:
+              - metrics
+              - totals
+      required:
+        - measurements
+      example: |
+        {
+          "measurements": {
+            "fluentbit_filter": {
+              "metrics": {
+                "drop_records": [
+                  {
+                    "time": "2022-02-07T11:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:55:20.003028413Z",
+                    "value": 119
+                  }
+                ],
+                "emit_records": [
+                  {
+                    "time": "2022-02-07T11:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:55:20.003028413Z",
+                    "value": 119
+                  }
+                ]
+              },
+              "totals": {
+                "drop_records": [
+                  {
+                    "time": "2022-02-07T12:55:04.78743322Z",
+                    "value": 119
+                  }
+                ],
+                "emit_records": [
+                  {
+                    "time": "2022-02-07T12:55:04.787434277Z",
+                    "value": 119
+                  }
+                ]
+              }
+            },
+            "fluentbit_input": {
+              "metrics": {
+                "bytes": [
+                  {
+                    "time": "2022-02-07T11:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:55:20.029124832Z",
+                    "value": 4760
+                  }
+                ],
+                "records": [
+                  {
+                    "time": "2022-02-07T11:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:55:20.029124832Z",
+                    "value": 119
+                  }
+                ]
+              },
+              "totals": {
+                "bytes": [
+                  {
+                    "time": "2022-02-07T12:55:04.787450155Z",
+                    "value": 4760
+                  }
+                ],
+                "records": [
+                  {
+                    "time": "2022-02-07T12:55:04.787450155Z",
+                    "value": 119
+                  }
+                ]
+              }
+            },
+            "fluentbit_output": {
+              "metrics": {
+                "bytes": [
+                  {
+                    "time": "2022-02-07T11:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:55:20.059227599Z",
+                    "value": 4560
+                  }
+                ],
+                "records": [
+                  {
+                    "time": "2022-02-07T11:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:55:20.059227599Z",
+                    "value": 114
+                  }
+                ]
+              },
+              "totals": {
+                "bytes": [
+                  {
+                    "time": "2022-02-07T12:55:00.785234434Z",
+                    "value": 4560
+                  }
+                ],
+                "records": [
+                  {
+                    "time": "2022-02-07T12:55:00.785234434Z",
+                    "value": 114
+                  }
+                ]
+              }
+            }
+          }
+        }
     Metrics:
       type: object
       description: Metrics model.
@@ -2693,3 +2862,45 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AgentMetrics"
+  "/v1/aggregator_metrics/{aggregatorID}":
+    parameters:
+      - name: aggregatorID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      parameters:
+        - name: start
+          required: false
+          in: query
+          description: |
+            Option to filter metrics since the given time ago
+          schema:
+            type: string
+            format: duration
+            default: -24h
+        - name: interval
+          required: false
+          in: query
+          description: |
+            Option to set the time window to group metrics
+          schema:
+            type: string
+            format: duration
+            default: 1h
+      security:
+        - user: [ ]
+        - project: [ ]
+      summary: Aggregator metrics
+      operationId: aggregatorMetrics
+      tags:
+        - metric
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AggregatorMetrics"
