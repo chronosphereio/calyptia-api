@@ -34,7 +34,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           repository: calyptia/api
-          token: ${{ secrets.CI_PAT }}
+          token: ${{ secrets.token }}
           ref: ${{ inputs.api-ref || 'main' }}
 
       - run: docker run --rm -v $PWD:/spec redocly/openapi-cli lint spec/open-api.yml
