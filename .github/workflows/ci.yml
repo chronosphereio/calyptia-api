@@ -57,8 +57,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   component-test:
-    # TODO: DO NOT MERGE until switch to main
-    uses: calyptia/api/.github/workflows/call-test.yml@17_schema_validation
+    uses: calyptia/api/.github/workflows/call-test.yml@main
     with:
       api-ref: ${{ github.ref }}
     secrets:
