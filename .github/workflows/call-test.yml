@@ -96,7 +96,7 @@ jobs:
         timeout-minutes: 5
         run: |
           export TOKENFILE=$PWD/token
-          /bin/bash ./scripts/schema_validation.sh
+          /bin/bash ./scripts/schema-validation.sh
         shell: bash
         working-directory: api
 
