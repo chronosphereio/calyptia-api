@@ -83,7 +83,7 @@ jobs:
           ./scripts/setup-tests.sh
           ./scripts/run-tests.sh
         shell: bash
-        timeout-minutes: 2
+        timeout-minutes: 5
 
       - name: Dump docker logs on failure
         if: failure()
