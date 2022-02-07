@@ -68,7 +68,7 @@ jobs:
           docker run -d --network=host \
             --name cloud \
             -e DEBUG=true \
-            -e DEFAULT_TOKEN_FILE=/api/token -v $PWD/../api:/api \
+            -e DEFAULT_TOKEN_FILE=/api/token -v $PWD/../api:/api:Z \
             ghcr.io/calyptia/cloud:$IMAGE_TAG
         shell: bash
         working-directory: cloud
@@ -90,11 +90,12 @@ jobs:
       - name: Check we have a token file
         timeout-minutes: 1
         run: |
-          until [ -f token ]
+          until [ -f ./token ]
           do
             sleep 1
           done
           echo "Found token file"
+          ls -l ./token
         working-directory: api
         shell: bash
 
