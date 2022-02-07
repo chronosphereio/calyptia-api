@@ -63,7 +63,7 @@ jobs:
             --name cloud \
             -e DEBUG=true \
             -e DEFAULT_TOKEN_FILE=/api/token -v $PWD/../api:/api \
-            calyptia/cloud:main
+            ghcr.io/calyptia/cloud:main
         shell: bash
         working-directory: cloud
 
