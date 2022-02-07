@@ -30,7 +30,7 @@ docker-compose --project-name api_cloud_test -f "$CLOUD_DIR/docker-compose.yml" 
 
 # This actually takes a while to come up on the runners sometimes so a compose stack is not great for it.
 echo "Waiting for Postgresql to be ready"
-until docker exec -it api_cloud_test_postgres_1 pg_isready ; do
+until docker exec -t api_cloud_test_postgres_1 pg_isready ; do
     echo -n "."
     sleep 1
 done
