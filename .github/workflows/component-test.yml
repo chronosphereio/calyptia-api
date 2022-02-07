@@ -11,6 +11,7 @@ on:
         required: false
         default: 'main'
       cloud-ref:
+        # TODO: move to common test set up repo or remove with all-in-one image
         description: The Github commit, SHA, branch or tag to use for the calyptia/cloud repository.
         type: string
         required: false
@@ -78,6 +79,7 @@ jobs:
         # TODO: Again, part of all-in-one
         timeout-minutes: 2
         run:
+          docker ps -a
           until [[ $(curl -sL --write-out %{http_code} http://localhost:5000/healthz -o /dev/null) -eq 200 ]] ; do
             sleep 1
           done
