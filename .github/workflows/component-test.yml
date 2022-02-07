@@ -1,0 +1,108 @@
+name: Component test for API
+# Local repo must provide GITHUB_TOKEN for container registry login and cloud repo checkout
+on:
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        description: The Github commit, SHA, branch or tag to use.
+        type: string
+        required: false
+        default: 'main'
+    secrets:
+      github_token:
+        description: The Github token used for getting the source code.
+        required: true
+
+jobs:
+  schema-lint:
+    name: Schema linting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: calyptia/api
+          token: ${{ secrets.github_token || github.token }}
+          ref: ${{ inputs.ref || github.ref || 'main' }}
+
+      - run: docker run --rm -v $PWD:/spec redocly/openapi-cli lint spec/open-api.yml
+        shell: bash
+
+  schema-validation:
+    name: Schema validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.github_token || secrets.GITHUB_TOKEN }}
+
+      - uses: actions/checkout@v2
+        with:
+          repository: calyptia/api
+          token: ${{ secrets.github_token || github.token }}
+          ref: ${{ inputs.ref || github.ref || 'main' }}
+          path: api
+
+      - uses: actions/checkout@v2
+        with:
+          repository: calyptia/cloud
+          token: ${{ secrets.github_token || secrets.GITHUB_TOKEN }}
+          ref: ${{ inputs.ref || 'main' }}
+          path: cloud
+
+      - name: Run up cloud support infrastructure
+        # TODO: replace with all-in-one: https://github.com/calyptia/cloud/issues/308
+        run: |
+          docker-compose up -d
+          docker run -d --network=host \
+            -e DEBUG=true \
+            -e DEFAULT_TOKEN_FILE=/api/token -v $PWD/../api:/api \
+            calyptia/cloud:main
+        shell: bash
+        working-directory: cloud
+
+      - name: Wait for infrastructure set up to complete
+        # TODO: Again, part of all-in-one
+        timeout-minutes: 2
+        run:
+          echo "Waiting for cloud port"
+          until nc -z localhost 5000 ; do
+            echo -n "."
+            sleep 1
+          done
+          echo
+          echo "Container responding"
+
+          echo "Waiting for token file"
+          until [ -f token ]; do
+            echo -n "."
+            sleep 1
+          done
+          echo
+          echo "Found token file"
+        working-directory: api
+        shell: bash
+
+      - name: Run up the schema validation container
+        run: |
+          TOKEN=$(cat ./token)
+          docker run --network=host -v $PWD/spec/:/spec \
+            schemathesis/schemathesis:stable \
+              run \
+              --header "Authorization:" \
+              --header "X-Project-Token:$TOKEN" \
+              --stateful=links \
+              --workers 8 \
+              /spec/open-api.yml \
+              --base-url=http://localhost:5000/
+        shell: bash
+        working-directory: api
+
+      - name: Dump docker logs on failure
+        if: failure()
+        continue-on-error: true
+        uses: jwalton/gh-docker-logs@v1
