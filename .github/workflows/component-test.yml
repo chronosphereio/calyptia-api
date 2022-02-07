@@ -15,6 +15,11 @@ on:
         type: string
         required: false
         default: 'main'
+      cloud-image-ref:
+        description: The image tag for the ghcr.io/calyptia/cloud image.
+        type: string
+        required: false
+        default: ${{ inputs.cloud-ref }}
 
 jobs:
   schema-lint:
@@ -63,19 +68,25 @@ jobs:
             --name cloud \
             -e DEBUG=true \
             -e DEFAULT_TOKEN_FILE=/api/token -v $PWD/../api:/api \
-            ghcr.io/calyptia/cloud:main
+            ghcr.io/calyptia/cloud:$IMAGE_TAG
         shell: bash
         working-directory: cloud
+        env:
+          IMAGE_TAG: ${{ inputs.cloud-image-ref || 'main' }}
 
       - name: Wait for infrastructure set up to complete
         # TODO: Again, part of all-in-one
         timeout-minutes: 2
         run:
-          until curl -sL -w 200 http://localhost:5000/healthz ; do
+          until [[ $(curl -sL --write-out %{http_code} http://localhost:5000/healthz -o /dev/null) -eq 200 ]] ; do
             sleep 1
           done
           echo "Container responding"
+        shell: bash
 
+      - name: Check we have a token file
+        timeout-minutes: 1
+        run: |
           until [ -f token ]; do
             sleep 1
           done
