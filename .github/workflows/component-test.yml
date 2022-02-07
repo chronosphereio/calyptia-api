@@ -71,20 +71,14 @@ jobs:
         # TODO: Again, part of all-in-one
         timeout-minutes: 2
         run:
-          echo "Waiting for cloud container"
           until curl -sL -w 200 http://localhost:5000/healthz ; do
-            echo -n "."
             sleep 1
           done
-          echo
           echo "Container responding"
 
-          echo "Waiting for token file"
           until [ -f token ]; do
-            echo -n "."
             sleep 1
           done
-          echo
           echo "Found token file"
         working-directory: api
         shell: bash
