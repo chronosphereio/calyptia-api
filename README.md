@@ -25,13 +25,18 @@ func main() {
 }
 ```
 
-API keys are bound to an specific project. With that API key you cannot list all your other projects, or create more API keys.
-But you can perform all other actions within a project: manage agents, aggregators and pipelines, invite members, etc.
+API keys are bound to an specific project.
+With that API key you cannot list all your other projects,
+or create more API keys.
+But you can perform all other actions within a project:
+manage agents, aggregators and pipelines, invite members, etc.
 
 ### User authentication
 
-Machines using this client should prefer API key authorization, but if you need user authentication, you must setup [Auth0](https://auth0.com).
-After you successfully login and get an access token, you can create an authenticated client like so:
+Machines using this client should prefer API key authorization,
+but if you need user authentication, you must setup [Auth0](https://auth0.com).
+After you successfully login and get an access token,
+you can create an authenticated client like so:
 
 ```go
 tok := &oauth2.Token{
