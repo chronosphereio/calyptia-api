@@ -11,7 +11,7 @@ on:
         required: false
         default: 'main'
     secrets:
-      github_token:
+      token:
         description: The Github token used for getting the source code.
         required: true
 
@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           repository: calyptia/api
-          token: ${{ secrets.github_token || github.token }}
+          token: ${{ secrets.token || github.token }}
           ref: ${{ inputs.ref || github.ref || 'main' }}
 
       - run: docker run --rm -v $PWD:/spec redocly/openapi-cli lint spec/open-api.yml
@@ -38,19 +38,19 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.github_token || secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.token || secrets.GITHUB_TOKEN }}
 
       - uses: actions/checkout@v2
         with:
           repository: calyptia/api
-          token: ${{ secrets.github_token || github.token }}
+          token: ${{ secrets.token || github.token }}
           ref: ${{ inputs.ref || github.ref || 'main' }}
           path: api
 
       - uses: actions/checkout@v2
         with:
           repository: calyptia/cloud
-          token: ${{ secrets.github_token || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.token || secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref || 'main' }}
           path: cloud
 
