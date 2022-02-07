@@ -80,7 +80,8 @@ jobs:
         timeout-minutes: 2
         run: |
           docker ps -a
-          until [[ $(curl -sL --write-out %{http_code} http://localhost:5000/healthz -o /dev/null) -eq 200 ]] ; do
+          until [[ $(curl -sL --write-out %{http_code} http://localhost:5000/healthz -o /dev/null) -eq 200 ]]
+          do
             sleep 1
           done
           echo "Container responding"
@@ -89,7 +90,8 @@ jobs:
       - name: Check we have a token file
         timeout-minutes: 1
         run: |
-          until [ -f token ]; do
+          until [ -f token ]
+          do
             sleep 1
           done
           echo "Found token file"
