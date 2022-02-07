@@ -16,6 +16,10 @@ if [[ -z "${TOKEN:-}" ]]; then
     TOKEN=$(cat "$TOKENFILE")
 fi
 
+# Schema linting
+docker run --rm -v "$SPEC_DIR/":/spec:ro redocly/openapi-cli lint /spec/open-api.yml
+
+# Schema validation against the cloud image
 docker run --rm --network=host -v "$SPEC_DIR/":/spec:ro \
     schemathesis/schemathesis:stable \
         run \
