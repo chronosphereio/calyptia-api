@@ -13,7 +13,7 @@ if [[ -n "${TOKENFILE:-}" ]]; then
     TOKEN=$(cat "$TOKENFILE")
 fi
 
-if [[ -n "${TOKEN:-}" ]]; then
+if [[ -z "${TOKEN:-}" ]]; then
     echo "No TOKEN or invalid TOKENFILE defined"
     exit 1
 fi
