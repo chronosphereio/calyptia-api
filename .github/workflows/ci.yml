@@ -83,3 +83,8 @@ jobs:
           ./scripts/setup-tests.sh
           ./scripts/run-tests.sh
         shell: bash
+
+      - name: Dump docker logs on failure
+        if: failure()
+        continue-on-error: true
+        uses: jwalton/gh-docker-logs@v2
