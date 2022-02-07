@@ -43,7 +43,7 @@ jobs:
         with:
           args: >
             -Dsonar.organization=calyptia
-            -Dsonar.projectKey=${{ env.CI_REPOSITORY_NAME_SLUG }}
+            -Dsonar.projectKey=calyptia_${{ env.CI_REPOSITORY_NAME_SLUG }}
             -Dsonar.sources=.
             -Dsonar.exclusions=**/*_test.go
             -Dsonar.tests=.

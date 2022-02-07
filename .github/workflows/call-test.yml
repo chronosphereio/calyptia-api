@@ -79,18 +79,6 @@ jobs:
         env:
           IMAGE_TAG: ${{ inputs.cloud-image-ref || 'main' }}
 
-      - name: Wait for infrastructure set up to complete
-        # TODO: Again, part of all-in-one
-        timeout-minutes: 2
-        run: |
-          docker ps -a
-          until [[ $(curl -sL --write-out %{http_code} http://localhost:5000/healthz -o /dev/null) -eq 200 ]]
-          do
-            sleep 1
-          done
-          echo "Container responding"
-        shell: bash
-
       - name: Check we have a token file
         timeout-minutes: 1
         run: |
@@ -105,17 +93,10 @@ jobs:
         shell: bash
 
       - name: Run up the schema validation container
+        timeout-minutes: 5
         run: |
-          TOKEN=$(cat ./token)
-          docker run --network=host -v $PWD/spec/:/spec \
-            schemathesis/schemathesis:stable \
-              run \
-              --header "Authorization:" \
-              --header "X-Project-Token:$TOKEN" \
-              --stateful=links \
-              --workers 8 \
-              /spec/open-api.yml \
-              --base-url=http://localhost:5000/
+          export TOKENFILE=$PWD/token
+          /bin/bash ./scripts/schema_validation.sh
         shell: bash
         working-directory: api
 
