@@ -9,19 +9,46 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
 
-      - name: Run markdown lint
+      - name: Go Lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.43.0
+
+      - name: Run golangci lint
+        if: github.event_name == 'pull_request'
+        uses: reviewdog/action-golangci-lint@v2
+
+      - name: Run Markdown lint
         uses: actionshub/markdownlint@2.0.2
 
-      - name: Run action lint
+      - name: Run Action lint
         run: |
           echo "::add-matcher::.github/actionlint-matcher.json"
           bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
           ./actionlint -color -shellcheck=
         shell: bash
 
-      - name: Run golangci lint
-        if: github.event_name == 'pull_request'
-        uses: reviewdog/action-golangci-lint@v2
+  sonarcloud:
+    runs-on: ubuntu-latest
+    name: PR - Sonarcloud
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: FranzDiebold/github-env-vars-action@v2
+
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@v1.6
+        with:
+          args: >
+            -Dsonar.organization=calyptia
+            -Dsonar.projectKey=${{ env.CI_REPOSITORY_NAME_SLUG }}
+            -Dsonar.sources=.
+            -Dsonar.exclusions=**/*_test.go
+            -Dsonar.tests=.
+            -Dsonar.test.inclusions=**/*_test.go
+            -Dsonar.go.coverage.reportPaths=coverage.out
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
