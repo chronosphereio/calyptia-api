@@ -2,6 +2,15 @@ package types
 
 import "time"
 
+type AggregatorMeasurement struct {
+	Metrics map[string][]MetricFields `json:"metrics"`
+	Totals  map[string][]MetricFields `json:"totals"`
+}
+
+type AggregatorMetrics struct {
+	Measurements map[string]AggregatorMeasurement `json:"measurements"`
+}
+
 // ProjectMetrics response payload for project level metrics.
 type ProjectMetrics struct {
 	Measurements map[string]ProjectMeasurement `json:"measurements"`

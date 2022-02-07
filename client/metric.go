@@ -46,3 +46,16 @@ func (c *Client) PipelineMetrics(ctx context.Context, pipelineID string, params 
 	path := "/v1/pipeline_metrics/" + url.PathEscape(pipelineID) + "?" + q.Encode()
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }
+
+// AggregatorMetrics contains an overview of the aggregated metrics for a project.
+// It includes metrics link the amount of records, bytes, and errors per plugin.
+func (c *Client) AggregatorMetrics(ctx context.Context, aggregatorID string, params types.MetricsParams) (types.AggregatorMetrics, error) {
+	q := url.Values{
+		"start":    []string{params.Start.String()},
+		"interval": []string{params.Interval.String()},
+	}
+
+	var out types.AggregatorMetrics
+	path := "/v1/aggregator_metrics/" + url.PathEscape(aggregatorID) + "?" + q.Encode()
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+}
