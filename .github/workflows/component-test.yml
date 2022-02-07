@@ -95,6 +95,7 @@ jobs:
             sleep 1
           done
           echo "Found token file"
+          sudo chmod a+r ./token
           ls -l ./token
         working-directory: api
         shell: bash
