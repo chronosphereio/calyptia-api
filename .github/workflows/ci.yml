@@ -57,7 +57,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   component-test:
-    uses: calyptia/api/.github/workflows/call-test.yml@main
+    uses: calyptia/api/.github/workflows/call-test.yml@17_schema_validation
     with:
       api-ref: ${{ github.ref }}
     secrets:
