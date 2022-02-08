@@ -237,3 +237,7 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/go,windows,linux,macos,visualstudiocode,goland,vim,git,dotenv
+
+# For testing, ignore anything in this directory
+scripts/resources/*
+!scripts/resources/.gitkeep

@@ -57,9 +57,35 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   component-test:
-    uses: calyptia/api/.github/workflows/call-test.yml@main
-    with:
-      api-ref: ${{ github.ref }}
-    secrets:
-      token-username: ${{ secrets.CI_USERNAME }}
-      token: ${{ secrets.CI_PAT }}
+    name: Run component tests against Cloud image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.CI_USERNAME }}
+          password: ${{ secrets.CI_PAT }}
+
+      - uses: actions/checkout@v2
+        with:
+          repository: calyptia/api
+          token: ${{ secrets.CI_PAT }}
+
+      - uses: actions/checkout@v2
+        with:
+          repository: calyptia/cloud
+          token: ${{ secrets.CI_PAT }}
+          ref: 'main'
+          path: scripts/resources/cloud
+
+      - run: |
+          ./scripts/setup-tests.sh
+          ./scripts/run-tests.sh
+        shell: bash
+        timeout-minutes: 10
+
+      - name: Dump docker logs on failure
+        if: failure()
+        continue-on-error: true
+        uses: jwalton/gh-docker-logs@v2
