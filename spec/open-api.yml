@@ -2520,7 +2520,7 @@ paths:
         name: agentType
         in: path
         required: true
-    get:
+    post:
       tags:
         - config_validator
       summary: Validate configuration
