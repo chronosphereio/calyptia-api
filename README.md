@@ -4,13 +4,15 @@
 [![CI](https://github.com/calyptia/go-repo-template/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/calyptia/go-repo-template/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/calyptia/api/branch/main/graph/badge.svg?token=FUCFZ7JRAS)](https://codecov.io/gh/calyptia/api)
 
-OpenAPI spec and Golang types and client for the API to [Calyptia Cloud](https://cloud.calyptia.com).
+OpenAPI spec, Golang types and client for the API to [Calyptia Cloud](https://cloud.calyptia.com).
 
-## Client
+## Install
 
 ```bash
 go get github.com/calyptia/api
 ```
+
+## Client usage
 
 Get an API key from [Calyptia Cloud](https://cloud.calyptia.com) under settings.
 
