@@ -23,6 +23,7 @@ docker run --rm -v "$SPEC_DIR/":/spec:ro redocly/openapi-cli lint /spec/open-api
 docker run --rm --network=host -v "$SPEC_DIR/":/spec:ro \
     schemathesis/schemathesis:stable \
         run \
+        --hypothesis-suppress-health-check=too_slow \
         --header "Authorization:" \
         --header "X-Project-Token:$TOKEN" \
         --stateful=links \
