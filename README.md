@@ -1,4 +1,4 @@
-# Calyptia Cloud API - Spec, Client and types
+# Calyptia Cloud API - OpenAPI specification, Golang reference client and types.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/calyptia/api.svg)](https://pkg.go.dev/github.com/calyptia/api)
 [![CI](https://github.com/calyptia/go-repo-template/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/calyptia/go-repo-template/actions/workflows/ci.yml)
