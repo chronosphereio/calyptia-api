@@ -35,6 +35,7 @@ tags:
   - name: pipeline_secret
   - name: pipeline_port
   - name: config_validator
+  - name: config_validator_v2
   - name: metric
 components:
   securitySchemes:
@@ -1416,6 +1417,82 @@ components:
             - filter
       required:
         - errors
+
+    ConfigValidityV2Property:
+      type: object
+      description: Property of the validated configuration section
+      properties:
+        id:
+          description: ID of the configuration section
+          type: string
+        property:
+          description: property name
+          type: string
+        text:
+          description: property name, value
+          type: string
+        errors:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - property
+        - text
+        - errors
+
+    ConfigValidityV2Runtime:
+      type: object
+      description: Runtime errors for the validated configuration.
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        id:
+          description: Id of the configuration section
+          type: string
+      required:
+        - id
+        - errors
+
+    ValidatedConfigV2:
+      type: object
+      description: Validation V2 config response.
+      properties:
+        errors:
+          type: object
+          properties:
+            runtime:
+              type: array
+              additionalProperties:
+                $ref: "#/components/schemas/ConfigValidityV2Runtime"
+            input:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ConfigValidityV2Property"
+            output:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ConfigValidityV2Property"
+            filter:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ConfigValidityV2Property"
+          required:
+            - runtime
+            - input
+            - output
+            - filter
+      required:
+        - errors
+
 paths:
   /v1/verification_email:
     post:
@@ -2712,6 +2789,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ValidatedConfig"
+  "/v1/config_validate_v2":
+    post:
+      tags:
+        - config_validator_v2
+      summary: Validate configuration on the v2 endpoint of the service
+      operationId: validateConfigV2
+      description: |-
+        Validates that an already parsed fluentbit config is semantically valid under the V2 error specification
+        To parse the raw agent config take a look at https://github.com/calyptia/fluent-bit-config-parser.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValidatingConfig"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidatedConfigV2"
+
 # TODO: due to limitations on the way x-msgpack body fields are processed
 # by schemathesis, we aren't not exposing this endpoint yet until
 # we have a valid cmetrics encoder.
