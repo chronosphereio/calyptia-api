@@ -22,7 +22,7 @@ func (c *Client) CreateProject(ctx context.Context, payload types.CreateProject)
 func (c *Client) Projects(ctx context.Context, params types.ProjectsParams) ([]types.Project, error) {
 	q := url.Values{}
 	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(*params.Last, DefaultUintFormatBase))
+		q.Set("last", strconv.FormatUint(*params.Last, defaultUintFormatBase))
 	}
 	if params.Name != nil {
 		q.Set("name", *params.Name)

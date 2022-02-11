@@ -24,7 +24,7 @@ func (c *Client) CreateResourceProfile(ctx context.Context, aggregatorID string,
 func (c *Client) ResourceProfiles(ctx context.Context, aggregatorID string, params types.ResourceProfilesParams) ([]types.ResourceProfile, error) {
 	q := url.Values{}
 	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(*params.Last, DefaultUintFormatBase))
+		q.Set("last", strconv.FormatUint(*params.Last, defaultUintFormatBase))
 	}
 
 	var out []types.ResourceProfile

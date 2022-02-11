@@ -24,7 +24,7 @@ func (c *Client) CreateToken(ctx context.Context, projectID string, payload type
 func (c *Client) Tokens(ctx context.Context, projectID string, params types.TokensParams) ([]types.Token, error) {
 	q := url.Values{}
 	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(*params.Last, DefaultUintFormatBase))
+		q.Set("last", strconv.FormatUint(*params.Last, defaultUintFormatBase))
 	}
 	if params.Name != nil {
 		q.Set("name", *params.Name)

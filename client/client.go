@@ -25,9 +25,8 @@ type Client struct {
 
 const (
 	// DefaultBaseURL of the API.
-	DefaultBaseURL = "https://cloud-api.calyptia.com"
-	// DefaultUintFormatBase Default base to use on string conversion to uint.
-	DefaultUintFormatBase = 10
+	DefaultBaseURL        = "https://cloud-api.calyptia.com"
+	defaultUintFormatBase = 10
 )
 
 // New default client.
