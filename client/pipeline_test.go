@@ -11,15 +11,12 @@ import (
 	"github.com/calyptia/api/types"
 )
 
-const testFbitConfigWithAddr = `
-[INPUT]
+const testFbitConfigWithAddr = `[INPUT]
 	Name 			  forward
 	Listen            0.0.0.0
-	Port              24224
-`
+	Port              24224`
 
-const testFbitConfigWithAddr3 = `
-[INPUT]
+const testFbitConfigWithAddr3 = `[INPUT]
 	Name              forward
 	Listen            0.0.0.0
 	Port              24224
@@ -32,8 +29,7 @@ const testFbitConfigWithAddr3 = `
 	Name     syslog.1
 	Listen   0.0.0.0
 	Port     5140
-	Mode     udp
-`
+	Mode     udp`
 
 func TestClient_CreatePipeline(t *testing.T) {
 	ctx := context.Background()

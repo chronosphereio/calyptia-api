@@ -13,7 +13,7 @@ import (
 func (c *Client) Members(ctx context.Context, projectID string, params types.MembersParams) ([]types.Membership, error) {
 	q := url.Values{}
 	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(*params.Last, DefaultUintFormatBase))
+		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
 	}
 
 	var out []types.Membership

@@ -22,7 +22,7 @@ func (c *Client) CreatePipeline(ctx context.Context, aggregatorID string, payloa
 func (c *Client) Pipelines(ctx context.Context, aggregatorID string, params types.PipelinesParams) ([]types.Pipeline, error) {
 	q := url.Values{}
 	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(*params.Last, DefaultUintFormatBase))
+		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
 	}
 	if params.Name != nil {
 		q.Set("name", *params.Name)
@@ -37,7 +37,7 @@ func (c *Client) Pipelines(ctx context.Context, aggregatorID string, params type
 func (c *Client) ProjectPipelines(ctx context.Context, projectID string, params types.PipelinesParams) ([]types.Pipeline, error) {
 	q := url.Values{}
 	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(*params.Last, DefaultUintFormatBase))
+		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
 	}
 	if params.Name != nil {
 		q.Set("name", *params.Name)
