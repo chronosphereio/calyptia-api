@@ -12,6 +12,12 @@ import (
 	"github.com/calyptia/api/types"
 )
 
+const (
+	// DefaultBaseURL of the API.
+	DefaultBaseURL = "https://cloud-api.calyptia.com"
+	uintBase       = 10
+)
+
 // Client is the client over the REST HTTP API of Calyptia Cloud.
 type Client struct {
 	BaseURL string
@@ -22,12 +28,6 @@ type Client struct {
 	agentToken      string
 	aggregatorToken string
 }
-
-const (
-	// DefaultBaseURL of the API.
-	DefaultBaseURL        = "https://cloud-api.calyptia.com"
-	defaultUintFormatBase = 10
-)
 
 // New default client.
 func New() *Client {
