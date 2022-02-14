@@ -12,6 +12,7 @@ import (
 const DefaultEncryptionBits = 2048
 
 type RSA struct {
+	Handler
 	Bits int
 }
 
