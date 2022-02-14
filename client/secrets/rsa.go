@@ -16,7 +16,6 @@ const (
 )
 
 type RSA struct {
-	Handler
 	Bits int
 }
 
