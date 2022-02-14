@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	DefaultEncryptionBits    = 2048
+	DefaultEncryptionBits  = 2048
 	BlockTypeRSAPublicKey  = "RSA PUBLIC KEY"
 	BlockTypeRSAPrivateKey = "RSA PRIVATE KEY"
 )
@@ -69,7 +69,7 @@ func (r *RSA) GenerateKeyPair() ([]byte, []byte, error) {
 func PrivateKeyToBytes(priv *rsa.PrivateKey) []byte {
 	return pem.EncodeToMemory(
 		&pem.Block{
-			Type:  DefaultTypeRSAPrivateKey,
+			Type:  BlockTypeRSAPrivateKey,
 			Bytes: x509.MarshalPKCS1PrivateKey(priv),
 		},
 	)
@@ -82,7 +82,7 @@ func PublicKeyToBytes(pub *rsa.PublicKey) ([]byte, error) {
 	}
 
 	pubBytes := pem.EncodeToMemory(&pem.Block{
-		Type:  DefaultTypeRSAPublicKey,
+		Type:  BlockTypeRSAPublicKey,
 		Bytes: pubASN1,
 	})
 	return pubBytes, nil
