@@ -11,7 +11,7 @@ import (
 
 const (
 	DefaultEncryptionBits    = 2048
-	DefaultTypeRSAPublicKey  = "RSA PUBLIC KEY"
+	BlockTypeRSAPublicKey  = "RSA PUBLIC KEY"
 	DefaultTypeRSAPrivateKey = "RSA PRIVATE KEY"
 )
 
