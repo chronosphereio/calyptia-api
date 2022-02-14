@@ -12,7 +12,7 @@ import (
 const (
 	DefaultEncryptionBits    = 2048
 	BlockTypeRSAPublicKey  = "RSA PUBLIC KEY"
-	DefaultTypeRSAPrivateKey = "RSA PRIVATE KEY"
+	BlockTypeRSAPrivateKey = "RSA PRIVATE KEY"
 )
 
 type RSA struct {
