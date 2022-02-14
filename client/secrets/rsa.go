@@ -9,7 +9,11 @@ import (
 	"fmt"
 )
 
-const DefaultEncryptionBits = 2048
+const (
+	DefaultEncryptionBits    = 2048
+	DefaultTypeRSAPublicKey  = "RSA PUBLIC KEY"
+	DefaultTypeRSAPrivateKey = "RSA PRIVATE KEY"
+)
 
 type RSA struct {
 	Handler
@@ -66,7 +70,7 @@ func (r *RSA) GenerateKeyPair() ([]byte, []byte, error) {
 func PrivateKeyToBytes(priv *rsa.PrivateKey) []byte {
 	return pem.EncodeToMemory(
 		&pem.Block{
-			Type:  "RSA PRIVATE KEY",
+			Type:  DefaultTypeRSAPrivateKey,
 			Bytes: x509.MarshalPKCS1PrivateKey(priv),
 		},
 	)
@@ -79,7 +83,7 @@ func PublicKeyToBytes(pub *rsa.PublicKey) ([]byte, error) {
 	}
 
 	pubBytes := pem.EncodeToMemory(&pem.Block{
-		Type:  "RSA PUBLIC KEY",
+		Type:  DefaultTypeRSAPublicKey,
 		Bytes: pubASN1,
 	})
 	return pubBytes, nil
