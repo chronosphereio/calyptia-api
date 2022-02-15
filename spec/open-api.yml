@@ -16,7 +16,7 @@ servers:
         default: "5000"
   - url: "https://cloud-api-dev.calyptia.com"
     description: dev
-  - url: "https://cloud-api-prod.calyptia.com"
+  - url: "https://cloud-api.calyptia.com"
     description: prod
 tags:
   - name: user
