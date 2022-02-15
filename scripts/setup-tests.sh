@@ -2,42 +2,13 @@
 set -eux
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-CLOUD_URL=${CLOUD_URL:-http://localhost:5000}
+CLOUD_PORT=${CLOUD_PORT:-5000}
+CLOUD_EXPOSED_PORT=${CLOUD_EXPOSED_PORT:-5000}
+CLOUD_URL=${CLOUD_URL:-http://localhost:$CLOUD_EXPOSED_PORT}
 CLOUD_IMAGE_TAG=${CLOUD_IMAGE_TAG:-main}
-CLOUD_IMAGE=${CLOUD_IMAGE:-ghcr.io/calyptia/cloud:$CLOUD_IMAGE_TAG}
+CLOUD_IMAGE=${CLOUD_IMAGE:-ghcr.io/calyptia/cloud/all-in-one:$CLOUD_IMAGE_TAG}
 TOKEN_DIR=${TOKEN_DIR:-$SCRIPT_DIR/resources}
 TOKENFILE="$TOKEN_DIR/token"
-
-if ! docker pull "$CLOUD_IMAGE"; then
-    echo "Unable to pull cloud image: $CLOUD_IMAGE"
-    exit 1
-fi
-
-# TODO: remove once we have all-in-one container: https://github.com/calyptia/cloud/issues/308
-CLOUD_DIR=${CLOUD_DIR:-$SCRIPT_DIR/resources/cloud}
-
-if [[ ! -d "$CLOUD_DIR" ]]; then
-    echo "No CLOUD_DIR at '$CLOUD_DIR', please clone and select branch to use first."
-    exit 1
-fi
-
-if [[ ! -f "$CLOUD_DIR/docker-compose.yml" ]]; then
-    echo "No compose stack defined at $CLOUD_DIR/docker-compose.yml"
-    exit 1
-fi
-
-docker-compose --project-name api_cloud_test -f "$CLOUD_DIR/docker-compose.yml" up -d --force-recreate
-
-# This actually takes a while to come up on the runners sometimes so a compose stack is not great for it.
-echo "Waiting for Postgresql to be ready"
-until docker exec -t api_cloud_test_postgres_1 pg_isready ; do
-    echo -n "."
-    sleep 1
-done
-echo
-echo "Databases set up"
-
-# END OF TODO
 
 # TODO: only due to permissions issues: https://github.com/calyptia/cloud/issues/309
 mkdir -p "$TOKEN_DIR"
@@ -51,6 +22,7 @@ docker run -d --network=host \
     --name cloud \
     -e DEBUG=true \
     -e DEFAULT_TOKEN_FILE=/token/token -v "$TOKEN_DIR":/token:Z \
+    -p "$CLOUD_EXPOSED_PORT:$CLOUD_PORT" \
     "$CLOUD_IMAGE"
 
 echo "Waiting for Cloud container to be ready"
