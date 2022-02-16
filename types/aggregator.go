@@ -2,6 +2,14 @@ package types
 
 import "time"
 
+const (
+	ErrInvalidAggregatorToken = UnauthenticatedError("invalid aggregator token")
+	ErrInvalidAggregatorID    = InvalidArgumentError("invalid aggregator ID")
+	ErrInvalidAggregatorName  = InvalidArgumentError("invalid aggregator name")
+	ErrAggregatorGone         = GoneError("aggregator gone")
+	ErrAggregatorNotFound     = NotFoundError("aggregator not found")
+)
+
 // Aggregator model.
 type Aggregator struct {
 	ID             string    `json:"id" yaml:"id"`

@@ -2,6 +2,11 @@ package types
 
 import "time"
 
+const (
+	ErrInvalidPipelineStatus  = InvalidArgumentError("invalid pipeline status")
+	ErrPipelineStatusNotFound = NotFoundError("pipeline status not found")
+)
+
 // PipelineStatus model.
 type PipelineStatus struct {
 	ID        string             `json:"id" yaml:"id"`

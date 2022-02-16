@@ -5,6 +5,15 @@ import (
 	"time"
 )
 
+const (
+	ErrInvalidPipelineID         = InvalidArgumentError("invalid pipeline ID")
+	ErrInvalidPipelineName       = InvalidArgumentError("invalid pipeline name")
+	ErrInvalidPipelineMetadata   = InvalidArgumentError("invalid pipeline metadata")
+	ErrPipelineNameAlreadyExists = ConflictError("pipeline name already exists")
+	ErrPipelineGone              = GoneError("pipeline gone")
+	ErrPipelineNotFound          = NotFoundError("pipeline not found")
+)
+
 // Pipeline model.
 type Pipeline struct {
 	ID              string           `json:"id" yaml:"id"`

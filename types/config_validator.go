@@ -1,5 +1,9 @@
 package types
 
+const (
+	ErrInvalidConfigToValidate = InvalidArgumentError("invalid configuration validation payload")
+)
+
 // ValidatingConfig request body for validating a config.
 type ValidatingConfig struct {
 	Configs []ValidatingConfigEntry `json:"config"`

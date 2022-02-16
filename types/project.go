@@ -2,6 +2,13 @@ package types
 
 import "time"
 
+const (
+	ErrInvalidProjectID   = InvalidArgumentError("invalid project ID")
+	ErrInvalidProjectName = InvalidArgumentError("invalid project name")
+	ErrProjectGone        = GoneError("project gone")
+	ErrProjectNotFound    = NotFoundError("project not found")
+)
+
 // Project model.
 type Project struct {
 	ID               string    `json:"id" yaml:"id"`

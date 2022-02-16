@@ -2,6 +2,13 @@ package types
 
 import "time"
 
+const (
+	ErrInvalidStart    = InvalidArgumentError("invalid start")
+	ErrInvalidInterval = InvalidArgumentError("invalid interval")
+	// ErrInvalidMetricPlugin denotes that either `tag` nor `name` were not defined on the metric.
+	ErrInvalidMetricPlugin = InvalidArgumentError("invalid metric plugin")
+)
+
 type AggregatorMeasurement struct {
 	Metrics map[string][]MetricFields `json:"metrics"`
 	Totals  map[string][]MetricFields `json:"totals"`

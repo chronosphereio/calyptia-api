@@ -6,6 +6,29 @@ import (
 	"time"
 )
 
+const (
+	ErrInvalidAgentToken             = UnauthenticatedError("invalid agent token")
+	ErrInvalidAgentID                = InvalidArgumentError("invalid agent ID")
+	ErrInvalidAgentName              = InvalidArgumentError("invalid agent name")
+	ErrInvalidMachineID              = InvalidArgumentError("invalid machine ID")
+	ErrInvalidAgentType              = InvalidArgumentError("invalid agent type")
+	ErrInvalidAgentVersion           = InvalidArgumentError("invalid agent version")
+	ErrUnsupportedAgentVersion       = InvalidArgumentError("unsupported agent version")
+	ErrInvalidAgentEdition           = InvalidArgumentError("invalid agent edition")
+	ErrInvalidAgentFlags             = InvalidArgumentError("invalid agent flags")
+	ErrInvalidAgentFlag              = InvalidArgumentError("invalid agent flag")
+	ErrInvalidAgentRawConfig         = InvalidArgumentError("invalid agent raw config")
+	ErrInvalidAgentMetadata          = InvalidArgumentError("invalid agent metadata")
+	ErrUpdateAgentVersionForbidden   = PermissionDeniedError("update agent version forbidden")
+	ErrUpdateAgentEditionForbidden   = PermissionDeniedError("update agent edition forbidden")
+	ErrUpdateAgentFlagsForbidden     = PermissionDeniedError("update agent flags forbidden")
+	ErrUpdateAgentRawConfigForbidden = PermissionDeniedError("update agent raw config forbidden")
+	ErrUpdateAgentMetadataForbidden  = PermissionDeniedError("update agent metadata forbidden")
+	ErrAgentGone                     = GoneError("agent gone")
+	ErrMachineIDConflict             = ConflictError("machine ID conflict")
+	ErrAgentNotFound                 = NotFoundError("agent not found")
+)
+
 // Agent model.
 type Agent struct {
 	ID                  string           `json:"id" yaml:"id"`

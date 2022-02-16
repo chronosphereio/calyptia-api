@@ -2,6 +2,15 @@ package types
 
 import "time"
 
+const (
+	ErrInvalidResourceProfileID     = InvalidArgumentError("invalid resource profile ID")
+	ErrInvalidResourceProfileName   = InvalidArgumentError("invalid resource profile name")
+	ErrResourceProfileStillInUse    = PermissionDeniedError("resource profile still in use by pipelines")
+	ErrResourceProfileAlreadyExists = ConflictError("resource profile name already exists")
+	ErrResourceProfileGone          = GoneError("resource profile gone")
+	ErrResourceProfileNotFound      = NotFoundError("resource profile not found")
+)
+
 // ResourceProfile model.
 type ResourceProfile struct {
 	ID                     string    `json:"id" yaml:"id"`

@@ -2,6 +2,15 @@ package types
 
 import "time"
 
+const (
+	ErrEmailNotVerified = UnauthenticatedError("email not verified")
+	ErrInvalidEmail     = InvalidArgumentError("invalid email")
+	ErrInvalidUserName  = InvalidArgumentError("invalid user name")
+	ErrInvalidAvatarURL = InvalidArgumentError("invalid avatar URL")
+	ErrEmailTaken       = ConflictError("email taken")
+	ErrUserNotFound     = NotFoundError("user not found")
+)
+
 // User model.
 type User struct {
 	ID        string    `json:"id" yaml:"id"`

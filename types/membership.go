@@ -2,6 +2,8 @@ package types
 
 import "time"
 
+const ErrMemberAlreadyExists = ConflictError("member already exists")
+
 // Membership model.
 type Membership struct {
 	ID        string           `json:"id" yaml:"id"`

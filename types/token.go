@@ -2,6 +2,15 @@ package types
 
 import "time"
 
+const (
+	ErrInvalidToken     = UnauthenticatedError("invalid token")
+	ErrInvalidTokenID   = InvalidArgumentError("invalid token ID")
+	ErrInvalidTokenName = InvalidArgumentError("invalid token name")
+	ErrTokenNameTaken   = ConflictError("token name taken")
+	ErrTokenGone        = GoneError("token gone")
+	ErrTokenNotFound    = NotFoundError("token not found")
+)
+
 // Token model.
 type Token struct {
 	ID        string    `json:"id" yaml:"id"`

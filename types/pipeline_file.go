@@ -2,6 +2,13 @@ package types
 
 import "time"
 
+const (
+	ErrInvalidPipelineFileID         = InvalidArgumentError("invalid pipeline file ID")
+	ErrInvalidPipelineFileName       = InvalidArgumentError("invalid pipeline file name")
+	ErrPipelineFilenameAlreadyExists = ConflictError("pipeline file name already exists")
+	ErrPipelineFileNotFound          = NotFoundError("pipeline file not found")
+)
+
 // PipelineFile model.
 type PipelineFile struct {
 	ID        string    `json:"id" yaml:"id"`

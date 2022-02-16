@@ -2,6 +2,13 @@ package types
 
 import "time"
 
+const (
+	ErrInvalidPipelineSecretID     = InvalidArgumentError("invalid pipeline secret ID")
+	ErrInvalidPipelineSecretKey    = InvalidArgumentError("invalid pipeline secret key")
+	ErrPipelineSecretAlreadyExists = ConflictError("pipeline secret already exists")
+	ErrPipelineSecretNotFound      = NotFoundError("pipeline secret not found")
+)
+
 // PipelineSecret model.
 type PipelineSecret struct {
 	ID        string    `json:"id" yaml:"id"`

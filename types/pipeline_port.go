@@ -2,6 +2,16 @@ package types
 
 import "time"
 
+const (
+	ErrInvalidPipelinePortID                = InvalidArgumentError("invalid pipeline port ID")
+	ErrInvalidPipelinePortProtocol          = InvalidArgumentError("invalid pipeline port protocol")
+	ErrInvalidPipelinePortNumber            = InvalidArgumentError("invalid pipeline port number")
+	ErrInvalidPipelinePortEndpoint          = InvalidArgumentError("invalid pipeline port endpoint")
+	ErrPipelinePortFrontendAlreadyAllocated = ConflictError("pipeline port frontend already allocated")
+	ErrUpdatePipelinePortEndpointForbidden  = PermissionDeniedError("update pipeline port endpoint forbidden")
+	ErrPipelinePortNotFound                 = NotFoundError("pipeline port not found")
+)
+
 // PipelinePort model.
 type PipelinePort struct {
 	ID           string    `json:"id" yaml:"id"`
