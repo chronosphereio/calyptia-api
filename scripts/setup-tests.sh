@@ -14,11 +14,11 @@ TOKENFILE="$TOKEN_DIR/token"
 mkdir -p "$TOKEN_DIR"
 rm -f "$TOKENFILE"
 touch "$TOKENFILE"
-chmod a+r "$TOKENFILE"
+chmod 666 "$TOKENFILE"
 # END OF TODO
 
 docker rm -f cloud
-docker run -d --network=host \
+docker run -d \
     --name cloud \
     -e DEBUG=true \
     -e DEFAULT_TOKEN_FILE=/token/token -v "$TOKEN_DIR":/token:Z \
