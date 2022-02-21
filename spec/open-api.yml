@@ -9,15 +9,15 @@ info:
     url: "https://cloud.calyptia.com"
   termsOfService: "https://calyptia.com/terms/"
 servers:
+  - url: "https://cloud-api.calyptia.com"
+    description: prod
+  - url: "https://cloud-api-dev.calyptia.com"
+    description: dev
   - url: "http://localhost:{port}"
     description: local
     variables:
       port:
         default: "5000"
-  - url: "https://cloud-api-dev.calyptia.com"
-    description: dev
-  - url: "https://cloud-api.calyptia.com"
-    description: prod
 tags:
   - name: user
   - name: project
@@ -2815,42 +2815,42 @@ paths:
               schema:
                 $ref: "#/components/schemas/ValidatedConfigV2"
 
-# TODO: due to limitations on the way x-msgpack body fields are processed
-# by schemathesis, we aren't not exposing this endpoint yet until
-# we have a valid cmetrics encoder.
-#"/v1/agent_metrics":
-#    post:
-#      tags:
-#        - metric
-#      summary: Add agent metrics
-#      operationId: addAgentMetrics
-#      description: |-
-#        Store the incomming metrics from the agent.
-#      security:
-#        - project: []
-#      requestBody:
-#        content:
-#          application/x-msgpack:
-#            schema:
-#              type: string
-#              format: binary
-#              description: |-
-#                Msgpack encoded metrics using cmetrics library.
-#      responses:
-#        "201":
-#          description: Created
-#          content:
-#            application/json:
-#              schema:
-#                type: object
-#                description: Total number of inserted metrics.
-#                properties:
-#                  totalInserted:
-#                    type: integer
-#                    format: int64
-#                    minimum: 0
-#                required:
-#                  - totalInserted
+  # TODO: due to limitations on the way x-msgpack body fields are processed
+  # by schemathesis, we aren't not exposing this endpoint yet until
+  # we have a valid cmetrics encoder.
+  #"/v1/agent_metrics":
+  #    post:
+  #      tags:
+  #        - metric
+  #      summary: Add agent metrics
+  #      operationId: addAgentMetrics
+  #      description: |-
+  #        Store the incomming metrics from the agent.
+  #      security:
+  #        - project: []
+  #      requestBody:
+  #        content:
+  #          application/x-msgpack:
+  #            schema:
+  #              type: string
+  #              format: binary
+  #              description: |-
+  #                Msgpack encoded metrics using cmetrics library.
+  #      responses:
+  #        "201":
+  #          description: Created
+  #          content:
+  #            application/json:
+  #              schema:
+  #                type: object
+  #                description: Total number of inserted metrics.
+  #                properties:
+  #                  totalInserted:
+  #                    type: integer
+  #                    format: int64
+  #                    minimum: 0
+  #                required:
+  #                  - totalInserted
   "/v1/projects/{projectID}/metrics":
     parameters:
       - schema:
@@ -2997,8 +2997,8 @@ paths:
             format: duration
             default: 1h
       security:
-        - user: [ ]
-        - project: [ ]
+        - user: []
+        - project: []
       summary: Aggregator metrics
       operationId: aggregatorMetrics
       tags:
