@@ -329,6 +329,7 @@ func TestClient_UpdatePipeline(t *testing.T) {
 	wantEqual(t, err, nil)
 
 	wantEqual(t, len(got.AddedPorts), 2) // new config has 2 additional ports tcp/5140 and udp/5141.
+	wantEqual(t, len(got.RemovedPorts), 0)
 
 	// Sort added ports by protocold and port number
 	// since they are created at the same time

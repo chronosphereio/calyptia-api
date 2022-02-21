@@ -8,7 +8,7 @@ import (
 )
 
 func TestClient_ValidateConfig(t *testing.T) {
-	if testFluentbitConfigValidatorAPIKey == "" || testFluentdConfigValidatorAPIKey == "" {
+	if testFluentbitConfigValidatorAPIKey == "" { // || testFluentdConfigValidatorAPIKey == "" {
 		t.Skip("TODO: setup fluentbit/d config validator API keys")
 	}
 
@@ -41,7 +41,7 @@ func TestClient_ValidateConfig(t *testing.T) {
 }
 
 func TestClient_ValidateConfigV2(t *testing.T) {
-	if testFluentbitConfigValidatorAPIKey == "" || testFluentdConfigValidatorAPIKey == "" {
+	if testFluentbitConfigValidatorAPIKey == "" { // || testFluentdConfigValidatorAPIKey == "" {
 		t.Skip("TODO: setup fluentbit/d config validator API keys")
 	}
 

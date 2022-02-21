@@ -64,5 +64,6 @@ type PipelinesParams struct {
 
 // UpdatedPipeline response payload after updating a pipeline successfully.
 type UpdatedPipeline struct {
-	AddedPorts []PipelinePort `json:"addedPorts"`
+	AddedPorts   []PipelinePort `json:"addedPorts"`
+	RemovedPorts []PipelinePort `json:"removedPorts"`
 }
