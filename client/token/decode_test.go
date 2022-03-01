@@ -51,6 +51,8 @@ func TestDecode(t *testing.T) {
 				if !tc.expectError {
 					t.Errorf("error: %v != nil", err)
 				}
+
+				return
 			}
 			if want, got := tc.projectID, d; want != got {
 				t.Errorf("want: %v != got: %v", want, got)
