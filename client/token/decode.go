@@ -8,7 +8,8 @@ import (
 	"fmt"
 )
 
-var errInvalidToken = errors.New("invalid project token")
+// ErrInvalidToken denotes a malformed project token.
+var ErrInvalidToken = errors.New("invalid project token")
 
 const (
 	tokenPartsSeparator = "."
