@@ -26,7 +26,7 @@ type projectTokenPayload struct {
 func Decode(token []byte) (string, error) {
 	parts := bytes.Split(token, []byte(tokenPartsSeparator))
 	if len(parts) != tokenParts {
-		return "", errInvalidToken
+		return "", ErrInvalidToken
 	}
 
 	encodedPayload := parts[0]
@@ -34,7 +34,7 @@ func Decode(token []byte) (string, error) {
 	payload := make([]byte, base64.RawURLEncoding.DecodedLen(len(encodedPayload)))
 	n, err := base64.RawURLEncoding.Decode(payload, encodedPayload)
 	if err != nil {
-		return "", errInvalidToken
+		return "", ErrInvalidToken
 	}
 
 	payload = payload[:n]
