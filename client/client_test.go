@@ -48,7 +48,7 @@ var (
 
 var (
 	hostIP                             = env("HOST_IP", dockerHostGateway)
-	testCloudImage                     = env("TEST_CLOUD_IMAGE", "ghcr.io/calyptia/cloud")
+	testCloudImage                     = env("TEST_CLOUD_IMAGE", "ghcr.io/calyptia/cloud:main")
 	testCloudPort                      = env("TEST_CLOUD_PORT", "5000")
 	testFluentbitConfigValidatorAPIKey = os.Getenv("TEST_FLUENTBIT_CONFIG_VALIDATOR_API_KEY")
 	testFluentdConfigValidatorAPIKey   = os.Getenv("TEST_FLUENTD_CONFIG_VALIDATOR_API_KEY")
