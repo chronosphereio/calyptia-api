@@ -429,7 +429,7 @@ func getAuthConfigForImage(image string) (docker.AuthConfiguration, error) {
 func setupCloud(pool *dockertest.Pool, conf setupCloudConfig) (*dockertest.Resource, error) {
 	var cloudImageTag string
 
-	splitDockerImage := strings.Split(testCloudImage, ":")
+	splitDockerImage := strings.SplitN(testCloudImage, ":", 2)
 	if len(splitDockerImage) == 2 {
 		cloudImageTag = splitDockerImage[1]
 	} else {
