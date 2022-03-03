@@ -37,7 +37,8 @@ import (
 )
 
 const (
-	dockerHostGateway = "host-gateway"
+	dockerHostGateway          = "host-gateway"
+	defaultCloudImageLatestTag = "main"
 )
 
 var (
@@ -47,8 +48,7 @@ var (
 
 var (
 	hostIP                             = env("HOST_IP", dockerHostGateway)
-	testCloudImage                     = env("TEST_CLOUD_IMAGE", "ghcr.io/calyptia/cloud")
-	testCloudImageTag                  = env("TEST_CLOUD_IMAGE_TAG", "main")
+	testCloudImage                     = env("TEST_CLOUD_IMAGE", "ghcr.io/calyptia/cloud:main")
 	testCloudPort                      = env("TEST_CLOUD_PORT", "5000")
 	testFluentbitConfigValidatorAPIKey = os.Getenv("TEST_FLUENTBIT_CONFIG_VALIDATOR_API_KEY")
 	testFluentdConfigValidatorAPIKey   = os.Getenv("TEST_FLUENTD_CONFIG_VALIDATOR_API_KEY")
@@ -427,7 +427,17 @@ func getAuthConfigForImage(image string) (docker.AuthConfiguration, error) {
 }
 
 func setupCloud(pool *dockertest.Pool, conf setupCloudConfig) (*dockertest.Resource, error) {
-	authConfig, err := getAuthConfigForImage(testCloudImage)
+	var cloudImageTag string
+
+	splitDockerImage := strings.SplitN(testCloudImage, ":", 2)
+	if len(splitDockerImage) == 2 {
+		cloudImageTag = splitDockerImage[1]
+		testCloudImage = splitDockerImage[0]
+	} else {
+		cloudImageTag = defaultCloudImageLatestTag
+	}
+
+	authConfig, err := getAuthConfigForImage(splitDockerImage[0])
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -435,7 +445,7 @@ func setupCloud(pool *dockertest.Pool, conf setupCloudConfig) (*dockertest.Resou
 	return pool.RunWithOptions(&dockertest.RunOptions{
 		Auth:       authConfig,
 		Repository: testCloudImage,
-		Tag:        testCloudImageTag,
+		Tag:        cloudImageTag,
 		Env: []string{
 			"PORT=" + conf.port,
 			"ORIGIN=http://localhost:" + conf.port,
