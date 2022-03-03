@@ -16,6 +16,9 @@ func (c *Client) PipelineStatusHistory(ctx context.Context, pipelineID string, p
 	if params.Last != nil {
 		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
 	}
+	if params.Status != nil {
+		q.Set("status", string(*params.Status))
+	}
 
 	var out []types.PipelineStatus
 	path := "/v1/aggregator_pipelines/" + url.PathEscape(pipelineID) + "/status_history?" + q.Encode()
