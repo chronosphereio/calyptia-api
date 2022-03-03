@@ -430,7 +430,7 @@ func setupCloud(pool *dockertest.Pool, conf setupCloudConfig) (*dockertest.Resou
 	var cloudImageTag string
 
 	splitDockerImage := strings.Split(testCloudImage, ":")
-	if len(splitDockerImage) > 1 {
+	if len(splitDockerImage) == 2 {
 		cloudImageTag = splitDockerImage[1]
 	} else {
 		cloudImageTag = defaultCloudImageLatestTag
