@@ -2408,6 +2408,17 @@ paths:
           in: query
           name: last
           description: Last history entries.
+        - schema:
+            type: string
+            enum:
+              - NEW
+              - FAILED
+              - STARTING
+              - STARTED
+              - DELETED
+          in: query
+          name: status
+          description: Filter status entries with matching status.
       responses:
         "200":
           description: OK
