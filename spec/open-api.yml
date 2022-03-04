@@ -908,6 +908,7 @@ components:
           minimum: 0
       required:
         - name
+        - version
         - addHealthCheckPipeline
         - healthCheckPipelinePort
     UpdateAggregator:
