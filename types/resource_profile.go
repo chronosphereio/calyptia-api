@@ -20,6 +20,12 @@ type ResourceProfile struct {
 	UpdatedAt              time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
 
+// ResourceProfiles paginated list.
+type ResourceProfiles struct {
+	Items     []ResourceProfile
+	EndCursor *string
+}
+
 const (
 	// ResourceProfileHighPerformanceGuaranteedDelivery is one of the 3 default resource profiles created with an aggregator.
 	ResourceProfileHighPerformanceGuaranteedDelivery = "high-performance-guaranteed-delivery"
@@ -55,7 +61,8 @@ type CreatedResourceProfile struct {
 
 // ResourceProfilesParams request payload for querying resource profiles.
 type ResourceProfilesParams struct {
-	Last *uint64
+	Last   *uint64
+	Before *string
 }
 
 // UpdateResourceProfile request payload for updating a resource profile.

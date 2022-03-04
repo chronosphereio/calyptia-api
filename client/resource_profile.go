@@ -21,15 +21,18 @@ func (c *Client) CreateResourceProfile(ctx context.Context, aggregatorID string,
 }
 
 // ResourceProfiles from an aggregator in descending order.
-func (c *Client) ResourceProfiles(ctx context.Context, aggregatorID string, params types.ResourceProfilesParams) ([]types.ResourceProfile, error) {
+func (c *Client) ResourceProfiles(ctx context.Context, aggregatorID string, params types.ResourceProfilesParams) (types.ResourceProfiles, error) {
 	q := url.Values{}
 	if params.Last != nil {
 		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
 	}
+	if params.Before != nil {
+		q.Set("before", *params.Before)
+	}
 
-	var out []types.ResourceProfile
+	var out types.ResourceProfiles
 	path := "/v1/aggregators/" + url.PathEscape(aggregatorID) + "/resource_profiles?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
 }
 
 // ResourceProfile by ID.

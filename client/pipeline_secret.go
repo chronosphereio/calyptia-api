@@ -20,15 +20,18 @@ func (c *Client) CreatePipelineSecret(ctx context.Context, pipelineID string, pa
 }
 
 // PipelineSecrets in descending order.
-func (c *Client) PipelineSecrets(ctx context.Context, pipelineID string, params types.PipelineSecretsParams) ([]types.PipelineSecret, error) {
+func (c *Client) PipelineSecrets(ctx context.Context, pipelineID string, params types.PipelineSecretsParams) (types.PipelineSecrets, error) {
 	q := url.Values{}
 	if params.Last != nil {
 		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
 	}
+	if params.Before != nil {
+		q.Set("before", *params.Before)
+	}
 
-	var out []types.PipelineSecret
+	var out types.PipelineSecrets
 	path := "/v1/aggregator_pipelines/" + url.PathEscape(pipelineID) + "/secrets?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
 }
 
 // PipelineSecret by ID.

@@ -9,7 +9,14 @@ type AgentConfig struct {
 	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
 }
 
+// AgentConfigHistory paginated list.
+type AgentConfigHistory struct {
+	Items     []AgentConfig
+	EndCursor *string
+}
+
 // AgentConfigHistoryParams request payload for querying the agent config history.
 type AgentConfigHistoryParams struct {
-	Last *uint64
+	Last   *uint64
+	Before *string
 }

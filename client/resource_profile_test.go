@@ -40,31 +40,31 @@ func TestClient_ResourceProfiles(t *testing.T) {
 
 	got, err := asUser.ResourceProfiles(ctx, aggregator.ID, types.ResourceProfilesParams{})
 	wantEqual(t, err, nil)
-	wantEqual(t, len(got), 3) // By default, there are 3 resource profiles.
+	wantEqual(t, len(got.Items), 3) // By default, there are 3 resource profiles.
 
 	// Sort resource profiles by name
 	// since they are created at the same time
 	// and the order may switch.
-	sort.Slice(got, func(i, j int) bool {
-		return got[i].Name < got[j].Name
+	sort.Slice(got.Items, func(i, j int) bool {
+		return got.Items[i].Name < got.Items[j].Name
 	})
 
 	// TODO: check on the expected profile spec values.
 
-	wantNoEqual(t, got[0].ID, "")
-	wantEqual(t, got[0].Name, types.ResourceProfileBestEffortLowResource)
-	wantNoTimeZero(t, got[0].CreatedAt)
-	wantNoTimeZero(t, got[0].UpdatedAt)
+	wantNoEqual(t, got.Items[0].ID, "")
+	wantEqual(t, got.Items[0].Name, types.ResourceProfileBestEffortLowResource)
+	wantNoTimeZero(t, got.Items[0].CreatedAt)
+	wantNoTimeZero(t, got.Items[0].UpdatedAt)
 
-	wantNoEqual(t, got[1].ID, "")
-	wantEqual(t, got[1].Name, types.ResourceProfileHighPerformanceGuaranteedDelivery)
-	wantNoTimeZero(t, got[1].CreatedAt)
-	wantNoTimeZero(t, got[1].UpdatedAt)
+	wantNoEqual(t, got.Items[1].ID, "")
+	wantEqual(t, got.Items[1].Name, types.ResourceProfileHighPerformanceGuaranteedDelivery)
+	wantNoTimeZero(t, got.Items[1].CreatedAt)
+	wantNoTimeZero(t, got.Items[1].UpdatedAt)
 
-	wantNoEqual(t, got[2].ID, "")
-	wantEqual(t, got[2].Name, types.ResourceProfileHighPerformanceOptimalThroughput)
-	wantNoTimeZero(t, got[2].CreatedAt)
-	wantNoTimeZero(t, got[2].UpdatedAt)
+	wantNoEqual(t, got.Items[2].ID, "")
+	wantEqual(t, got.Items[2].Name, types.ResourceProfileHighPerformanceOptimalThroughput)
+	wantNoTimeZero(t, got.Items[2].CreatedAt)
+	wantNoTimeZero(t, got.Items[2].UpdatedAt)
 }
 
 func TestClient_ResourceProfile(t *testing.T) {

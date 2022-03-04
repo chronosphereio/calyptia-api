@@ -21,18 +21,21 @@ func (c *Client) CreateToken(ctx context.Context, projectID string, payload type
 }
 
 // Tokens from a project.
-func (c *Client) Tokens(ctx context.Context, projectID string, params types.TokensParams) ([]types.Token, error) {
+func (c *Client) Tokens(ctx context.Context, projectID string, params types.TokensParams) (types.Tokens, error) {
 	q := url.Values{}
 	if params.Last != nil {
 		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
+	}
+	if params.Before != nil {
+		q.Set("before", *params.Before)
 	}
 	if params.Name != nil {
 		q.Set("name", *params.Name)
 	}
 
-	var out []types.Token
+	var out types.Tokens
 	path := "/v1/projects/" + url.PathEscape(projectID) + "/tokens?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
 }
 
 // Token by ID.

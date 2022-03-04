@@ -25,6 +25,12 @@ type Agent struct {
 	UpdatedAt           time.Time        `json:"updatedAt" yaml:"updatedAt"`
 }
 
+// Agents paginated list.
+type Agents struct {
+	Items     []Agent
+	EndCursor *string
+}
+
 // AgentType declares the fluent agent type (fluentbit/fluentd).
 type AgentType string
 
@@ -67,8 +73,9 @@ type RegisteredAgent struct {
 
 // AgentsParams request payload for querying agents.
 type AgentsParams struct {
-	Last *uint64
-	Name *string
+	Last   *uint64
+	Before *string
+	Name   *string
 }
 
 // UpdateAgent request payload for updating an agent.

@@ -18,6 +18,12 @@ type Pipeline struct {
 	UpdatedAt       time.Time        `json:"updatedAt" yaml:"updatedAt"`
 }
 
+// Pipelines paginated list.
+type Pipelines struct {
+	Items     []Pipeline
+	EndCursor *string
+}
+
 // CreatePipeline request payload for creating a new pipeline.
 type CreatePipeline struct {
 	Name                      string                 `json:"name"`
@@ -58,8 +64,9 @@ type UpdatePipeline struct {
 
 // PipelinesParams request payload for querying pipelines.
 type PipelinesParams struct {
-	Last *uint64
-	Name *string
+	Last   *uint64
+	Before *string
+	Name   *string
 }
 
 // UpdatedPipeline response payload after updating a pipeline successfully.

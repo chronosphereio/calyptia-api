@@ -40,16 +40,16 @@ func TestClient_PipelineFiles(t *testing.T) {
 
 	got, err := asUser.PipelineFiles(ctx, pipeline.ID, types.PipelineFilesParams{})
 	wantEqual(t, err, nil)
-	wantEqual(t, len(got), 2) // Aditional "parsers" file should be created by default with each pipeline.
+	wantEqual(t, len(got.Items), 2) // Aditional "parsers" file should be created by default with each pipeline.
 
-	wantEqual(t, got[0].ID, file.ID)
-	wantEqual(t, got[0].Name, "testfile")
-	wantNoEqual(t, got[0].Contents, []byte("test-contents"))
-	wantEqual(t, got[0].Encrypted, true)
-	wantEqual(t, got[0].CreatedAt, file.CreatedAt)
-	wantEqual(t, got[0].UpdatedAt, file.CreatedAt)
+	wantEqual(t, got.Items[0].ID, file.ID)
+	wantEqual(t, got.Items[0].Name, "testfile")
+	wantNoEqual(t, got.Items[0].Contents, []byte("test-contents"))
+	wantEqual(t, got.Items[0].Encrypted, true)
+	wantEqual(t, got.Items[0].CreatedAt, file.CreatedAt)
+	wantEqual(t, got.Items[0].UpdatedAt, file.CreatedAt)
 
-	wantEqual(t, got[1].Name, "parsers")
+	wantEqual(t, got.Items[1].Name, "parsers")
 }
 
 func TestClient_PipelineFile(t *testing.T) {

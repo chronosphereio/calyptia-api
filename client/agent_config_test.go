@@ -36,13 +36,13 @@ func TestClient_AgentConfigHistory(t *testing.T) {
 
 	got, err := asUser.AgentConfigHistory(ctx, registered.ID, types.AgentConfigHistoryParams{})
 	wantEqual(t, err, nil)
-	wantEqual(t, len(got), 2)
+	wantEqual(t, len(got.Items), 2)
 
-	wantNoEqual(t, got[0].ID, "")
-	wantEqual(t, got[0].RawConfig, "test-raw-config-updated")
-	wantNoTimeZero(t, got[0].CreatedAt)
+	wantNoEqual(t, got.Items[0].ID, "")
+	wantEqual(t, got.Items[0].RawConfig, "test-raw-config-updated")
+	wantNoTimeZero(t, got.Items[0].CreatedAt)
 
-	wantNoEqual(t, got[1].ID, "")
-	wantEqual(t, got[1].RawConfig, "test-raw-config")
-	wantNoTimeZero(t, got[1].CreatedAt)
+	wantNoEqual(t, got.Items[1].ID, "")
+	wantEqual(t, got.Items[1].RawConfig, "test-raw-config")
+	wantNoTimeZero(t, got.Items[1].CreatedAt)
 }

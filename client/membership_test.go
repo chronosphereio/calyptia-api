@@ -15,9 +15,9 @@ func TestClient_Members(t *testing.T) {
 
 	got, err := asUser.Members(ctx, project.ID, types.MembersParams{})
 	wantEqual(t, err, nil)
-	wantEqual(t, len(got), 1)
-	wantNoEqual(t, got[0].ID, "")
-	wantEqual(t, got[0].Roles, []types.MembershipRole{types.MembershipRoleCreator})
-	wantNoTimeZero(t, got[0].CreatedAt)
-	wantNoEqual(t, got[0].User, nil)
+	wantEqual(t, len(got.Items), 1)
+	wantNoEqual(t, got.Items[0].ID, "")
+	wantEqual(t, got.Items[0].Roles, []types.MembershipRole{types.MembershipRoleCreator})
+	wantNoTimeZero(t, got.Items[0].CreatedAt)
+	wantNoEqual(t, got.Items[0].User, nil)
 }

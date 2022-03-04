@@ -45,23 +45,23 @@ func TestClient_PipelinePorts(t *testing.T) {
 	got, err := asUser.PipelinePorts(ctx, pipeline.ID, types.PipelinePortsParams{})
 	wantEqual(t, err, nil)
 
-	wantEqual(t, len(got), 2) // The setup pipeline already contains ports in its config.
+	wantEqual(t, len(got.Items), 2) // The setup pipeline already contains ports in its config.
 
-	wantEqual(t, got[0].ID, port.ID)
-	wantEqual(t, got[0].Protocol, "tcp")
-	wantEqual(t, got[0].FrontendPort, uint(4000))
-	wantEqual(t, got[0].BackendPort, uint(4000))
-	wantEqual(t, got[0].Endpoint, "http://localhost:4000")
-	wantEqual(t, got[0].CreatedAt, port.CreatedAt)
-	wantEqual(t, got[0].UpdatedAt, port.CreatedAt)
+	wantEqual(t, got.Items[0].ID, port.ID)
+	wantEqual(t, got.Items[0].Protocol, "tcp")
+	wantEqual(t, got.Items[0].FrontendPort, uint(4000))
+	wantEqual(t, got.Items[0].BackendPort, uint(4000))
+	wantEqual(t, got.Items[0].Endpoint, "http://localhost:4000")
+	wantEqual(t, got.Items[0].CreatedAt, port.CreatedAt)
+	wantEqual(t, got.Items[0].UpdatedAt, port.CreatedAt)
 
-	wantNoEqual(t, got[1].ID, "")
-	wantEqual(t, got[1].Protocol, "tcp")           // from the test config.
-	wantEqual(t, got[1].FrontendPort, uint(24224)) // from the test config.
-	wantEqual(t, got[1].BackendPort, uint(24224))  // from the test config.
-	wantEqual(t, got[1].Endpoint, "")
-	wantNoTimeZero(t, got[1].CreatedAt)
-	wantNoTimeZero(t, got[1].UpdatedAt)
+	wantNoEqual(t, got.Items[1].ID, "")
+	wantEqual(t, got.Items[1].Protocol, "tcp")           // from the test config.
+	wantEqual(t, got.Items[1].FrontendPort, uint(24224)) // from the test config.
+	wantEqual(t, got.Items[1].BackendPort, uint(24224))  // from the test config.
+	wantEqual(t, got.Items[1].Endpoint, "")
+	wantNoTimeZero(t, got.Items[1].CreatedAt)
+	wantNoTimeZero(t, got.Items[1].UpdatedAt)
 }
 
 func TestClient_PipelinePort(t *testing.T) {

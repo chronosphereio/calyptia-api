@@ -19,17 +19,20 @@ func (c *Client) CreateProject(ctx context.Context, payload types.CreateProject)
 }
 
 // Projects you are a member of in descending order.
-func (c *Client) Projects(ctx context.Context, params types.ProjectsParams) ([]types.Project, error) {
+func (c *Client) Projects(ctx context.Context, params types.ProjectsParams) (types.Projects, error) {
 	q := url.Values{}
 	if params.Last != nil {
 		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
+	}
+	if params.Before != nil {
+		q.Set("before", *params.Before)
 	}
 	if params.Name != nil {
 		q.Set("name", *params.Name)
 	}
 
-	var out []types.Project
-	return out, c.do(ctx, http.MethodGet, "/v1/projects?"+q.Encode(), nil, &out)
+	var out types.Projects
+	return out, c.do(ctx, http.MethodGet, "/v1/projects?"+q.Encode(), nil, &out.Items)
 }
 
 // Project by ID.

@@ -156,19 +156,19 @@ func TestClient_Pipelines(t *testing.T) {
 
 	got, err := asUser.Pipelines(ctx, aggregator.ID, types.PipelinesParams{})
 	wantEqual(t, err, nil)
-	wantEqual(t, len(got), 2) // additional healthcheck pipeline should be created by default.
+	wantEqual(t, len(got.Items), 2) // additional healthcheck pipeline should be created by default.
 
-	wantEqual(t, got[0].ID, pipeline.ID)
-	wantEqual(t, got[0].Name, pipeline.Name)
-	wantEqual(t, got[0].Config, pipeline.Config)
-	wantEqual(t, got[0].Status, pipeline.Status)
-	wantEqual(t, got[0].ResourceProfile, pipeline.ResourceProfile)
-	wantEqual(t, got[0].ReplicasCount, pipeline.ReplicasCount)
-	wantNoEqual(t, got[0].Metadata, nil)
-	wantEqual(t, *got[0].Metadata, rawMetadata)
-	wantEqual(t, got[0].Config.CreatedAt, pipeline.Config.CreatedAt)
+	wantEqual(t, got.Items[0].ID, pipeline.ID)
+	wantEqual(t, got.Items[0].Name, pipeline.Name)
+	wantEqual(t, got.Items[0].Config, pipeline.Config)
+	wantEqual(t, got.Items[0].Status, pipeline.Status)
+	wantEqual(t, got.Items[0].ResourceProfile, pipeline.ResourceProfile)
+	wantEqual(t, got.Items[0].ReplicasCount, pipeline.ReplicasCount)
+	wantNoEqual(t, got.Items[0].Metadata, nil)
+	wantEqual(t, *got.Items[0].Metadata, rawMetadata)
+	wantEqual(t, got.Items[0].Config.CreatedAt, pipeline.Config.CreatedAt)
 
-	wantEqual(t, got[1], *aggregator.HealthCheckPipeline)
+	wantEqual(t, got.Items[1], *aggregator.HealthCheckPipeline)
 }
 
 func TestClient_ProjectPipelines(t *testing.T) {
@@ -201,21 +201,21 @@ func TestClient_ProjectPipelines(t *testing.T) {
 
 	got, err := asUser.ProjectPipelines(ctx, project.ID, types.PipelinesParams{})
 	wantEqual(t, err, nil)
-	wantEqual(t, len(got), len(want))
+	wantEqual(t, len(got.Items), len(want))
 
 	// Reverse order to do proper assertion since retuls come in descending order.
-	sort.Slice(got, func(i, j int) bool {
-		return got[i].CreatedAt.Before(got[j].CreatedAt)
+	sort.Slice(got.Items, func(i, j int) bool {
+		return got.Items[i].CreatedAt.Before(got.Items[j].CreatedAt)
 	})
 
-	for i := range got {
-		wantEqual(t, got[i].ID, want[i].ID)
-		wantEqual(t, got[i].Name, want[i].Name)
-		wantEqual(t, got[i].Config, want[i].Config)
-		wantEqual(t, got[i].Status, want[i].Status)
-		wantEqual(t, got[i].ResourceProfile, want[i].ResourceProfile)
-		wantEqual(t, got[i].ReplicasCount, want[i].ReplicasCount)
-		wantEqual(t, got[i].CreatedAt, want[i].CreatedAt)
+	for i := range got.Items {
+		wantEqual(t, got.Items[i].ID, want[i].ID)
+		wantEqual(t, got.Items[i].Name, want[i].Name)
+		wantEqual(t, got.Items[i].Config, want[i].Config)
+		wantEqual(t, got.Items[i].Status, want[i].Status)
+		wantEqual(t, got.Items[i].ResourceProfile, want[i].ResourceProfile)
+		wantEqual(t, got.Items[i].ReplicasCount, want[i].ReplicasCount)
+		wantEqual(t, got.Items[i].CreatedAt, want[i].CreatedAt)
 	}
 }
 

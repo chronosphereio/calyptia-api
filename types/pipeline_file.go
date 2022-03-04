@@ -12,6 +12,12 @@ type PipelineFile struct {
 	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
 
+// PipelineFiles paginated list.
+type PipelineFiles struct {
+	Items     []PipelineFile
+	EndCursor *string
+}
+
 // CreatePipelineFile request payload for creating a new pipeline file.
 type CreatePipelineFile struct {
 	Name      string `json:"name"`
@@ -27,7 +33,8 @@ type CreatedPipelineFile struct {
 
 // PipelineFilesParams request payload for querying the pipeline files.
 type PipelineFilesParams struct {
-	Last *uint64
+	Last   *uint64
+	Before *string
 }
 
 // UpdatePipelineFile request payload for updating a pipeline file.

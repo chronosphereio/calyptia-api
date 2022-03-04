@@ -559,11 +559,11 @@ func defaultProject(t *testing.T, asUser *client.Client) types.Project {
 		t.Fatal(err)
 	}
 
-	if len(pp) == 0 {
+	if len(pp.Items) == 0 {
 		t.Fatal("no default project")
 	}
 
-	return pp[0]
+	return pp.Items[0]
 }
 
 func defaultToken(t *testing.T, asUser *client.Client) types.Token {
@@ -578,11 +578,11 @@ func defaultToken(t *testing.T, asUser *client.Client) types.Token {
 		t.Fatal(err)
 	}
 
-	if len(tt) == 0 {
+	if len(tt.Items) == 0 {
 		t.Fatal("no default token")
 	}
 
-	return tt[0]
+	return tt.Items[0]
 }
 
 func randStr(t *testing.T) string {

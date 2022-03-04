@@ -10,6 +10,12 @@ type PipelineStatus struct {
 	CreatedAt time.Time          `json:"createdAt" yaml:"createdAt"`
 }
 
+// PipelineStatusHistory paginated list.
+type PipelineStatusHistory struct {
+	Items     []PipelineStatus
+	EndCursor *string
+}
+
 // PipelineStatusKind enum.
 type PipelineStatusKind string
 
@@ -28,6 +34,7 @@ const (
 
 // PipelineStatusHistoryParams request payload for querying the pipeline status history.
 type PipelineStatusHistoryParams struct {
-	Status *PipelineStatusKind
 	Last   *uint64
+	Before *string
+	Status *PipelineStatusKind
 }
