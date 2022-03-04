@@ -37,10 +37,10 @@ func TestClient_Tokens(t *testing.T) {
 	got, err := asUser.Tokens(ctx, project.ID, types.TokensParams{})
 	wantEqual(t, err, nil)
 
-	wantEqual(t, len(got), 2) // Aditional "default" token should be created by default with each project.
+	wantEqual(t, len(got.Items), 2) // Aditional "default" token should be created by default with each project.
 
-	wantEqual(t, got[0], token)
-	wantEqual(t, got[1].Name, "default")
+	wantEqual(t, got.Items[0], token)
+	wantEqual(t, got.Items[1].Name, "default")
 }
 
 func TestClient_Token(t *testing.T) {

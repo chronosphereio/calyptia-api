@@ -10,6 +10,12 @@ type Token struct {
 	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
 }
 
+// Tokens paginated list.
+type Tokens struct {
+	Items     []Token
+	EndCursor *string
+}
+
 // CreateToken request payload for creating a new token.
 type CreateToken struct {
 	Name string `json:"name"`
@@ -17,8 +23,9 @@ type CreateToken struct {
 
 // TokensParams request payload for querying tokens.
 type TokensParams struct {
-	Last *uint64
-	Name *string
+	Last   *uint64
+	Before *string
+	Name   *string
 }
 
 // UpdateToken request payload for updating a token.

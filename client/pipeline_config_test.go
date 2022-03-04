@@ -22,13 +22,13 @@ func TestClient_PipelineConfigHistory(t *testing.T) {
 	got, err := asUser.PipelineConfigHistory(ctx, pipeline.ID, types.PipelineConfigHistoryParams{})
 	wantEqual(t, err, nil)
 
-	wantEqual(t, len(got), 2) // Initial config should be already there by default.
+	wantEqual(t, len(got.Items), 2) // Initial config should be already there by default.
 
-	wantNoEqual(t, got[0].ID, "")
-	wantEqual(t, got[0].RawConfig, testFbitConfigWithAddr3)
-	wantNoTimeZero(t, got[0].CreatedAt)
+	wantNoEqual(t, got.Items[0].ID, "")
+	wantEqual(t, got.Items[0].RawConfig, testFbitConfigWithAddr3)
+	wantNoTimeZero(t, got.Items[0].CreatedAt)
 
-	wantNoEqual(t, got[1].ID, "")
-	wantEqual(t, got[1].RawConfig, testFbitConfigWithAddr)
-	wantNoTimeZero(t, got[1].CreatedAt)
+	wantNoEqual(t, got.Items[1].ID, "")
+	wantEqual(t, got.Items[1].RawConfig, testFbitConfigWithAddr)
+	wantNoTimeZero(t, got.Items[1].CreatedAt)
 }

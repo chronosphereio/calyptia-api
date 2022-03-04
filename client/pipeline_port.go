@@ -17,15 +17,18 @@ func (c *Client) CreatePipelinePort(ctx context.Context, pipelineID string, payl
 }
 
 // PipelinePorts in descending order.
-func (c *Client) PipelinePorts(ctx context.Context, pipelineID string, params types.PipelinePortsParams) ([]types.PipelinePort, error) {
+func (c *Client) PipelinePorts(ctx context.Context, pipelineID string, params types.PipelinePortsParams) (types.PipelinePorts, error) {
 	q := url.Values{}
 	if params.Last != nil {
 		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
 	}
+	if params.Before != nil {
+		q.Set("before", *params.Before)
+	}
 
-	var out []types.PipelinePort
+	var out types.PipelinePorts
 	path := "/v1/aggregator_pipelines/" + url.PathEscape(pipelineID) + "/ports?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
 }
 
 // PipelinePort by ID.

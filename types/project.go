@@ -14,6 +14,12 @@ type Project struct {
 	Membership *Membership `json:"membership" yaml:"membership"`
 }
 
+// Projects paginated list.
+type Projects struct {
+	Items     []Project
+	EndCursor *string
+}
+
 // CreateProject request payload for creating a project.
 type CreateProject struct {
 	Name string `json:"name"`
@@ -29,8 +35,9 @@ type CreatedProject struct {
 
 // ProjectsParams request payload for querying projects.
 type ProjectsParams struct {
-	Last *uint64
-	Name *string
+	Last   *uint64
+	Before *string
+	Name   *string
 }
 
 // UpdateProject request payload for updating a project.

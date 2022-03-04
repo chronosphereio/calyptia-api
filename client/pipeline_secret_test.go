@@ -43,13 +43,13 @@ func TestClient_PipelineSecrets(t *testing.T) {
 
 	got, err := asUser.PipelineSecrets(ctx, pipeline.ID, types.PipelineSecretsParams{})
 	wantEqual(t, err, nil)
-	wantEqual(t, len(got), 1)
+	wantEqual(t, len(got.Items), 1)
 
-	wantEqual(t, got[0].ID, secret.ID)
-	wantEqual(t, got[0].Key, "testsecret")
-	wantNoEqual(t, got[0].Value, []byte("test-value"))
-	wantEqual(t, got[0].CreatedAt, secret.CreatedAt)
-	wantEqual(t, got[0].UpdatedAt, secret.CreatedAt)
+	wantEqual(t, got.Items[0].ID, secret.ID)
+	wantEqual(t, got.Items[0].Key, "testsecret")
+	wantNoEqual(t, got.Items[0].Value, []byte("test-value"))
+	wantEqual(t, got.Items[0].CreatedAt, secret.CreatedAt)
+	wantEqual(t, got.Items[0].UpdatedAt, secret.CreatedAt)
 }
 
 func TestClient_PipelineSecret(t *testing.T) {

@@ -41,13 +41,13 @@ func TestClient_Aggregators(t *testing.T) {
 	project := defaultProject(t, asUser)
 	got, err := asUser.Aggregators(ctx, project.ID, types.AggregatorsParams{})
 	wantEqual(t, err, nil)
-	wantEqual(t, len(got), 1)
-	wantEqual(t, got[0].ID, created.ID)
-	wantEqual(t, got[0].Name, created.Name)
-	wantEqual(t, got[0].Token, created.Token)
-	wantEqual(t, got[0].PipelinesCount, uint64(1))
-	wantEqual(t, got[0].CreatedAt, created.CreatedAt)
-	wantEqual(t, got[0].UpdatedAt, created.CreatedAt)
+	wantEqual(t, len(got.Items), 1)
+	wantEqual(t, got.Items[0].ID, created.ID)
+	wantEqual(t, got.Items[0].Name, created.Name)
+	wantEqual(t, got.Items[0].Token, created.Token)
+	wantEqual(t, got.Items[0].PipelinesCount, uint64(1))
+	wantEqual(t, got.Items[0].CreatedAt, created.CreatedAt)
+	wantEqual(t, got.Items[0].UpdatedAt, created.CreatedAt)
 }
 
 func TestClient_Aggregator(t *testing.T) {

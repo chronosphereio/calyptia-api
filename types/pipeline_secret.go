@@ -11,6 +11,12 @@ type PipelineSecret struct {
 	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
 
+// PipelineSecrets paginated list.
+type PipelineSecrets struct {
+	Items     []PipelineSecret
+	EndCursor *string
+}
+
 // CreatePipelineSecret request payload for creating a new pipeline secret.
 type CreatePipelineSecret struct {
 	Key   string `json:"key"`
@@ -25,7 +31,8 @@ type CreatedPipelineSecret struct {
 
 // PipelineSecretsParams request payload for querying the pipeline secrets.
 type PipelineSecretsParams struct {
-	Last *uint64
+	Last   *uint64
+	Before *string
 }
 
 // UpdatePipelineSecret request payload for updating a pipeline secret.

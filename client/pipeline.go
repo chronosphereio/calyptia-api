@@ -19,33 +19,39 @@ func (c *Client) CreatePipeline(ctx context.Context, aggregatorID string, payloa
 }
 
 // Pipelines from an aggregator in descending order.
-func (c *Client) Pipelines(ctx context.Context, aggregatorID string, params types.PipelinesParams) ([]types.Pipeline, error) {
+func (c *Client) Pipelines(ctx context.Context, aggregatorID string, params types.PipelinesParams) (types.Pipelines, error) {
 	q := url.Values{}
 	if params.Last != nil {
 		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
+	}
+	if params.Before != nil {
+		q.Set("before", *params.Before)
 	}
 	if params.Name != nil {
 		q.Set("name", *params.Name)
 	}
 
-	var out []types.Pipeline
+	var out types.Pipelines
 	path := "/v1/aggregators/" + url.PathEscape(aggregatorID) + "/pipelines?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
 }
 
 // ProjectPipelines returns the entire set of pipelines from a project.
-func (c *Client) ProjectPipelines(ctx context.Context, projectID string, params types.PipelinesParams) ([]types.Pipeline, error) {
+func (c *Client) ProjectPipelines(ctx context.Context, projectID string, params types.PipelinesParams) (types.Pipelines, error) {
 	q := url.Values{}
 	if params.Last != nil {
 		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
+	}
+	if params.Before != nil {
+		q.Set("before", *params.Before)
 	}
 	if params.Name != nil {
 		q.Set("name", *params.Name)
 	}
 
-	var out []types.Pipeline
+	var out types.Pipelines
 	path := "/v1/projects/" + url.PathEscape(projectID) + "/aggregator_pipelines?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
 }
 
 // Pipeline by ID.

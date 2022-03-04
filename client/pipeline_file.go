@@ -19,15 +19,18 @@ func (c *Client) CreatePipelineFile(ctx context.Context, pipelineID string, payl
 }
 
 // PipelineFiles in descending order.
-func (c *Client) PipelineFiles(ctx context.Context, pipelineID string, params types.PipelineFilesParams) ([]types.PipelineFile, error) {
+func (c *Client) PipelineFiles(ctx context.Context, pipelineID string, params types.PipelineFilesParams) (types.PipelineFiles, error) {
 	q := url.Values{}
 	if params.Last != nil {
 		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
 	}
+	if params.Before != nil {
+		q.Set("before", *params.Before)
+	}
 
-	var out []types.PipelineFile
+	var out types.PipelineFiles
 	path := "/v1/aggregator_pipelines/" + url.PathEscape(pipelineID) + "/files?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
 }
 
 // PipelineFile by ID.

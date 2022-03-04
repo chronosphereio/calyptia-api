@@ -11,6 +11,12 @@ type Membership struct {
 	User *User `json:"user" yaml:"user"`
 }
 
+// Memberships paginated list.
+type Memberships struct {
+	Items     []Membership
+	EndCursor *string
+}
+
 // MembershipRole type of membership role (creator/admin).
 type MembershipRole string
 
@@ -23,5 +29,6 @@ const (
 
 // MembersParams request payload for querying members.
 type MembersParams struct {
-	Last *uint64
+	Last   *uint64
+	Before *string
 }

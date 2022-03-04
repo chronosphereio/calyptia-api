@@ -18,18 +18,21 @@ func (c *Client) CreateAggregator(ctx context.Context, payload types.CreateAggre
 }
 
 // Aggregators from a project in descending order.
-func (c *Client) Aggregators(ctx context.Context, projectID string, params types.AggregatorsParams) ([]types.Aggregator, error) {
+func (c *Client) Aggregators(ctx context.Context, projectID string, params types.AggregatorsParams) (types.Aggregators, error) {
 	q := url.Values{}
 	if params.Last != nil {
 		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
+	}
+	if params.Before != nil {
+		q.Set("before", *params.Before)
 	}
 	if params.Name != nil {
 		q.Set("name", *params.Name)
 	}
 
-	var out []types.Aggregator
+	var out types.Aggregators
 	path := "/v1/projects/" + url.PathEscape(projectID) + "/aggregators?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
 }
 
 // Aggregator by ID.

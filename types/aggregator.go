@@ -17,6 +17,12 @@ type Aggregator struct {
 	UpdatedAt      time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
 
+// Aggregators paginated list.
+type Aggregators struct {
+	Items     []Aggregator
+	EndCursor *string
+}
+
 // CreateAggregator request payload for creating a new aggregator.
 type CreateAggregator struct {
 	Name                    string `json:"name"`
@@ -41,8 +47,9 @@ type CreatedAggregator struct {
 
 // AggregatorsParams request payload for querying aggregators.
 type AggregatorsParams struct {
-	Last *uint64
-	Name *string
+	Last   *uint64
+	Before *string
+	Name   *string
 }
 
 // UpdateAggregator request payload for updating an aggregator.

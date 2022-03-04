@@ -11,16 +11,19 @@ import (
 
 // PipelineStatusHistory in descending order.
 // Every time a pipeline status is changed, a new history entry with the change is created.
-func (c *Client) PipelineStatusHistory(ctx context.Context, pipelineID string, params types.PipelineStatusHistoryParams) ([]types.PipelineStatus, error) {
+func (c *Client) PipelineStatusHistory(ctx context.Context, pipelineID string, params types.PipelineStatusHistoryParams) (types.PipelineStatusHistory, error) {
 	q := url.Values{}
 	if params.Last != nil {
 		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
+	}
+	if params.Before != nil {
+		q.Set("before", *params.Before)
 	}
 	if params.Status != nil {
 		q.Set("status", string(*params.Status))
 	}
 
-	var out []types.PipelineStatus
+	var out types.PipelineStatusHistory
 	path := "/v1/aggregator_pipelines/" + url.PathEscape(pipelineID) + "/status_history?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
 }

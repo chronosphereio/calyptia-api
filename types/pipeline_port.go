@@ -13,6 +13,12 @@ type PipelinePort struct {
 	UpdatedAt    time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
 
+// PipelinePorts paginated list.
+type PipelinePorts struct {
+	Items     []PipelinePort
+	EndCursor *string
+}
+
 // CreatePipelinePort request payload for creating a pipeline port.
 type CreatePipelinePort struct {
 	Protocol     string `json:"protocol"`
@@ -29,7 +35,8 @@ type CreatedPipelinePort struct {
 
 // PipelinePortsParams request payload for querying the pipeline ports.
 type PipelinePortsParams struct {
-	Last *uint64
+	Last   *uint64
+	Before *string
 }
 
 // UpdatePipelinePort request payload for updating a pipeline port.
