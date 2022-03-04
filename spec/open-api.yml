@@ -259,6 +259,9 @@ components:
           type: string
           format: hostname
           example: my-aggregator
+        version:
+          type: string
+          example: v0.1.12
         pipelinesCount:
           type: integer
           format: int64
@@ -894,6 +897,9 @@ components:
           type: string
           format: hostname
           example: new-aggregator
+        version:
+          type: string
+          example: v0.1.12
         addHealthCheckPipeline:
           type: boolean
         healthCheckPipelinePort:
@@ -1273,6 +1279,9 @@ components:
           type: string
           format: hostname
           example: my-aggregator
+        version:
+          type: string
+          example: v0.1.12
         createdAt:
           type: string
           format: date-time
