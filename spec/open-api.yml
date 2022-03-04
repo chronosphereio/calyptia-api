@@ -919,6 +919,10 @@ components:
           format: hostname
           example: new-aggregator
           nullable: true
+        version:
+          type: string
+          example: v0.1.12
+          nullable: true
     CreateResourceProfile:
       description: Create resource profile request body.
       type: object
