@@ -18,6 +18,7 @@ func TestClient_CreateAggregator(t *testing.T) {
 		Version:                types.DefaultAggregatorVersion,
 		AddHealthCheckPipeline: true,
 	})
+
 	wantEqual(t, err, nil)
 	wantEqual(t, got.Version, types.DefaultAggregatorVersion)
 	wantEqual(t, got.Name, "test-aggregator")
@@ -27,6 +28,21 @@ func TestClient_CreateAggregator(t *testing.T) {
 	wantNoTimeZero(t, got.CreatedAt)
 	wantNoEqual(t, got.HealthCheckPipeline, nil)
 	wantEqual(t, len(got.ResourceProfiles), 3)
+
+	t.Run("name exists", func(t *testing.T) {
+		_, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+			Name: "duplicate",
+		})
+
+		wantEqual(t, err, nil)
+
+		got, err = withToken.CreateAggregator(ctx, types.CreateAggregator{
+			Name: "duplicate",
+		})
+
+		wantEqual(t, got, types.CreatedAggregator{})
+		wantNoEqual(t, err, nil)
+	})
 }
 
 func TestClient_Aggregators(t *testing.T) {
