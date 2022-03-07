@@ -1869,11 +1869,27 @@ paths:
         - schema:
             type: string
           in: query
+          name: before
+          description: Agents before the given cursor.
+        - schema:
+            type: string
+          in: query
           name: name
           description: Name matching agents.
       responses:
         "200":
           description: OK
+          headers:
+            Link:
+              schema:
+                type: string
+                example: </v1/projects/foo/agents?before=bar>; rel="next"
+              description: RFC5988 with `rel="next"`.
+          links:
+            NextAgentsPage:
+              operationId: agents
+              parameters:
+                before: "$response.header.Link#rel=next"
           content:
             application/json:
               schema:
