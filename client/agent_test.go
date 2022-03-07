@@ -1,6 +1,3 @@
-//go:build integration
-// +build integration
-
 package client_test
 
 import (
@@ -73,18 +70,18 @@ func TestClient_Agents(t *testing.T) {
 	project := defaultProject(t, asUser)
 	got, err := asUser.Agents(ctx, project.ID, types.AgentsParams{})
 	wantEqual(t, err, nil)
-	wantEqual(t, len(got), 1)
-	wantEqual(t, got[0].ID, registered.ID)
-	wantEqual(t, got[0].Name, registered.Name)
-	wantEqual(t, got[0].Token, registered.Token)
-	wantEqual(t, got[0].MachineID, "test-machine-id")
-	wantEqual(t, got[0].Type, types.AgentTypeFluentBit)
-	wantEqual(t, got[0].Version, "1.8.6")
-	wantEqual(t, got[0].Edition, types.AgentEditionCommunity)
-	wantEqual(t, got[0].Flags, []string{"test-flag"})
-	wantEqual(t, got[0].RawConfig, "test-raw-config")
-	wantEqual(t, got[0].Metadata, &rawMetadata)
-	wantNoTimeZero(t, got[0].CreatedAt)
+	wantEqual(t, len(got.Items), 1)
+	wantEqual(t, got.Items[0].ID, registered.ID)
+	wantEqual(t, got.Items[0].Name, registered.Name)
+	wantEqual(t, got.Items[0].Token, registered.Token)
+	wantEqual(t, got.Items[0].MachineID, "test-machine-id")
+	wantEqual(t, got.Items[0].Type, types.AgentTypeFluentBit)
+	wantEqual(t, got.Items[0].Version, "1.8.6")
+	wantEqual(t, got.Items[0].Edition, types.AgentEditionCommunity)
+	wantEqual(t, got.Items[0].Flags, []string{"test-flag"})
+	wantEqual(t, got.Items[0].RawConfig, "test-raw-config")
+	wantEqual(t, got.Items[0].Metadata, &rawMetadata)
+	wantNoTimeZero(t, got.Items[0].CreatedAt)
 
 	// skipping metrics tests here.
 }
