@@ -136,7 +136,6 @@ func TestClient_UpdateAggregator(t *testing.T) {
 		})
 
 		wantErrMsg(t, err, "invalid aggregator version")
-
 	})
 }
 
