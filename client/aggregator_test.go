@@ -48,7 +48,6 @@ func TestClient_CreateAggregator(t *testing.T) {
 			Name: "duplicate",
 		})
 
-		wantEqual(t, got, types.CreatedAggregator{})
 		wantErrMsg(t, err, "aggregator name already exists")
 	})
 }
