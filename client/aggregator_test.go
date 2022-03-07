@@ -2,11 +2,19 @@ package client_test
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/calyptia/api/client"
 	"github.com/calyptia/api/types"
 )
+
+func wantErrMsg(t *testing.T, err error, msg string) {
+	t.Helper()
+	if err == nil || (err != nil && !strings.Contains(err.Error(), msg)) {
+		t.Fatalf("want msg %q; got %v", msg, err)
+	}
+}
 
 func TestClient_CreateAggregator(t *testing.T) {
 	ctx := context.Background()
@@ -41,7 +49,7 @@ func TestClient_CreateAggregator(t *testing.T) {
 		})
 
 		wantEqual(t, got, types.CreatedAggregator{})
-		wantNoEqual(t, err, nil)
+		wantErrMsg(t, err, "aggregator name already exists")
 	})
 }
 
@@ -52,6 +60,7 @@ func TestClient_Aggregators(t *testing.T) {
 
 	created, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
 		Name:                   "test-aggregator",
+		Version:                types.DefaultAggregatorVersion,
 		AddHealthCheckPipeline: true,
 	})
 	wantEqual(t, err, nil)
@@ -77,6 +86,7 @@ func TestClient_Aggregator(t *testing.T) {
 
 	created, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
 		Name:                   "test-aggregator",
+		Version:                types.DefaultAggregatorVersion,
 		AddHealthCheckPipeline: true,
 	})
 	wantEqual(t, err, nil)
