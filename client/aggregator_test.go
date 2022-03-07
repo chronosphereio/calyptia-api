@@ -130,12 +130,15 @@ func TestClient_UpdateAggregator(t *testing.T) {
 		})
 
 		wantNoEqual(t, err, nil)
+		wantErrMsg(t, err, "invalid aggregator version")
 
 		err = withToken.UpdateAggregator(ctx, created.ID, types.UpdateAggregator{
 			Version: ptrStr(""),
 		})
 
 		wantNoEqual(t, err, nil)
+		wantErrMsg(t, err, "invalid aggregator version")
+
 	})
 }
 
