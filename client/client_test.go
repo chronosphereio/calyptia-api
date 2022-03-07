@@ -613,6 +613,13 @@ func wantEqual(t *testing.T, got, want interface{}) {
 	}
 }
 
+func wantErrMsg(t *testing.T, err error, msg string) {
+	t.Helper()
+	if err == nil || (err != nil && !strings.Contains(err.Error(), msg)) {
+		t.Fatalf("want msg %q; got %v", msg, err)
+	}
+}
+
 func ptrStr(s string) *string {
 	return &s
 }
