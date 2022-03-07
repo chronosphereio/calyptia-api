@@ -29,7 +29,7 @@ func TestClient_Projects(t *testing.T) {
 	asUser := userClient(t)
 	got, err := asUser.Projects(ctx, types.ProjectsParams{})
 	wantEqual(t, err, nil)
-	wantEqual(t, len(got.Items), 1) // a default project must be created for the user as a side-effect.
+	wantEqual(t, len(got.Items), 1) // a default project must be created for the user as a side effect.
 	wantNoEqual(t, got.Items[0].ID, "")
 	wantEqual(t, got.Items[0].Name, "default")
 	wantEqual(t, got.Items[0].MembersCount, uint64(1))
