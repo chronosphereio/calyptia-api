@@ -32,7 +32,7 @@ func (c *Client) Agents(ctx context.Context, projectID string, params types.Agen
 
 	var out types.Agents
 	path := "/v1/projects/" + url.PathEscape(projectID) + "/agents?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }
 
 // Agent by ID.
