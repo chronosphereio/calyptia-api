@@ -2,19 +2,11 @@ package client_test
 
 import (
 	"context"
-	"strings"
 	"testing"
 
 	"github.com/calyptia/api/client"
 	"github.com/calyptia/api/types"
 )
-
-func wantErrMsg(t *testing.T, err error, msg string) {
-	t.Helper()
-	if err == nil || (err != nil && !strings.Contains(err.Error(), msg)) {
-		t.Fatalf("want msg %q; got %v", msg, err)
-	}
-}
 
 func TestClient_CreateAggregator(t *testing.T) {
 	ctx := context.Background()
