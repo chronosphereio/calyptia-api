@@ -44,7 +44,7 @@ func TestClient_CreateAggregator(t *testing.T) {
 
 		wantEqual(t, err, nil)
 
-		got, err = withToken.CreateAggregator(ctx, types.CreateAggregator{
+		_, err = withToken.CreateAggregator(ctx, types.CreateAggregator{
 			Name: "duplicate",
 		})
 
