@@ -10,8 +10,9 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/calyptia/api/types"
 	"github.com/peterhellberg/link"
+
+	"github.com/calyptia/api/types"
 )
 
 const (
