@@ -103,7 +103,7 @@ func TestClient_Agents(t *testing.T) {
 		})
 		wantEqual(t, err, nil)
 		wantEqual(t, len(page1.Items), 3)
-		wantNoEqual(t, page1.EndCursor, nil)
+		wantNoEqual(t, page1.EndCursor, (*string)(nil))
 
 		page2, err := asUser.Agents(ctx, project.ID, types.AgentsParams{
 			Last:   ptrUint64(3),
@@ -111,7 +111,7 @@ func TestClient_Agents(t *testing.T) {
 		})
 		wantEqual(t, err, nil)
 		wantEqual(t, len(page2.Items), 3)
-		wantNoEqual(t, page2.EndCursor, nil)
+		wantNoEqual(t, page2.EndCursor, (*string)(nil))
 
 		wantNoEqual(t, page1.Items, page2.Items)
 		wantNoEqual(t, *page1.EndCursor, *page2.EndCursor)
