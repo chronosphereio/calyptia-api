@@ -1,5 +1,6 @@
 package client_test
 
+//nolint:gci // using goimports
 import (
 	"context"
 	"crypto/rand"

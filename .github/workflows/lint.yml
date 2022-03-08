@@ -7,13 +7,18 @@ jobs:
     runs-on: ubuntu-latest
     name: PR - Linters
     steps:
+      - name: Setup Golang
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.17"
+
       - name: Checkout
         uses: actions/checkout@v2
 
       - name: Go Lint
         uses: golangci/golangci-lint-action@v3.1.0
         with:
-          version: v1.43.0
+          version: v1.44.2
 
       - name: Run golangci lint
         if: github.event_name == 'pull_request'

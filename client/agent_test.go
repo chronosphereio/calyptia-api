@@ -3,6 +3,7 @@ package client_test
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/calyptia/api/types"
@@ -84,6 +85,38 @@ func TestClient_Agents(t *testing.T) {
 	wantNoTimeZero(t, got.Items[0].CreatedAt)
 
 	// skipping metrics tests here.
+
+	t.Run("pagination", func(t *testing.T) {
+		for i := 0; i < 10; i++ {
+			_, err := withToken.RegisterAgent(ctx, types.RegisterAgent{
+				Name:      fmt.Sprintf("test-agent-%d", i),
+				MachineID: fmt.Sprintf("test-machine-id-%d", i), // unique machine id otherwise it gets upserted.
+				Type:      types.AgentTypeFluentBit,
+				Version:   "v1.8.6",
+				Edition:   types.AgentEditionCommunity,
+			})
+			wantEqual(t, err, nil)
+		}
+
+		page1, err := asUser.Agents(ctx, project.ID, types.AgentsParams{
+			Last: ptrUint64(3),
+		})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(page1.Items), 3)
+		wantNoEqual(t, page1.EndCursor, (*string)(nil))
+
+		page2, err := asUser.Agents(ctx, project.ID, types.AgentsParams{
+			Last:   ptrUint64(3),
+			Before: page1.EndCursor,
+		})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(page2.Items), 3)
+		wantNoEqual(t, page2.EndCursor, (*string)(nil))
+
+		wantNoEqual(t, page1.Items, page2.Items)
+		wantNoEqual(t, *page1.EndCursor, *page2.EndCursor)
+		wantEqual(t, page1.Items[2].CreatedAt.After(page2.Items[0].CreatedAt), true)
+	})
 }
 
 func TestClient_Agent(t *testing.T) {
