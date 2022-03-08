@@ -7,6 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     name: PR - Linters
     steps:
+      - name: Setup Golang
+        uses: actions/setup-go@v2
+
       - name: Checkout
         uses: actions/checkout@v2
 
