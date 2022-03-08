@@ -78,6 +78,7 @@ func (c *Client) setRequestHeaders(req *http.Request) {
 	}
 }
 
+//nolint:dupl // TODO: simplify api and maybe export it.
 func (c *Client) do(ctx context.Context, method, path string, v, dest interface{}, oo ...opt) error {
 	var options opts
 	for _, o := range oo {
