@@ -64,5 +64,8 @@ Or preview it using [SwaggerUI](https://editor.swagger.io/?url=https://raw.githu
 Example using [openapi-typescript-codegen](https://www.npmjs.com/package/openapi-typescript-codegen).
 
 ```bash
-npx openapi-typescript-codegen --input ./spec/open-api.yml --output ./ts-client
+npx openapi-typescript-codegen \
+    --input ./spec/open-api.yml \
+    --output ./ts-client \
+    --name Client
 ```

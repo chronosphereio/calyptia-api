@@ -1,6 +1,7 @@
 // Package client provides a client over the REST HTTP API of Calyptia Cloud.
 package client
 
+//nolint:gci // using goimports
 import (
 	"bytes"
 	"context"
@@ -8,6 +9,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
+
+	"github.com/peterhellberg/link"
 
 	"github.com/calyptia/api/types"
 )
@@ -75,7 +79,13 @@ func (c *Client) setRequestHeaders(req *http.Request) {
 	}
 }
 
-func (c *Client) do(ctx context.Context, method, path string, v, dest interface{}) error {
+//nolint:gocyclo // TODO: simplify api and maybe export it.
+func (c *Client) do(ctx context.Context, method, path string, v, dest interface{}, oo ...opt) error {
+	var options opts
+	for _, o := range oo {
+		o(&options)
+	}
+
 	var body io.Reader
 
 	if b, ok := v.(io.Reader); ok {
@@ -121,6 +131,17 @@ func (c *Client) do(ctx context.Context, method, path string, v, dest interface{
 		return e
 	}
 
+	if s := resp.Header.Get("Link"); s != "" && options.cursor != nil {
+		before, err := nextLinkBefore(s)
+		if err != nil {
+			return err
+		}
+
+		if before != "" {
+			*options.cursor = &before
+		}
+	}
+
 	if dest != nil {
 		err = json.NewDecoder(resp.Body).Decode(dest)
 		if err != nil {
@@ -129,4 +150,41 @@ func (c *Client) do(ctx context.Context, method, path string, v, dest interface{
 	}
 
 	return nil
+}
+
+type opts struct {
+	cursor **string
+}
+
+type opt func(*opts)
+
+func withCursor(s **string) opt {
+	return func(o *opts) {
+		o.cursor = s
+	}
+}
+
+// nextLinkBefore parses the given `Link` header
+// and extracts the `?before=` query string parameter
+// from the URI.
+// It can return an empty string.
+func nextLinkBefore(s string) (string, error) {
+	for _, l := range link.Parse(s) {
+		if l.Rel != "next" {
+			continue
+		}
+
+		u, err := url.Parse(l.URI)
+		if err != nil {
+			return "", fmt.Errorf("could not parse link header uri: %w", err)
+		}
+
+		if !u.Query().Has("before") {
+			continue
+		}
+
+		return u.Query().Get("before"), nil
+	}
+
+	return "", nil
 }
