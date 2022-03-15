@@ -33,7 +33,7 @@ func (c *Client) Pipelines(ctx context.Context, aggregatorID string, params type
 
 	var out types.Pipelines
 	path := "/v1/aggregators/" + url.PathEscape(aggregatorID) + "/pipelines?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }
 
 // ProjectPipelines returns the entire set of pipelines from a project.
