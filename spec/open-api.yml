@@ -2037,11 +2037,27 @@ paths:
         - schema:
             type: string
           in: query
+          name: before
+          description: Aggregators before the given cursor.
+        - schema:
+            type: string
+          in: query
           name: name
           description: Name matching aggregators.
       responses:
         "200":
           description: OK
+          headers:
+            Link:
+              schema:
+                type: string
+                example: </v1/projects/foo/aggregators?before=bar>; rel="next"
+              description: RFC5988 with `rel="next"`.
+          links:
+            NextAgentsPage:
+              operationId: aggregators
+              parameters:
+                before: "$response.header.Link#rel=next"
           content:
             application/json:
               schema:
