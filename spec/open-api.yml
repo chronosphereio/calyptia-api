@@ -2054,7 +2054,7 @@ paths:
                 example: </v1/projects/foo/aggregators?before=bar>; rel="next"
               description: RFC5988 with `rel="next"`.
           links:
-            NextAgentsPage:
+            NextAggregatorsPage:
               operationId: aggregators
               parameters:
                 before: "$response.header.Link#rel=next"
