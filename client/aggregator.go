@@ -32,7 +32,7 @@ func (c *Client) Aggregators(ctx context.Context, projectID string, params types
 
 	var out types.Aggregators
 	path := "/v1/projects/" + url.PathEscape(projectID) + "/aggregators?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }
 
 // Aggregator by ID.

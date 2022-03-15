@@ -2,6 +2,7 @@ package client_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/calyptia/api/client"
@@ -68,6 +69,35 @@ func TestClient_Aggregators(t *testing.T) {
 	wantEqual(t, got.Items[0].PipelinesCount, uint64(1))
 	wantEqual(t, got.Items[0].CreatedAt, created.CreatedAt)
 	wantEqual(t, got.Items[0].UpdatedAt, created.CreatedAt)
+
+	t.Run("pagination", func(t *testing.T) {
+		for i := 0; i < 10; i++ {
+			_, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+				Name:    fmt.Sprintf("test-aggregator-%d", i),
+				Version: types.DefaultAggregatorVersion,
+			})
+			wantEqual(t, err, nil)
+		}
+
+		page1, err := asUser.Aggregators(ctx, project.ID, types.AggregatorsParams{
+			Last: ptrUint64(3),
+		})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(page1.Items), 3)
+		wantNoEqual(t, page1.EndCursor, (*string)(nil))
+
+		page2, err := asUser.Aggregators(ctx, project.ID, types.AggregatorsParams{
+			Last:   ptrUint64(3),
+			Before: page1.EndCursor,
+		})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(page2.Items), 3)
+		wantNoEqual(t, page2.EndCursor, (*string)(nil))
+
+		wantNoEqual(t, page1.Items, page2.Items)
+		wantNoEqual(t, *page1.EndCursor, *page2.EndCursor)
+		wantEqual(t, page1.Items[2].CreatedAt.After(page2.Items[0].CreatedAt), true)
+	})
 }
 
 func TestClient_Aggregator(t *testing.T) {
