@@ -169,6 +169,35 @@ func TestClient_Pipelines(t *testing.T) {
 	wantEqual(t, got.Items[0].Config.CreatedAt, pipeline.Config.CreatedAt)
 
 	wantEqual(t, got.Items[1], *aggregator.HealthCheckPipeline)
+
+	t.Run("pagination", func(t *testing.T) {
+		for i := 0; i < 10; i++ {
+			_, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+				Name:      fmt.Sprintf("test-pipeline-%d", i),
+				RawConfig: testFbitConfigWithAddr,
+			})
+			wantEqual(t, err, nil)
+		}
+
+		page1, err := asUser.Pipelines(ctx, aggregator.ID, types.PipelinesParams{
+			Last: ptrUint64(3),
+		})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(page1.Items), 3)
+		wantNoEqual(t, page1.EndCursor, (*string)(nil))
+
+		page2, err := asUser.Pipelines(ctx, aggregator.ID, types.PipelinesParams{
+			Last:   ptrUint64(3),
+			Before: page1.EndCursor,
+		})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(page2.Items), 3)
+		wantNoEqual(t, page2.EndCursor, (*string)(nil))
+
+		wantNoEqual(t, page1.Items, page2.Items)
+		wantNoEqual(t, *page1.EndCursor, *page2.EndCursor)
+		wantEqual(t, page1.Items[2].CreatedAt.After(page2.Items[0].CreatedAt), true)
+	})
 }
 
 func TestClient_ProjectPipelines(t *testing.T) {
