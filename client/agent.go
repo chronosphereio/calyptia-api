@@ -1,3 +1,4 @@
+//nolint:dupl // Certain level of code duplication is a good trade off to avoid complexity.
 package client
 
 import (
