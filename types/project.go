@@ -11,7 +11,18 @@ type Project struct {
 	AggregatorsCount uint64    `json:"aggregatorsCount" yaml:"aggregatorsCount"`
 	CreatedAt        time.Time `json:"createdAt" yaml:"createdAt"`
 
+	Quotas ProjectQuotas `json:"quotas" yaml:"quotas"`
+
 	Membership *Membership `json:"membership" yaml:"membership"`
+}
+
+type ProjectQuotas struct {
+	MaxAgents           uint64 `json:"maxAgents" yaml:"maxAgents"`
+	MaxAggregators      uint64 `json:"maxAggregators" yaml:"maxAggregators"`
+	MaxPipelines        uint64 `json:"maxPipelines" yaml:"maxPipelines"`
+	MaxPipelineFiles    uint64 `json:"maxPipelineFiles" yaml:"maxPipelineFiles"`
+	MaxPipelineSecrets  uint64 `json:"maxPipelineSecrets" yaml:"maxPipelineSecrets"`
+	MaxPipelineFileSize uint64 `json:"maxPipelineFileSize" yaml:"maxPipelineFileSize"`
 }
 
 // Projects paginated list.
