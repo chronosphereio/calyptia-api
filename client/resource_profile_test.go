@@ -2,6 +2,7 @@ package client_test
 
 import (
 	"context"
+	"fmt"
 	"sort"
 	"testing"
 
@@ -38,33 +39,62 @@ func TestClient_ResourceProfiles(t *testing.T) {
 	asUser := userClient(t)
 	aggregator := setupAggregator(t, withToken(t, asUser))
 
-	got, err := asUser.ResourceProfiles(ctx, aggregator.ID, types.ResourceProfilesParams{})
-	wantEqual(t, err, nil)
-	wantEqual(t, len(got.Items), 3) // By default, there are 3 resource profiles.
+	t.Run("ok", func(t *testing.T) {
+		got, err := asUser.ResourceProfiles(ctx, aggregator.ID, types.ResourceProfilesParams{})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(got.Items), 3) // By default, there are 3 resource profiles.
 
-	// Sort resource profiles by name
-	// since they are created at the same time
-	// and the order may switch.
-	sort.Slice(got.Items, func(i, j int) bool {
-		return got.Items[i].Name < got.Items[j].Name
+		// Sort resource profiles by name
+		// since they are created at the same time
+		// and the order may switch.
+		sort.Slice(got.Items, func(i, j int) bool {
+			return got.Items[i].Name < got.Items[j].Name
+		})
+
+		// TODO: check on the expected profile spec values.
+
+		wantNoEqual(t, got.Items[0].ID, "")
+		wantEqual(t, got.Items[0].Name, types.ResourceProfileBestEffortLowResource)
+		wantNoTimeZero(t, got.Items[0].CreatedAt)
+		wantNoTimeZero(t, got.Items[0].UpdatedAt)
+
+		wantNoEqual(t, got.Items[1].ID, "")
+		wantEqual(t, got.Items[1].Name, types.ResourceProfileHighPerformanceGuaranteedDelivery)
+		wantNoTimeZero(t, got.Items[1].CreatedAt)
+		wantNoTimeZero(t, got.Items[1].UpdatedAt)
+
+		wantNoEqual(t, got.Items[2].ID, "")
+		wantEqual(t, got.Items[2].Name, types.ResourceProfileHighPerformanceOptimalThroughput)
+		wantNoTimeZero(t, got.Items[2].CreatedAt)
+		wantNoTimeZero(t, got.Items[2].UpdatedAt)
 	})
+	t.Run("pagination", func(t *testing.T) {
+		for i := 0; i < 10; i++ {
+			_, err := asUser.CreateResourceProfile(ctx, aggregator.ID, types.CreateResourceProfile{
+				Name:                   fmt.Sprintf("test-resource-profile-%d", i),
+				StorageMaxChunksUp:     3,
+				StorageSyncFull:        true,
+				StorageBacklogMemLimit: "40Mi",
+				StorageVolumeSize:      "30Mi",
+				StorageMaxChunksPause:  true,
+				CPUBufferWorkers:       2,
+				CPULimit:               "30Mi",
+				CPURequest:             "20Mi",
+				MemoryLimit:            "35Mi",
+				MemoryRequest:          "25Mi",
+			})
+			wantEqual(t, err, nil)
+		}
+		allResourceProfile, err := asUser.ResourceProfiles(ctx, aggregator.ID, types.ResourceProfilesParams{})
+		wantEqual(t, err, nil)
+		page1, err := asUser.ResourceProfiles(ctx, aggregator.ID, types.ResourceProfilesParams{Last: ptrUint64(3)})
+		wantEqual(t, err, nil)
+		page2, err := asUser.ResourceProfiles(ctx, aggregator.ID, types.ResourceProfilesParams{Last: ptrUint64(3), Before: page1.EndCursor})
+		wantEqual(t, err, nil)
 
-	// TODO: check on the expected profile spec values.
-
-	wantNoEqual(t, got.Items[0].ID, "")
-	wantEqual(t, got.Items[0].Name, types.ResourceProfileBestEffortLowResource)
-	wantNoTimeZero(t, got.Items[0].CreatedAt)
-	wantNoTimeZero(t, got.Items[0].UpdatedAt)
-
-	wantNoEqual(t, got.Items[1].ID, "")
-	wantEqual(t, got.Items[1].Name, types.ResourceProfileHighPerformanceGuaranteedDelivery)
-	wantNoTimeZero(t, got.Items[1].CreatedAt)
-	wantNoTimeZero(t, got.Items[1].UpdatedAt)
-
-	wantNoEqual(t, got.Items[2].ID, "")
-	wantEqual(t, got.Items[2].Name, types.ResourceProfileHighPerformanceOptimalThroughput)
-	wantNoTimeZero(t, got.Items[2].CreatedAt)
-	wantNoTimeZero(t, got.Items[2].UpdatedAt)
+		want := allResourceProfile.Items[3:6]
+		wantEqual(t, page2.Items, want)
+	})
 }
 
 func TestClient_ResourceProfile(t *testing.T) {

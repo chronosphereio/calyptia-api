@@ -33,7 +33,7 @@ func (c *Client) ResourceProfiles(ctx context.Context, aggregatorID string, para
 
 	var out types.ResourceProfiles
 	path := "/v1/aggregators/" + url.PathEscape(aggregatorID) + "/resource_profiles?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }
 
 // ResourceProfile by ID.
