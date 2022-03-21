@@ -20,4 +20,7 @@ func TestClient_Members(t *testing.T) {
 	wantEqual(t, got.Items[0].Roles, []types.MembershipRole{types.MembershipRoleCreator})
 	wantNoTimeZero(t, got.Items[0].CreatedAt)
 	wantNoEqual(t, got.Items[0].User, nil)
+	t.Run("pagination", func(t *testing.T) {
+		// TODO: HOW TO CREATE NEW USERS TO TEST THE PAGINATION?
+	})
 }
