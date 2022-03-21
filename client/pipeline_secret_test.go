@@ -7,6 +7,7 @@ import (
 	"crypto/sha512"
 	"crypto/x509"
 	"encoding/pem"
+	"strconv"
 	"testing"
 
 	"github.com/calyptia/api/types"
@@ -35,21 +36,42 @@ func TestClient_PipelineSecrets(t *testing.T) {
 	aggregator := setupAggregator(t, withToken(t, asUser))
 	pipeline := setupPipeline(t, asUser, aggregator.ID)
 
-	secret, err := asUser.CreatePipelineSecret(ctx, pipeline.ID, types.CreatePipelineSecret{
-		Key:   "testsecret",
-		Value: []byte("test-value"),
+	t.Run("ok", func(t *testing.T) {
+		secret, err := asUser.CreatePipelineSecret(ctx, pipeline.ID, types.CreatePipelineSecret{
+			Key:   "testsecret",
+			Value: []byte("test-value"),
+		})
+		wantEqual(t, err, nil)
+
+		got, err := asUser.PipelineSecrets(ctx, pipeline.ID, types.PipelineSecretsParams{})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(got.Items), 1)
+
+		wantEqual(t, got.Items[0].ID, secret.ID)
+		wantEqual(t, got.Items[0].Key, "testsecret")
+		wantNoEqual(t, got.Items[0].Value, []byte("test-value"))
+		wantEqual(t, got.Items[0].CreatedAt, secret.CreatedAt)
+		wantEqual(t, got.Items[0].UpdatedAt, secret.CreatedAt)
 	})
-	wantEqual(t, err, nil)
 
-	got, err := asUser.PipelineSecrets(ctx, pipeline.ID, types.PipelineSecretsParams{})
-	wantEqual(t, err, nil)
-	wantEqual(t, len(got.Items), 1)
+	t.Run("pagination", func(t *testing.T) {
+		for i := 0; i < 9; i++ {
+			_, err := asUser.CreatePipelineSecret(ctx, pipeline.ID, types.CreatePipelineSecret{
+				Key:   "testsecret" + strconv.Itoa(i),
+				Value: []byte("test-value"),
+			})
+			wantEqual(t, err, nil)
+		}
+		allSecrets, err := asUser.PipelineSecrets(ctx, pipeline.ID, types.PipelineSecretsParams{})
+		wantEqual(t, err, nil)
+		page1, err := asUser.PipelineSecrets(ctx, pipeline.ID, types.PipelineSecretsParams{Last: ptrUint64(3)})
+		wantEqual(t, err, nil)
+		page2, err := asUser.PipelineSecrets(ctx, pipeline.ID, types.PipelineSecretsParams{Last: ptrUint64(3), Before: page1.EndCursor})
+		wantEqual(t, err, nil)
 
-	wantEqual(t, got.Items[0].ID, secret.ID)
-	wantEqual(t, got.Items[0].Key, "testsecret")
-	wantNoEqual(t, got.Items[0].Value, []byte("test-value"))
-	wantEqual(t, got.Items[0].CreatedAt, secret.CreatedAt)
-	wantEqual(t, got.Items[0].UpdatedAt, secret.CreatedAt)
+		want := allSecrets.Items[3:6]
+		wantEqual(t, page2.Items, want)
+	})
 }
 
 func TestClient_PipelineSecret(t *testing.T) {
