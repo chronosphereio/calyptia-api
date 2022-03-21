@@ -22,5 +22,5 @@ func (c *Client) PipelineConfigHistory(ctx context.Context, pipelineID string, p
 
 	var out types.PipelineConfigHistory
 	path := "/v1/aggregator_pipelines/" + url.PathEscape(pipelineID) + "/config_history?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }
