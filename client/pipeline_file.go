@@ -31,7 +31,7 @@ func (c *Client) PipelineFiles(ctx context.Context, pipelineID string, params ty
 
 	var out types.PipelineFiles
 	path := "/v1/aggregator_pipelines/" + url.PathEscape(pipelineID) + "/files?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }
 
 // PipelineFile by ID.
