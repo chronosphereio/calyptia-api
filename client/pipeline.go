@@ -51,7 +51,7 @@ func (c *Client) ProjectPipelines(ctx context.Context, projectID string, params 
 
 	var out types.Pipelines
 	path := "/v1/projects/" + url.PathEscape(projectID) + "/aggregator_pipelines?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }
 
 // Pipeline by ID.

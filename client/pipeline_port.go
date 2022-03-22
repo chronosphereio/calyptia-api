@@ -29,7 +29,7 @@ func (c *Client) PipelinePorts(ctx context.Context, pipelineID string, params ty
 
 	var out types.PipelinePorts
 	path := "/v1/aggregator_pipelines/" + url.PathEscape(pipelineID) + "/ports?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }
 
 // PipelinePort by ID.

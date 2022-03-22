@@ -21,5 +21,5 @@ func (c *Client) Members(ctx context.Context, projectID string, params types.Mem
 
 	var out types.Memberships
 	path := "/v1/projects/" + url.PathEscape(projectID) + "/members?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }
