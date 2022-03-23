@@ -32,7 +32,7 @@ func (c *Client) Projects(ctx context.Context, params types.ProjectsParams) (typ
 	}
 
 	var out types.Projects
-	return out, c.do(ctx, http.MethodGet, "/v1/projects?"+q.Encode(), nil, &out.Items)
+	return out, c.do(ctx, http.MethodGet, "/v1/projects?"+q.Encode(), nil, &out.Items, withCursor(&out.EndCursor))
 }
 
 // Project by ID.
