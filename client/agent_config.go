@@ -22,5 +22,5 @@ func (c *Client) AgentConfigHistory(ctx context.Context, agentID string, params 
 
 	var out types.AgentConfigHistory
 	path := "/v1/agents/" + url.PathEscape(agentID) + "/config_history?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }

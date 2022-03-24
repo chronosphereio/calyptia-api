@@ -35,7 +35,7 @@ func (c *Client) Tokens(ctx context.Context, projectID string, params types.Toke
 
 	var out types.Tokens
 	path := "/v1/projects/" + url.PathEscape(projectID) + "/tokens?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items)
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }
 
 // Token by ID.
