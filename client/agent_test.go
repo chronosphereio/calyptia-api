@@ -117,6 +117,50 @@ func TestClient_Agents(t *testing.T) {
 		wantNoEqual(t, *page1.EndCursor, *page2.EndCursor)
 		wantEqual(t, page1.Items[2].CreatedAt.After(page2.Items[0].CreatedAt), true)
 	})
+
+	t.Run("tags", func(t *testing.T) {
+		for i := 0; i < 10; i++ {
+			agent := types.RegisterAgent{
+				Name:      fmt.Sprintf("test-agent-%d", i),
+				MachineID: fmt.Sprintf("test-machine-id-%d", i), // unique machine id otherwise it gets upserted.
+				Type:      types.AgentTypeFluentBit,
+				Version:   "v1.8.6",
+				Edition:   types.AgentEditionCommunity,
+			}
+			if i >= 5 {
+				agent.Tags = append(agent.Tags, "tagone,tagthree")
+			} else {
+				agent.Tags = append(agent.Tags, "tagtwo,tagthree")
+			}
+			_, err := withToken.RegisterAgent(ctx, agent)
+			wantEqual(t, err, nil)
+		}
+
+		opts := types.AgentsParams{}
+		opts.TagFilter("tagone")
+		tag1, err := asUser.Agents(ctx, project.ID, opts)
+		wantEqual(t, err, nil)
+		wantEqual(t, len(tag1.Items), 5)
+		wantEqual(t, tag1.Items[0].Tags, []string{"tagone"})
+
+		opts.TagFilter("tagtwo")
+		tag2, err := asUser.Agents(ctx, project.ID, opts)
+		wantEqual(t, err, nil)
+		wantEqual(t, len(tag2.Items), 5)
+		wantEqual(t, tag2.Items[0].Tags, []string{"tagtwo"})
+
+		opts.TagFilter("tagthree")
+		tag3, err := asUser.Agents(ctx, project.ID, opts)
+		wantEqual(t, err, nil)
+		wantEqual(t, len(tag3.Items), 10)
+		wantEqual(t, tag3.Items[0].Tags, []string{"tagthree"})
+
+		opts.TagFilter("tagone AND tagthree")
+		tag4, err := asUser.Agents(ctx, project.ID, opts)
+		wantEqual(t, err, nil)
+		wantEqual(t, len(tag4.Items), 5)
+		wantEqual(t, tag4.Items[0].Tags, []string{"tagone", "tagthree"})
+	})
 }
 
 func TestClient_Agent(t *testing.T) {
