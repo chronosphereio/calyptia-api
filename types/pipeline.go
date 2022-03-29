@@ -13,6 +13,7 @@ type Pipeline struct {
 	Status          PipelineStatus   `json:"status" yaml:"status"`
 	ResourceProfile ResourceProfile  `json:"resourceProfile" yaml:"resourceProfile"`
 	ReplicasCount   uint64           `json:"replicasCount" yaml:"replicasCount"`
+	Tags            []string         `json:"tags" yaml:"tags"`
 	Metadata        *json.RawMessage `json:"metadata"`
 	CreatedAt       time.Time        `json:"createdAt" yaml:"createdAt"`
 	UpdatedAt       time.Time        `json:"updatedAt" yaml:"updatedAt"`
@@ -34,6 +35,7 @@ type CreatePipeline struct {
 	ResourceProfileName       string                 `json:"resourceProfile"`
 	AutoCreatePortsFromConfig bool                   `json:"autoCreatePortsFromConfig"`
 	Metadata                  *json.RawMessage       `json:"metadata"`
+	Tags                      []string               `json:"tags"`
 }
 
 // CreatedPipeline response payload after creating a pipeline successfully.
@@ -67,6 +69,7 @@ type PipelinesParams struct {
 	Last   *uint64
 	Before *string
 	Name   *string
+	Tags   *string
 }
 
 // UpdatedPipeline response payload after updating a pipeline successfully.
