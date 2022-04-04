@@ -18,6 +18,7 @@ type Agent struct {
 	Flags               []string         `json:"flags" yaml:"flags"`
 	RawConfig           string           `json:"rawConfig" yaml:"rawConfig"`
 	Metadata            *json.RawMessage `json:"metadata" yaml:"metadata"`
+	Tags                []string         `json:"tags" yaml:"tags"`
 	FirstMetricsAddedAt time.Time        `json:"firstMetricsAddedAt" yaml:"firstMetricsAddedAt"`
 	LastMetricsAddedAt  time.Time        `json:"lastMetricsAddedAt" yaml:"lastMetricsAddedAt"`
 	MetricsCount        uint64           `json:"metricsCount" yaml:"metricsCount"`
@@ -61,6 +62,7 @@ type RegisterAgent struct {
 	Flags     []string         `json:"flags"`
 	RawConfig string           `json:"rawConfig"`
 	Metadata  *json.RawMessage `json:"metadata"`
+	Tags      []string         `json:"tags"`
 }
 
 // RegisteredAgent response payload after registering an agent successfully.
@@ -76,6 +78,7 @@ type AgentsParams struct {
 	Last   *uint64
 	Before *string
 	Name   *string
+	Tags   *string
 }
 
 // UpdateAgent request payload for updating an agent.

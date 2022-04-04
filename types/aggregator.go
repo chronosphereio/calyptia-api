@@ -13,6 +13,7 @@ type Aggregator struct {
 	Name           string    `json:"name" yaml:"name"`
 	Version        string    `json:"version" yaml:"version"`
 	PipelinesCount uint64    `json:"pipelinesCount" yaml:"pipelinesCount"`
+	Tags           []string  `json:"tags" yaml:"tags"`
 	CreatedAt      time.Time `json:"createdAt" yaml:"createdAt"`
 	UpdatedAt      time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
@@ -25,10 +26,11 @@ type Aggregators struct {
 
 // CreateAggregator request payload for creating a new aggregator.
 type CreateAggregator struct {
-	Name                    string `json:"name"`
-	Version                 string `json:"version" yaml:"version"`
-	AddHealthCheckPipeline  bool   `json:"addHealthCheckPipeline"`
-	HealthCheckPipelinePort uint   `json:"healthCheckPipelinePort"`
+	Name                    string   `json:"name"`
+	Version                 string   `json:"version" yaml:"version"`
+	AddHealthCheckPipeline  bool     `json:"addHealthCheckPipeline"`
+	HealthCheckPipelinePort uint     `json:"healthCheckPipelinePort"`
+	Tags                    []string `json:"tags" yaml:"tags"`
 }
 
 // CreatedAggregator response payload after creating an aggregator successfully.
@@ -40,6 +42,7 @@ type CreatedAggregator struct {
 	Name          string    `json:"name"`
 	Version       string    `json:"version"`
 	CreatedAt     time.Time `json:"createdAt"`
+	Tags          []string  `json:"tags"`
 
 	HealthCheckPipeline *Pipeline         `json:"healthCheckPipeline"`
 	ResourceProfiles    []ResourceProfile `json:"resourceProfiles"`
@@ -50,6 +53,7 @@ type AggregatorsParams struct {
 	Last   *uint64
 	Before *string
 	Name   *string
+	Tags   *string
 }
 
 // UpdateAggregator request payload for updating an aggregator.
