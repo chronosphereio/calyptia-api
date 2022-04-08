@@ -371,6 +371,12 @@ components:
           type: integer
           format: int64
           minimum: 0
+        tags:
+          type: array
+          nullable: true
+          uniqueItems: true
+          items:
+            type: string
         metadata:
           type: object
           nullable: true
@@ -2315,6 +2321,12 @@ paths:
           in: query
           name: name
           description: Name matching pipelines.
+        - schema:
+            type: string
+            example: tagone AND tagtwo
+          in: query
+          name: tags_query
+          description: Tag query.
       responses:
         "200":
           description: OK
@@ -2365,6 +2377,12 @@ paths:
           in: query
           name: name
           description: Name matching pipelines.
+        - schema:
+            type: string
+            example: tagone AND tagtwo
+          in: query
+          name: tags_query
+          description: Tag query.
       responses:
         "200":
           description: OK
