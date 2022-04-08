@@ -119,7 +119,7 @@ func TestClient_Agents(t *testing.T) {
 	})
 
 	t.Run("tags", func(t *testing.T) {
-		for i := 0; i < 10; i++ {
+		for i := 10; i < 20; i++ {
 			agent := types.RegisterAgent{
 				Name:      fmt.Sprintf("test-agent-%d", i),
 				MachineID: fmt.Sprintf("test-machine-id-%d", i), // unique machine id otherwise it gets upserted.
@@ -127,39 +127,42 @@ func TestClient_Agents(t *testing.T) {
 				Version:   "v1.8.6",
 				Edition:   types.AgentEditionCommunity,
 			}
-			if i >= 5 {
-				agent.Tags = append(agent.Tags, "tagone,tagthree")
+			if i >= 15 {
+				agent.Tags = append(agent.Tags, "tagone", "tagthree")
 			} else {
-				agent.Tags = append(agent.Tags, "tagtwo,tagthree")
+				agent.Tags = append(agent.Tags, "tagtwo", "tagthree")
 			}
 			_, err := withToken.RegisterAgent(ctx, agent)
 			wantEqual(t, err, nil)
 		}
 
 		opts := types.AgentsParams{}
-		opts.TagFilter("tagone")
+		s := "tagone"
+		opts.Tags = &s
 		tag1, err := asUser.Agents(ctx, project.ID, opts)
 		wantEqual(t, err, nil)
 		wantEqual(t, len(tag1.Items), 5)
-		wantEqual(t, tag1.Items[0].Tags, []string{"tagone"})
+		wantEqual(t, tag1.Items[0].Tags, []string{"tagone", "tagthree"})
 
-		opts.TagFilter("tagtwo")
+		s2 := "tagtwo"
+		opts.Tags = &s2
 		tag2, err := asUser.Agents(ctx, project.ID, opts)
 		wantEqual(t, err, nil)
 		wantEqual(t, len(tag2.Items), 5)
-		wantEqual(t, tag2.Items[0].Tags, []string{"tagtwo"})
+		wantEqual(t, tag2.Items[0].Tags, []string{"tagtwo", "tagthree"})
 
-		opts.TagFilter("tagthree")
+		s3 := "tagthree"
+		opts.Tags = &s3
 		tag3, err := asUser.Agents(ctx, project.ID, opts)
 		wantEqual(t, err, nil)
 		wantEqual(t, len(tag3.Items), 10)
-		wantEqual(t, tag3.Items[0].Tags, []string{"tagthree"})
+		wantEqual(t, tag3.Items[0].Tags, []string{"tagone", "tagthree"})
 
-		opts.TagFilter("tagone AND tagthree")
+		s4 := "tagone AND tagtwo"
+		opts.Tags = &s4
 		tag4, err := asUser.Agents(ctx, project.ID, opts)
 		wantEqual(t, err, nil)
-		wantEqual(t, len(tag4.Items), 5)
-		wantEqual(t, tag4.Items[0].Tags, []string{"tagone", "tagthree"})
+		wantEqual(t, len(tag4.Items), 0)
 	})
 }
 

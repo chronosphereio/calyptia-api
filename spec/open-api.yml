@@ -191,6 +191,12 @@ components:
           uniqueItems: true
           items:
             type: string
+        tags:
+          type: array
+          nullable: true
+          uniqueItems: true
+          items:
+            type: string
         rawConfig:
           type: string
         metadata:
@@ -1876,6 +1882,12 @@ paths:
           in: query
           name: name
           description: Name matching agents.
+        - schema:
+            type: string
+            example: tagone AND tagtwo
+          in: query
+          name: tags_query
+          description: Tag query.
       responses:
         "200":
           description: OK

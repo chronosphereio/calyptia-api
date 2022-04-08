@@ -81,10 +81,6 @@ type AgentsParams struct {
 	Tags   *string
 }
 
-func (p *AgentsParams) TagFilter(s string) {
-	p.Tags = &s
-}
-
 // UpdateAgent request payload for updating an agent.
 type UpdateAgent struct {
 	Name      *string          `json:"name"`

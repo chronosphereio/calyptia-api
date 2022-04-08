@@ -31,7 +31,7 @@ func (c *Client) Agents(ctx context.Context, projectID string, params types.Agen
 		q.Set("name", *params.Name)
 	}
 	if params.Tags != nil {
-		q.Set("tags", *params.Tags)
+		q.Set("tags_query", *params.Tags)
 	}
 
 	var out types.Agents
