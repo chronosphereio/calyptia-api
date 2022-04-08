@@ -56,10 +56,6 @@ type AggregatorsParams struct {
 	Tags   *string
 }
 
-func (p *AggregatorsParams) TagFilter(s string) {
-	p.Tags = &s
-}
-
 // UpdateAggregator request payload for updating an aggregator.
 type UpdateAggregator struct {
 	Name    *string `json:"name"`

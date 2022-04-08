@@ -278,6 +278,12 @@ components:
         updatedAt:
           type: string
           format: date-time
+        tags:
+          type: array
+          nullable: true
+          uniqueItems: true
+          items:
+            type: string
       required:
         - id
         - token
@@ -2056,6 +2062,12 @@ paths:
           in: query
           name: name
           description: Name matching aggregators.
+        - schema:
+            type: string
+            example: tagone AND tagtwo
+          in: query
+          name: tags_query
+          description: Tag query.
       responses:
         "200":
           description: OK

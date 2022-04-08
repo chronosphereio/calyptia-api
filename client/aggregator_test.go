@@ -100,44 +100,47 @@ func TestClient_Aggregators(t *testing.T) {
 	})
 
 	t.Run("tags", func(t *testing.T) {
-		for i := 0; i < 10; i++ {
+		for i := 10; i < 20; i++ {
 			aggregator := types.CreateAggregator{
 				Name:    fmt.Sprintf("test-aggregator-%d", i),
 				Version: types.DefaultAggregatorVersion,
 			}
-			if i >= 5 {
-				aggregator.Tags = append(aggregator.Tags, "tagone,tagthree")
+			if i >= 15 {
+				aggregator.Tags = append(aggregator.Tags, "tagone", "tagthree")
 			} else {
-				aggregator.Tags = append(aggregator.Tags, "tagtwo,tagthree")
+				aggregator.Tags = append(aggregator.Tags, "tagtwo", "tagthree")
 			}
 			_, err := withToken.CreateAggregator(ctx, aggregator)
 			wantEqual(t, err, nil)
 		}
 
 		opts := types.AggregatorsParams{}
-		opts.TagFilter("tagone")
+		s := "tagone"
+		opts.Tags = &s
 		tag1, err := asUser.Aggregators(ctx, project.ID, opts)
 		wantEqual(t, err, nil)
 		wantEqual(t, len(tag1.Items), 5)
-		wantEqual(t, tag1.Items[0].Tags, []string{"tagone"})
+		wantEqual(t, tag1.Items[0].Tags, []string{"tagone", "tagthree"})
 
-		opts.TagFilter("tagtwo")
+		s2 := "tagtwo"
+		opts.Tags = &s2
 		tag2, err := asUser.Aggregators(ctx, project.ID, opts)
 		wantEqual(t, err, nil)
 		wantEqual(t, len(tag2.Items), 5)
-		wantEqual(t, tag2.Items[0].Tags, []string{"tagtwo"})
+		wantEqual(t, tag2.Items[0].Tags, []string{"tagtwo", "tagthree"})
 
-		opts.TagFilter("tagthree")
+		s3 := "tagthree"
+		opts.Tags = &s3
 		tag3, err := asUser.Aggregators(ctx, project.ID, opts)
 		wantEqual(t, err, nil)
 		wantEqual(t, len(tag3.Items), 10)
-		wantEqual(t, tag3.Items[0].Tags, []string{"tagthree"})
+		wantEqual(t, tag3.Items[0].Tags, []string{"tagone", "tagthree"})
 
-		opts.TagFilter("tagone AND tagthree")
+		s4 := "tagone AND tagtwo"
+		opts.Tags = &s4
 		tag4, err := asUser.Aggregators(ctx, project.ID, opts)
 		wantEqual(t, err, nil)
-		wantEqual(t, len(tag4.Items), 5)
-		wantEqual(t, tag4.Items[0].Tags, []string{"tagone", "tagthree"})
+		wantEqual(t, len(tag4.Items), 0)
 	})
 }
 
