@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/cenkalti/backoff/v4 v4.1.2
 	github.com/influxdata/influxdb-client-go/v2 v2.8.1
-	github.com/lestrrat-go/jwx v1.2.20
+	github.com/lestrrat-go/jwx v1.2.22
 	github.com/lib/pq v1.10.4
 	github.com/ory/dockertest/v3 v3.8.1
 	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a
@@ -22,7 +22,7 @@ require (
 	github.com/docker/docker v20.10.13+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
-	github.com/goccy/go-json v0.9.5 // indirect
+	github.com/goccy/go-json v0.9.6 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
@@ -30,7 +30,7 @@ require (
 	github.com/influxdata/line-protocol v0.0.0-20210922203350-b1ad95c89adf // indirect
 	github.com/lestrrat-go/backoff/v2 v2.0.8 // indirect
 	github.com/lestrrat-go/blackmagic v1.0.0 // indirect
-	github.com/lestrrat-go/httpcc v1.0.0 // indirect
+	github.com/lestrrat-go/httpcc v1.0.1 // indirect
 	github.com/lestrrat-go/iter v1.0.1 // indirect
 	github.com/lestrrat-go/option v1.0.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
