@@ -41,7 +41,7 @@ jobs:
           HOST_IP: ${{ env.DOCKER_HOST_IP }}
 
       - name: Upload coverage artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: coverage reports
           path: |
