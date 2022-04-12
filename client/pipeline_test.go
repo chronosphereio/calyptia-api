@@ -116,61 +116,71 @@ func TestClient_Pipelines(t *testing.T) {
 
 	asUser := userClient(t)
 	withToken := withToken(t, asUser)
+	t.Run("ok", func(t *testing.T) {
 
-	aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
-		Name:                    "test-aggregator",
-		AddHealthCheckPipeline:  true,
-		HealthCheckPipelinePort: 2020,
-	})
-	wantEqual(t, err, nil)
+		aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+			Name:                    "test-aggregator-one",
+			AddHealthCheckPipeline:  true,
+			HealthCheckPipelinePort: 2020,
+		})
+		wantEqual(t, err, nil)
 
-	jsonMetadata, err := json.Marshal(map[string]interface{}{
-		"test-key": "test-value",
-	})
-	wantEqual(t, err, nil)
+		jsonMetadata, err := json.Marshal(map[string]interface{}{
+			"test-key": "test-value",
+		})
+		wantEqual(t, err, nil)
 
-	rawMetadata := json.RawMessage(jsonMetadata)
+		rawMetadata := json.RawMessage(jsonMetadata)
 
-	pipeline, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
-		Name:          "test-pipeline",
-		ReplicasCount: 3,
-		RawConfig:     testFbitConfigWithAddr,
-		Secrets: []types.CreatePipelineSecret{
-			{
-				Key:   "testkey",
-				Value: []byte("test-value"),
+		pipeline, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:          "test-pipeline",
+			ReplicasCount: 3,
+			RawConfig:     testFbitConfigWithAddr,
+			Secrets: []types.CreatePipelineSecret{
+				{
+					Key:   "testkey",
+					Value: []byte("test-value"),
+				},
 			},
-		},
-		Files: []types.CreatePipelineFile{
-			{
-				Name:      "testfile",
-				Contents:  []byte("test-contents"),
-				Encrypted: true,
+			Files: []types.CreatePipelineFile{
+				{
+					Name:      "testfile",
+					Contents:  []byte("test-contents"),
+					Encrypted: true,
+				},
 			},
-		},
-		ResourceProfileName:       types.DefaultResourceProfileName,
-		AutoCreatePortsFromConfig: true,
-		Metadata:                  &rawMetadata,
+			ResourceProfileName:       types.DefaultResourceProfileName,
+			AutoCreatePortsFromConfig: true,
+			Metadata:                  &rawMetadata,
+		})
+		wantEqual(t, err, nil)
+
+		got, err := asUser.Pipelines(ctx, aggregator.ID, types.PipelinesParams{})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(got.Items), 2) // additional healthcheck pipeline should be created by default.
+
+		wantEqual(t, got.Items[0].ID, pipeline.ID)
+		wantEqual(t, got.Items[0].Name, pipeline.Name)
+		wantEqual(t, got.Items[0].Config, pipeline.Config)
+		wantEqual(t, got.Items[0].Status, pipeline.Status)
+		wantEqual(t, got.Items[0].ResourceProfile, pipeline.ResourceProfile)
+		wantEqual(t, got.Items[0].ReplicasCount, pipeline.ReplicasCount)
+		wantNoEqual(t, got.Items[0].Metadata, nil)
+		wantEqual(t, *got.Items[0].Metadata, rawMetadata)
+		wantEqual(t, got.Items[0].Config.CreatedAt, pipeline.Config.CreatedAt)
+
+		wantEqual(t, got.Items[1], *aggregator.HealthCheckPipeline)
 	})
-	wantEqual(t, err, nil)
-
-	got, err := asUser.Pipelines(ctx, aggregator.ID, types.PipelinesParams{})
-	wantEqual(t, err, nil)
-	wantEqual(t, len(got.Items), 2) // additional healthcheck pipeline should be created by default.
-
-	wantEqual(t, got.Items[0].ID, pipeline.ID)
-	wantEqual(t, got.Items[0].Name, pipeline.Name)
-	wantEqual(t, got.Items[0].Config, pipeline.Config)
-	wantEqual(t, got.Items[0].Status, pipeline.Status)
-	wantEqual(t, got.Items[0].ResourceProfile, pipeline.ResourceProfile)
-	wantEqual(t, got.Items[0].ReplicasCount, pipeline.ReplicasCount)
-	wantNoEqual(t, got.Items[0].Metadata, nil)
-	wantEqual(t, *got.Items[0].Metadata, rawMetadata)
-	wantEqual(t, got.Items[0].Config.CreatedAt, pipeline.Config.CreatedAt)
-
-	wantEqual(t, got.Items[1], *aggregator.HealthCheckPipeline)
 
 	t.Run("pagination", func(t *testing.T) {
+
+		aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+			Name:                    "test-aggregator-two",
+			AddHealthCheckPipeline:  true,
+			HealthCheckPipelinePort: 2020,
+		})
+		wantEqual(t, err, nil)
+
 		for i := 0; i < 10; i++ {
 			_, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
 				Name:      fmt.Sprintf("test-pipeline-%d", i),
@@ -197,6 +207,54 @@ func TestClient_Pipelines(t *testing.T) {
 		wantNoEqual(t, page1.Items, page2.Items)
 		wantNoEqual(t, *page1.EndCursor, *page2.EndCursor)
 		wantEqual(t, page1.Items[2].CreatedAt.After(page2.Items[0].CreatedAt), true)
+	})
+
+	t.Run("tags", func(t *testing.T) {
+		aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+			Name: "test-aggregator-three",
+		})
+		wantEqual(t, err, nil)
+		for i := 10; i < 20; i++ {
+			pipeline := types.CreatePipeline{
+				Name:      fmt.Sprintf("test-pipeline-%d", i),
+				RawConfig: testFbitConfigWithAddr,
+			}
+			if i >= 15 {
+				pipeline.Tags = append(pipeline.Tags, "tagone", "tagthree")
+			} else {
+				pipeline.Tags = append(pipeline.Tags, "tagtwo", "tagthree")
+			}
+			_, err := asUser.CreatePipeline(ctx, aggregator.ID, pipeline)
+			wantEqual(t, err, nil)
+		}
+
+		opts := types.PipelinesParams{}
+		s := "tagone"
+		opts.Tags = &s
+		tag1, err := asUser.Pipelines(ctx, aggregator.ID, opts)
+		wantEqual(t, err, nil)
+		wantEqual(t, len(tag1.Items), 5)
+		wantEqual(t, tag1.Items[0].Tags, []string{"tagone", "tagthree"})
+
+		s2 := "tagtwo"
+		opts.Tags = &s2
+		tag2, err := asUser.Pipelines(ctx, aggregator.ID, opts)
+		wantEqual(t, err, nil)
+		wantEqual(t, len(tag2.Items), 5)
+		wantEqual(t, tag2.Items[0].Tags, []string{"tagtwo", "tagthree"})
+
+		s3 := "tagthree"
+		opts.Tags = &s3
+		tag3, err := asUser.Pipelines(ctx, aggregator.ID, opts)
+		wantEqual(t, err, nil)
+		wantEqual(t, len(tag3.Items), 10)
+		wantEqual(t, tag3.Items[0].Tags, []string{"tagone", "tagthree"})
+
+		s4 := "tagone AND tagtwo"
+		opts.Tags = &s4
+		tag4, err := asUser.Pipelines(ctx, aggregator.ID, opts)
+		wantEqual(t, err, nil)
+		wantEqual(t, len(tag4.Items), 0)
 	})
 }
 
@@ -278,6 +336,53 @@ func TestClient_ProjectPipelines(t *testing.T) {
 		wantNoEqual(t, page1.Items, page2.Items)
 		wantNoEqual(t, *page1.EndCursor, *page2.EndCursor)
 		wantEqual(t, page1.Items[2].CreatedAt.After(page2.Items[0].CreatedAt), true)
+	})
+	t.Run("tags", func(t *testing.T) {
+		aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+			Name: "test-aggregator-one",
+		})
+		wantEqual(t, err, nil)
+		for i := 10; i < 20; i++ {
+			pipeline := types.CreatePipeline{
+				Name:      fmt.Sprintf("test-pipeline-%d", i),
+				RawConfig: testFbitConfigWithAddr,
+			}
+			if i >= 15 {
+				pipeline.Tags = append(pipeline.Tags, "tagone", "tagthree")
+			} else {
+				pipeline.Tags = append(pipeline.Tags, "tagtwo", "tagthree")
+			}
+			_, err := asUser.CreatePipeline(ctx, aggregator.ID, pipeline)
+			wantEqual(t, err, nil)
+		}
+
+		opts := types.PipelinesParams{}
+		s := "tagone"
+		opts.Tags = &s
+		tag1, err := asUser.ProjectPipelines(ctx, project.ID, opts)
+		wantEqual(t, err, nil)
+		wantEqual(t, len(tag1.Items), 5)
+		wantEqual(t, tag1.Items[0].Tags, []string{"tagone", "tagthree"})
+
+		s2 := "tagtwo"
+		opts.Tags = &s2
+		tag2, err := asUser.ProjectPipelines(ctx, project.ID, opts)
+		wantEqual(t, err, nil)
+		wantEqual(t, len(tag2.Items), 5)
+		wantEqual(t, tag2.Items[0].Tags, []string{"tagtwo", "tagthree"})
+
+		s3 := "tagthree"
+		opts.Tags = &s3
+		tag3, err := asUser.ProjectPipelines(ctx, project.ID, opts)
+		wantEqual(t, err, nil)
+		wantEqual(t, len(tag3.Items), 10)
+		wantEqual(t, tag3.Items[0].Tags, []string{"tagone", "tagthree"})
+
+		s4 := "tagone AND tagtwo"
+		opts.Tags = &s4
+		tag4, err := asUser.ProjectPipelines(ctx, project.ID, opts)
+		wantEqual(t, err, nil)
+		wantEqual(t, len(tag4.Items), 0)
 	})
 }
 
