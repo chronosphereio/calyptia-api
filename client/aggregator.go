@@ -30,6 +30,9 @@ func (c *Client) Aggregators(ctx context.Context, projectID string, params types
 	if params.Name != nil {
 		q.Set("name", *params.Name)
 	}
+	if params.Tags != nil {
+		q.Set("tags_query", *params.Tags)
+	}
 
 	var out types.Aggregators
 	path := "/v1/projects/" + url.PathEscape(projectID) + "/aggregators?" + q.Encode()
