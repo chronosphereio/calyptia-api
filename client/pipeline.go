@@ -30,6 +30,9 @@ func (c *Client) Pipelines(ctx context.Context, aggregatorID string, params type
 	if params.Name != nil {
 		q.Set("name", *params.Name)
 	}
+	if params.Tags != nil {
+		q.Set("tags_query", *params.Tags)
+	}
 
 	var out types.Pipelines
 	path := "/v1/aggregators/" + url.PathEscape(aggregatorID) + "/pipelines?" + q.Encode()
@@ -47,6 +50,9 @@ func (c *Client) ProjectPipelines(ctx context.Context, projectID string, params 
 	}
 	if params.Name != nil {
 		q.Set("name", *params.Name)
+	}
+	if params.Tags != nil {
+		q.Set("tags_query", *params.Tags)
 	}
 
 	var out types.Pipelines

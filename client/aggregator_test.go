@@ -98,6 +98,50 @@ func TestClient_Aggregators(t *testing.T) {
 		wantNoEqual(t, *page1.EndCursor, *page2.EndCursor)
 		wantEqual(t, page1.Items[2].CreatedAt.After(page2.Items[0].CreatedAt), true)
 	})
+
+	t.Run("tags", func(t *testing.T) {
+		for i := 10; i < 20; i++ {
+			aggregator := types.CreateAggregator{
+				Name:    fmt.Sprintf("test-aggregator-%d", i),
+				Version: types.DefaultAggregatorVersion,
+			}
+			if i >= 15 {
+				aggregator.Tags = append(aggregator.Tags, "tagone", "tagthree")
+			} else {
+				aggregator.Tags = append(aggregator.Tags, "tagtwo", "tagthree")
+			}
+			_, err := withToken.CreateAggregator(ctx, aggregator)
+			wantEqual(t, err, nil)
+		}
+
+		opts := types.AggregatorsParams{}
+		s := "tagone"
+		opts.Tags = &s
+		tag1, err := asUser.Aggregators(ctx, project.ID, opts)
+		wantEqual(t, err, nil)
+		wantEqual(t, len(tag1.Items), 5)
+		wantEqual(t, tag1.Items[0].Tags, []string{"tagone", "tagthree"})
+
+		s2 := "tagtwo"
+		opts.Tags = &s2
+		tag2, err := asUser.Aggregators(ctx, project.ID, opts)
+		wantEqual(t, err, nil)
+		wantEqual(t, len(tag2.Items), 5)
+		wantEqual(t, tag2.Items[0].Tags, []string{"tagtwo", "tagthree"})
+
+		s3 := "tagthree"
+		opts.Tags = &s3
+		tag3, err := asUser.Aggregators(ctx, project.ID, opts)
+		wantEqual(t, err, nil)
+		wantEqual(t, len(tag3.Items), 10)
+		wantEqual(t, tag3.Items[0].Tags, []string{"tagone", "tagthree"})
+
+		s4 := "tagone AND tagtwo"
+		opts.Tags = &s4
+		tag4, err := asUser.Aggregators(ctx, project.ID, opts)
+		wantEqual(t, err, nil)
+		wantEqual(t, len(tag4.Items), 0)
+	})
 }
 
 func TestClient_Aggregator(t *testing.T) {
