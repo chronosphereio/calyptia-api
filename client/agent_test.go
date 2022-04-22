@@ -9,6 +9,12 @@ import (
 	"github.com/calyptia/api/types"
 )
 
+const (
+	TagOne   = "tagone"
+	TagTwo   = "tagtwo"
+	TagThree = "tagthree"
+)
+
 func TestClient_RegisterAgent(t *testing.T) {
 	ctx := context.Background()
 
@@ -128,37 +134,37 @@ func TestClient_Agents(t *testing.T) {
 				Edition:   types.AgentEditionCommunity,
 			}
 			if i >= 15 {
-				agent.Tags = append(agent.Tags, "tagone", "tagthree")
+				agent.Tags = append(agent.Tags, TagOne, TagThree)
 			} else {
-				agent.Tags = append(agent.Tags, "tagtwo", "tagthree")
+				agent.Tags = append(agent.Tags, TagTwo, TagThree)
 			}
 			_, err := withToken.RegisterAgent(ctx, agent)
 			wantEqual(t, err, nil)
 		}
 
 		opts := types.AgentsParams{}
-		s := "tagone"
+		s := TagOne
 		opts.Tags = &s
 		tag1, err := asUser.Agents(ctx, project.ID, opts)
 		wantEqual(t, err, nil)
 		wantEqual(t, len(tag1.Items), 5)
-		wantEqual(t, tag1.Items[0].Tags, []string{"tagone", "tagthree"})
+		wantEqual(t, tag1.Items[0].Tags, []string{TagOne, TagThree})
 
-		s2 := "tagtwo"
+		s2 := TagTwo
 		opts.Tags = &s2
 		tag2, err := asUser.Agents(ctx, project.ID, opts)
 		wantEqual(t, err, nil)
 		wantEqual(t, len(tag2.Items), 5)
-		wantEqual(t, tag2.Items[0].Tags, []string{"tagtwo", "tagthree"})
+		wantEqual(t, tag2.Items[0].Tags, []string{TagTwo, TagThree})
 
-		s3 := "tagthree"
+		s3 := TagThree
 		opts.Tags = &s3
 		tag3, err := asUser.Agents(ctx, project.ID, opts)
 		wantEqual(t, err, nil)
 		wantEqual(t, len(tag3.Items), 10)
-		wantEqual(t, tag3.Items[0].Tags, []string{"tagone", "tagthree"})
+		wantEqual(t, tag3.Items[0].Tags, []string{TagOne, TagThree})
 
-		s4 := "tagone AND tagtwo"
+		s4 := "TagOneAND tagtwo"
 		opts.Tags = &s4
 		tag4, err := asUser.Agents(ctx, project.ID, opts)
 		wantEqual(t, err, nil)
