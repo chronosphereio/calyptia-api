@@ -115,28 +115,28 @@ func TestClient_Aggregators(t *testing.T) {
 		}
 
 		opts := types.AggregatorsParams{}
-		s := "tagone"
+		s := TagOne
 		opts.Tags = &s
 		tag1, err := asUser.Aggregators(ctx, project.ID, opts)
 		wantEqual(t, err, nil)
 		wantEqual(t, len(tag1.Items), 5)
-		wantEqual(t, tag1.Items[0].Tags, []string{"tagone", "tagthree"})
+		wantEqual(t, tag1.Items[0].Tags, []string{TagOne, TagThree})
 
-		s2 := "tagtwo"
+		s2 := TagTwo
 		opts.Tags = &s2
 		tag2, err := asUser.Aggregators(ctx, project.ID, opts)
 		wantEqual(t, err, nil)
 		wantEqual(t, len(tag2.Items), 5)
 		wantEqual(t, tag2.Items[0].Tags, []string{"tagtwo", "tagthree"})
 
-		s3 := "tagthree"
+		s3 := TagThree
 		opts.Tags = &s3
 		tag3, err := asUser.Aggregators(ctx, project.ID, opts)
 		wantEqual(t, err, nil)
 		wantEqual(t, len(tag3.Items), 10)
 		wantEqual(t, tag3.Items[0].Tags, []string{"tagone", "tagthree"})
 
-		s4 := "tagone AND tagtwo"
+		s4 := fmt.Sprintf("%s AND %s", TagOne, TagTwo)
 		opts.Tags = &s4
 		tag4, err := asUser.Aggregators(ctx, project.ID, opts)
 		wantEqual(t, err, nil)

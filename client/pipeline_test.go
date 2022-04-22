@@ -117,7 +117,6 @@ func TestClient_Pipelines(t *testing.T) {
 	asUser := userClient(t)
 	withToken := withToken(t, asUser)
 	t.Run("ok", func(t *testing.T) {
-
 		aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
 			Name:                    "test-aggregator-one",
 			AddHealthCheckPipeline:  true,
@@ -173,7 +172,6 @@ func TestClient_Pipelines(t *testing.T) {
 	})
 
 	t.Run("pagination", func(t *testing.T) {
-
 		aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
 			Name:                    "test-aggregator-two",
 			AddHealthCheckPipeline:  true,
@@ -209,6 +207,7 @@ func TestClient_Pipelines(t *testing.T) {
 		wantEqual(t, page1.Items[2].CreatedAt.After(page2.Items[0].CreatedAt), true)
 	})
 
+	//nolint:dupl // this is a test and could be duplicated
 	t.Run("tags", func(t *testing.T) {
 		aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
 			Name: "test-aggregator-three",
@@ -337,6 +336,8 @@ func TestClient_ProjectPipelines(t *testing.T) {
 		wantNoEqual(t, *page1.EndCursor, *page2.EndCursor)
 		wantEqual(t, page1.Items[2].CreatedAt.After(page2.Items[0].CreatedAt), true)
 	})
+
+	//nolint:dupl // this is a test and could be duplicated
 	t.Run("tags", func(t *testing.T) {
 		aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
 			Name: "test-aggregator-one",
