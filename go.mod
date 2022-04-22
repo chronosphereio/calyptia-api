@@ -3,7 +3,7 @@ module github.com/calyptia/api
 go 1.17
 
 require (
-	github.com/cenkalti/backoff/v4 v4.1.2
+	github.com/cenkalti/backoff/v4 v4.1.3
 	github.com/influxdata/influxdb-client-go/v2 v2.8.1
 	github.com/lestrrat-go/jwx v1.2.20
 	github.com/lib/pq v1.10.5
