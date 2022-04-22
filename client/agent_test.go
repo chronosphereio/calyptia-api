@@ -164,7 +164,7 @@ func TestClient_Agents(t *testing.T) {
 		wantEqual(t, len(tag3.Items), 10)
 		wantEqual(t, tag3.Items[0].Tags, []string{TagOne, TagThree})
 
-		s4 := "TagOneAND tagtwo"
+		s4 := fmt.Sprintf("%s AND %s", TagOne, TagTwo)
 		opts.Tags = &s4
 		tag4, err := asUser.Agents(ctx, project.ID, opts)
 		wantEqual(t, err, nil)
