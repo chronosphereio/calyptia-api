@@ -28,10 +28,11 @@ type Aggregators struct {
 // CreateAggregator request payload for creating a new aggregator.
 type CreateAggregator struct {
 	Name                    string   `json:"name"`
-	Version                 string   `json:"version" yaml:"version"`
+	Version                 string   `json:"version"`
 	AddHealthCheckPipeline  bool     `json:"addHealthCheckPipeline"`
 	HealthCheckPipelinePort uint     `json:"healthCheckPipelinePort"`
-	Tags                    []string `json:"tags" yaml:"tags"`
+	Tags                    []string `json:"tags"`
+	EnvironmentID           string   `json:"environmentID"`
 }
 
 // CreatedAggregator response payload after creating an aggregator successfully.
@@ -59,6 +60,7 @@ type AggregatorsParams struct {
 
 // UpdateAggregator request payload for updating an aggregator.
 type UpdateAggregator struct {
-	Name    *string `json:"name"`
-	Version *string `json:"version"`
+	Name          *string `json:"name"`
+	Version       *string `json:"version"`
+	EnvironmentID *string `json:"environmentID"`
 }
