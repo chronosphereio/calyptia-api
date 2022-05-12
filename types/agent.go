@@ -55,15 +55,16 @@ const (
 
 // RegisterAgent request payload for registering a new agent.
 type RegisterAgent struct {
-	Name      string           `json:"name"`
-	MachineID string           `json:"machineID"`
-	Type      AgentType        `json:"type"`
-	Version   string           `json:"version"`
-	Edition   AgentEdition     `json:"edition"`
-	Flags     []string         `json:"flags"`
-	RawConfig string           `json:"rawConfig"`
-	Metadata  *json.RawMessage `json:"metadata"`
-	Tags      []string         `json:"tags"`
+	Name          string           `json:"name"`
+	MachineID     string           `json:"machineID"`
+	Type          AgentType        `json:"type"`
+	Version       string           `json:"version"`
+	Edition       AgentEdition     `json:"edition"`
+	Flags         []string         `json:"flags"`
+	RawConfig     string           `json:"rawConfig"`
+	Metadata      *json.RawMessage `json:"metadata"`
+	Tags          []string         `json:"tags"`
+	EnvironmentID string           `json:"environmentID"`
 }
 
 // RegisteredAgent response payload after registering an agent successfully.
@@ -84,10 +85,11 @@ type AgentsParams struct {
 
 // UpdateAgent request payload for updating an agent.
 type UpdateAgent struct {
-	Name      *string          `json:"name"`
-	Version   *string          `json:"version"`
-	Edition   *AgentEdition    `json:"edition"`
-	Flags     *[]string        `json:"flags"`
-	RawConfig *string          `json:"rawConfig"`
-	Metadata  *json.RawMessage `json:"metadata"`
+	Name          *string          `json:"name"`
+	Version       *string          `json:"version"`
+	Edition       *AgentEdition    `json:"edition"`
+	Flags         *[]string        `json:"flags"`
+	RawConfig     *string          `json:"rawConfig"`
+	Metadata      *json.RawMessage `json:"metadata"`
+	EnvironmentID *string          `json:"environmentID"`
 }
