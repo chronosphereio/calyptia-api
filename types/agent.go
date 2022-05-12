@@ -12,7 +12,7 @@ type Agent struct {
 	Token               string           `json:"token" yaml:"token"`
 	Name                string           `json:"name" yaml:"name"`
 	MachineID           string           `json:"machineID" yaml:"machineID"`
-	Environment         string           `json:"environment" yaml:"environment"`
+	EnvironmentName     string           `json:"environmentName" yaml:"environmentName"`
 	Type                AgentType        `json:"type" yaml:"type"`
 	Version             string           `json:"version" yaml:"version"`
 	Edition             AgentEdition     `json:"edition" yaml:"edition"`
@@ -55,16 +55,16 @@ const (
 
 // RegisterAgent request payload for registering a new agent.
 type RegisterAgent struct {
-	Name        string           `json:"name"`
-	MachineID   string           `json:"machineID"`
-	Type        AgentType        `json:"type"`
-	Version     string           `json:"version"`
-	Edition     AgentEdition     `json:"edition"`
-	Flags       []string         `json:"flags"`
-	RawConfig   string           `json:"rawConfig"`
-	Metadata    *json.RawMessage `json:"metadata"`
-	Tags        []string         `json:"tags"`
-	Environment string           `json:"environment"`
+	Name          string           `json:"name"`
+	MachineID     string           `json:"machineID"`
+	Type          AgentType        `json:"type"`
+	Version       string           `json:"version"`
+	Edition       AgentEdition     `json:"edition"`
+	Flags         []string         `json:"flags"`
+	RawConfig     string           `json:"rawConfig"`
+	Metadata      *json.RawMessage `json:"metadata"`
+	Tags          []string         `json:"tags"`
+	EnvironmentID string           `json:"environmentID"`
 }
 
 // RegisteredAgent response payload after registering an agent successfully.
@@ -85,11 +85,11 @@ type AgentsParams struct {
 
 // UpdateAgent request payload for updating an agent.
 type UpdateAgent struct {
-	Name        *string          `json:"name"`
-	Version     *string          `json:"version"`
-	Edition     *AgentEdition    `json:"edition"`
-	Flags       *[]string        `json:"flags"`
-	RawConfig   *string          `json:"rawConfig"`
-	Metadata    *json.RawMessage `json:"metadata"`
-	Environment *string          `json:"environment"`
+	Name          *string          `json:"name"`
+	Version       *string          `json:"version"`
+	Edition       *AgentEdition    `json:"edition"`
+	Flags         *[]string        `json:"flags"`
+	RawConfig     *string          `json:"rawConfig"`
+	Metadata      *json.RawMessage `json:"metadata"`
+	EnvironmentID *string          `json:"environmentID"`
 }

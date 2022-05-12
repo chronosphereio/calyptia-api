@@ -8,15 +8,15 @@ const (
 
 // Aggregator model.
 type Aggregator struct {
-	ID             string    `json:"id" yaml:"id"`
-	Token          string    `json:"token" yaml:"token"`
-	Name           string    `json:"name" yaml:"name"`
-	Environment    string    `json:"environment" yaml:"environment"`
-	Version        string    `json:"version" yaml:"version"`
-	PipelinesCount uint64    `json:"pipelinesCount" yaml:"pipelinesCount"`
-	Tags           []string  `json:"tags" yaml:"tags"`
-	CreatedAt      time.Time `json:"createdAt" yaml:"createdAt"`
-	UpdatedAt      time.Time `json:"updatedAt" yaml:"updatedAt"`
+	ID              string    `json:"id" yaml:"id"`
+	Token           string    `json:"token" yaml:"token"`
+	Name            string    `json:"name" yaml:"name"`
+	EnvironmentName string    `json:"environmentName" yaml:"environmentName"`
+	Version         string    `json:"version" yaml:"version"`
+	PipelinesCount  uint64    `json:"pipelinesCount" yaml:"pipelinesCount"`
+	Tags            []string  `json:"tags" yaml:"tags"`
+	CreatedAt       time.Time `json:"createdAt" yaml:"createdAt"`
+	UpdatedAt       time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
 
 // Aggregators paginated list.
@@ -28,11 +28,11 @@ type Aggregators struct {
 // CreateAggregator request payload for creating a new aggregator.
 type CreateAggregator struct {
 	Name                    string   `json:"name"`
-	Environment             string   `json:"environment"`
-	Version                 string   `json:"version" yaml:"version"`
+	Version                 string   `json:"version"`
 	AddHealthCheckPipeline  bool     `json:"addHealthCheckPipeline"`
 	HealthCheckPipelinePort uint     `json:"healthCheckPipelinePort"`
-	Tags                    []string `json:"tags" yaml:"tags"`
+	Tags                    []string `json:"tags"`
+	EnvironmentID           string   `json:"environmentID"`
 }
 
 // CreatedAggregator response payload after creating an aggregator successfully.
@@ -60,7 +60,7 @@ type AggregatorsParams struct {
 
 // UpdateAggregator request payload for updating an aggregator.
 type UpdateAggregator struct {
-	Name        *string `json:"name"`
-	Version     *string `json:"version"`
-	Environment *string `json:"environment"`
+	Name          *string `json:"name"`
+	Version       *string `json:"version"`
+	EnvironmentID *string `json:"environmentID"`
 }

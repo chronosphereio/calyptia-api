@@ -3,22 +3,21 @@ package types
 import "time"
 
 type Environment struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	ProjectID string    `json:"project_id"`
+	ID        string    `json:"id" yaml:"id" `
+	Name      string    `json:"name" yaml:"name" `
+	ProjectID string    `json:"-" yaml:"-"`
 	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
 
 type CreateEnvironment struct {
-	Name      string `json:"name"`
-	ProjectID string `json:"project_id"`
+	Name string `json:"name"`
 }
 
 type CreatedEnvironment struct {
-	ID         string     `json:"id"`
-	CreatedAt  time.Time  `json:"createdAt"`
-	Membership Membership `json:"membership"`
+	ID         string     `json:"id" yaml:"id"`
+	CreatedAt  time.Time  `json:"createdAt" yaml:"createdAt"`
+	Membership Membership `json:"membership" yaml:"membership"`
 }
 
 type Environments struct {
@@ -32,5 +31,5 @@ type EnvironmentsParams struct {
 }
 
 type UpdateEnvironment struct {
-	Name string `json:"name"`
+	Name *string `json:"name"`
 }
