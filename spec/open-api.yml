@@ -409,6 +409,13 @@ components:
           format: uuid
         rawConfig:
           type: string
+        configFormat:
+          type: string
+          enum:
+              - ini
+              - json
+              - yaml
+          nullable: true
         createdAt:
           type: string
           format: date-time
@@ -1049,6 +1056,13 @@ components:
           minimum: 0
         rawConfig:
           type: string
+        configFormat:
+          type: string
+          enum:
+              - ini
+              - json
+              - yaml
+          nullable: true
         secrets:
           type: array
           nullable: true
@@ -1094,6 +1108,13 @@ components:
           nullable: true
         rawConfig:
           type: string
+          nullable: true
+        configFormat:
+          type: string
+          enum:
+              - ini
+              - json
+              - yaml
           nullable: true
         secrets:
           type: array
@@ -2327,6 +2348,15 @@ paths:
           in: query
           name: tags_query
           description: Tag query.
+        - schema:
+            type: string
+            enum:
+              - ini
+              - json
+              - yaml
+          in: query
+          name: config_format
+          description: Desired output config format.
       responses:
         "200":
           description: OK
@@ -2383,6 +2413,15 @@ paths:
           in: query
           name: tags_query
           description: Tag query.
+        - schema:
+            type: string
+            enum:
+              - ini
+              - json
+              - yaml
+          in: query
+          name: config_format
+          description: Desired output config format.
       responses:
         "200":
           description: OK
