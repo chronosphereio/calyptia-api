@@ -29,7 +29,7 @@ type Pipelines struct {
 type CreatePipeline struct {
 	Name                      string                 `json:"name"`
 	ReplicasCount             uint64                 `json:"replicasCount"`
-	ConfigFormat              *string                `json:"configFormat"`
+	ConfigFormat              *ConfigFormat          `json:"configFormat"`
 	RawConfig                 string                 `json:"rawConfig"`
 	Secrets                   []CreatePipelineSecret `json:"secrets"`
 	Files                     []CreatePipelineFile   `json:"files"`
@@ -56,7 +56,7 @@ type CreatedPipeline struct {
 type UpdatePipeline struct {
 	Name                      *string                `json:"name"`
 	ReplicasCount             *uint64                `json:"replicasCount"`
-	ConfigFormat              *string                `json:"configFormat"`
+	ConfigFormat              *ConfigFormat          `json:"configFormat"`
 	RawConfig                 *string                `json:"rawConfig"`
 	Secrets                   []UpdatePipelineSecret `json:"secrets"`
 	Files                     []UpdatePipelineFile   `json:"files"`
@@ -72,7 +72,7 @@ type PipelinesParams struct {
 	Before       *string
 	Name         *string
 	Tags         *string
-	ConfigFormat *string
+	ConfigFormat *ConfigFormat
 }
 
 // UpdatedPipeline response payload after updating a pipeline successfully.
