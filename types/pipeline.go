@@ -29,8 +29,8 @@ type Pipelines struct {
 type CreatePipeline struct {
 	Name                      string                 `json:"name"`
 	ReplicasCount             uint64                 `json:"replicasCount"`
-	ConfigFormat              *ConfigFormat          `json:"configFormat"`
 	RawConfig                 string                 `json:"rawConfig"`
+	ConfigFormat              ConfigFormat           `json:"configFormat"`
 	Secrets                   []CreatePipelineSecret `json:"secrets"`
 	Files                     []CreatePipelineFile   `json:"files"`
 	ResourceProfileName       string                 `json:"resourceProfile"`
@@ -56,8 +56,8 @@ type CreatedPipeline struct {
 type UpdatePipeline struct {
 	Name                      *string                `json:"name"`
 	ReplicasCount             *uint64                `json:"replicasCount"`
-	ConfigFormat              *ConfigFormat          `json:"configFormat"`
 	RawConfig                 *string                `json:"rawConfig"`
+	ConfigFormat              *ConfigFormat          `json:"configFormat"`
 	Secrets                   []UpdatePipelineSecret `json:"secrets"`
 	Files                     []UpdatePipelineFile   `json:"files"`
 	Status                    *PipelineStatusKind    `json:"status"`
@@ -72,6 +72,11 @@ type PipelinesParams struct {
 	Before       *string
 	Name         *string
 	Tags         *string
+	ConfigFormat *ConfigFormat
+}
+
+// PipelineParams request payload for querying a single pipeline.
+type PipelineParams struct {
 	ConfigFormat *ConfigFormat
 }
 

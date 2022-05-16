@@ -12,10 +12,10 @@ const (
 
 // PipelineConfig model.
 type PipelineConfig struct {
-	ID           string        `json:"id" yaml:"id"`
-	ConfigFormat *ConfigFormat `json:"configFormat"`
-	RawConfig    string        `json:"rawConfig" yaml:"rawConfig"`
-	CreatedAt    time.Time     `json:"createdAt" yaml:"createdAt"`
+	ID           string       `json:"id" yaml:"id"`
+	RawConfig    string       `json:"rawConfig" yaml:"rawConfig"`
+	ConfigFormat ConfigFormat `json:"configFormat"`
+	CreatedAt    time.Time    `json:"createdAt" yaml:"createdAt"`
 }
 
 // PipelineConfigHistory paginated list.
