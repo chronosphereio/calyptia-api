@@ -22,6 +22,9 @@ func (c *Client) PipelineStatusHistory(ctx context.Context, pipelineID string, p
 	if params.Status != nil {
 		q.Set("status", string(*params.Status))
 	}
+	if params.ConfigFormat != nil {
+		q.Set("config_format", string(*params.ConfigFormat))
+	}
 
 	var out types.PipelineStatusHistory
 	path := "/v1/aggregator_pipelines/" + url.PathEscape(pipelineID) + "/status_history?" + q.Encode()

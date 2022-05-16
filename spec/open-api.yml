@@ -415,13 +415,13 @@ components:
               - ini
               - json
               - yaml
-          nullable: true
         createdAt:
           type: string
           format: date-time
       required:
         - id
         - rawConfig
+        - configFormat
         - createdAt
     PipelineStatus:
       type: object
@@ -1062,7 +1062,6 @@ components:
               - ini
               - json
               - yaml
-          nullable: true
         secrets:
           type: array
           nullable: true
@@ -2448,6 +2447,16 @@ paths:
       security:
         - user: []
         - project: []
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - ini
+              - json
+              - yaml
+          in: query
+          name: config_format
+          description: Desired output config format.
       responses:
         "200":
           description: OK
@@ -2562,6 +2571,15 @@ paths:
           in: query
           name: status
           description: Filter status entries with matching status.
+        - schema:
+            type: string
+            enum:
+              - ini
+              - json
+              - yaml
+          in: query
+          name: config_format
+          description: Desired output config format.
       responses:
         "200":
           description: OK

@@ -34,7 +34,8 @@ const (
 
 // PipelineStatusHistoryParams request payload for querying the pipeline status history.
 type PipelineStatusHistoryParams struct {
-	Last   *uint64
-	Before *string
-	Status *PipelineStatusKind
+	Last         *uint64
+	Before       *string
+	Status       *PipelineStatusKind
+	ConfigFormat *ConfigFormat
 }
