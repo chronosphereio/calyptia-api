@@ -423,7 +423,7 @@ func TestClient_Pipeline(t *testing.T) {
 	})
 	wantEqual(t, err, nil)
 
-	got, err := asUser.Pipeline(ctx, pipeline.ID)
+	got, err := asUser.Pipeline(ctx, pipeline.ID, types.PipelineParams{})
 	wantEqual(t, err, nil)
 
 	wantEqual(t, got.ID, pipeline.ID)
