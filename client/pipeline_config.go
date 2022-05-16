@@ -19,6 +19,9 @@ func (c *Client) PipelineConfigHistory(ctx context.Context, pipelineID string, p
 	if params.Before != nil {
 		q.Set("before", *params.Before)
 	}
+	if params.ConfigFormat != nil {
+		q.Set("config_format", string(*params.ConfigFormat))
+	}
 
 	var out types.PipelineConfigHistory
 	path := "/v1/aggregator_pipelines/" + url.PathEscape(pipelineID) + "/config_history?" + q.Encode()

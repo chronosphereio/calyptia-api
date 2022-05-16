@@ -33,6 +33,9 @@ func (c *Client) Pipelines(ctx context.Context, aggregatorID string, params type
 	if params.Tags != nil {
 		q.Set("tags_query", *params.Tags)
 	}
+	if params.ConfigFormat != nil {
+		q.Set("config_format", string(*params.ConfigFormat))
+	}
 
 	var out types.Pipelines
 	path := "/v1/aggregators/" + url.PathEscape(aggregatorID) + "/pipelines?" + q.Encode()
@@ -54,6 +57,9 @@ func (c *Client) ProjectPipelines(ctx context.Context, projectID string, params 
 	if params.Tags != nil {
 		q.Set("tags_query", *params.Tags)
 	}
+	if params.ConfigFormat != nil {
+		q.Set("config_format", string(*params.ConfigFormat))
+	}
 
 	var out types.Pipelines
 	path := "/v1/projects/" + url.PathEscape(projectID) + "/aggregator_pipelines?" + q.Encode()
@@ -61,9 +67,15 @@ func (c *Client) ProjectPipelines(ctx context.Context, projectID string, params 
 }
 
 // Pipeline by ID.
-func (c *Client) Pipeline(ctx context.Context, pipelineID string) (types.Pipeline, error) {
+func (c *Client) Pipeline(ctx context.Context, pipelineID string, params types.PipelineParams) (types.Pipeline, error) {
+	q := url.Values{}
+	if params.ConfigFormat != nil {
+		q.Set("config_format", string(*params.ConfigFormat))
+	}
+
 	var out types.Pipeline
-	return out, c.do(ctx, http.MethodGet, "/v1/aggregator_pipelines/"+url.PathEscape(pipelineID), nil, &out)
+	path := "/v1/aggregator_pipelines/" + url.PathEscape(pipelineID) + "?" + q.Encode()
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }
 
 // UpdatePipeline by its ID.
