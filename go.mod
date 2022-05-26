@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/cenkalti/backoff/v4 v4.1.3
-	github.com/influxdata/influxdb-client-go/v2 v2.8.2
+	github.com/influxdata/influxdb-client-go/v2 v2.9.0
 	github.com/lestrrat-go/jwx v1.2.25
 	github.com/lib/pq v1.10.5
 	github.com/ory/dockertest/v3 v3.8.1
