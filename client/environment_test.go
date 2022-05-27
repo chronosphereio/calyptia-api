@@ -94,77 +94,77 @@ func TestClient_Environments(t *testing.T) {
 	})
 }
 
-// func TestClient_UpdateEnvironment(t *testing.T) {
-// 	t.Run("ok", func(t *testing.T) {
-// 		ctx := context.Background()
+func TestClient_UpdateEnvironment(t *testing.T) {
+	t.Run("ok", func(t *testing.T) {
+		ctx := context.Background()
 
-// 		asUser := userClient(t)
-// 		withToken := withToken(t, asUser)
+		asUser := userClient(t)
+		withToken := withToken(t, asUser)
 
-// 		project := defaultProject(t, asUser)
-// 		created, err := withToken.CreateEnvironment(ctx, project.ID, types.CreateEnvironment{
-// 			Name: "test-environment",
-// 		})
-// 		wantEqual(t, err, nil)
+		project := defaultProject(t, asUser)
+		created, err := withToken.CreateEnvironment(ctx, project.ID, types.CreateEnvironment{
+			Name: "test-environment",
+		})
+		wantEqual(t, err, nil)
 
-// 		err = asUser.UpdateEnvironment(ctx, created.ID, types.UpdateEnvironment{
-// 			Name: ptrStr("test-environment-updated"),
-// 		})
-// 		wantEqual(t, err, nil)
-// 	})
-// 	t.Run("already existent name", func(t *testing.T) {
-// 		ctx := context.Background()
+		err = asUser.UpdateEnvironment(ctx, created.ID, types.UpdateEnvironment{
+			Name: ptrStr("test-environment-updated"),
+		})
+		wantEqual(t, err, nil)
+	})
+	t.Run("already existent name", func(t *testing.T) {
+		ctx := context.Background()
 
-// 		asUser := userClient(t)
-// 		withToken := withToken(t, asUser)
+		asUser := userClient(t)
+		withToken := withToken(t, asUser)
 
-// 		project := defaultProject(t, asUser)
-// 		_, err := withToken.CreateEnvironment(ctx, project.ID, types.CreateEnvironment{
-// 			Name: "existent-name",
-// 		})
-// 		wantEqual(t, err, nil)
-// 		created, err := withToken.CreateEnvironment(ctx, project.ID, types.CreateEnvironment{
-// 			Name: "test-environment",
-// 		})
-// 		wantEqual(t, err, nil)
+		project := defaultProject(t, asUser)
+		_, err := withToken.CreateEnvironment(ctx, project.ID, types.CreateEnvironment{
+			Name: "existent-name",
+		})
+		wantEqual(t, err, nil)
+		created, err := withToken.CreateEnvironment(ctx, project.ID, types.CreateEnvironment{
+			Name: "test-environment",
+		})
+		wantEqual(t, err, nil)
 
-// 		err = asUser.UpdateEnvironment(ctx, created.ID, types.UpdateEnvironment{
-// 			Name: ptrStr("existent-name"),
-// 		})
-// 		wantEqual(t, err.Error(), "environment name taken")
-// 	})
-// }
+		err = asUser.UpdateEnvironment(ctx, created.ID, types.UpdateEnvironment{
+			Name: ptrStr("existent-name"),
+		})
+		wantEqual(t, err.Error(), "environment name taken")
+	})
+}
 
-// func TestClient_DeleteEnvironment(t *testing.T) {
-// 	t.Run("ok", func(t *testing.T) {
-// 		ctx := context.Background()
+func TestClient_DeleteEnvironment(t *testing.T) {
+	t.Run("ok", func(t *testing.T) {
+		ctx := context.Background()
 
-// 		asUser := userClient(t)
-// 		withToken := withToken(t, asUser)
-// 		project := defaultProject(t, asUser)
-// 		created, err := withToken.CreateEnvironment(ctx, project.ID, types.CreateEnvironment{
-// 			Name: "test-environment",
-// 		})
-// 		wantEqual(t, err, nil)
+		asUser := userClient(t)
+		withToken := withToken(t, asUser)
+		project := defaultProject(t, asUser)
+		created, err := withToken.CreateEnvironment(ctx, project.ID, types.CreateEnvironment{
+			Name: "test-environment",
+		})
+		wantEqual(t, err, nil)
 
-// 		err = asUser.DeleteEnvironment(ctx, created.ID)
-// 		wantEqual(t, err, nil)
-// 	})
-// 	t.Run("deleting non-existing environment", func(t *testing.T) {
-// 		ctx := context.Background()
+		err = asUser.DeleteEnvironment(ctx, created.ID)
+		wantEqual(t, err, nil)
+	})
+	t.Run("deleting non-existing environment", func(t *testing.T) {
+		ctx := context.Background()
 
-// 		asUser := userClient(t)
-// 		withToken := withToken(t, asUser)
-// 		project := defaultProject(t, asUser)
-// 		_, err := withToken.CreateEnvironment(ctx, project.ID, types.CreateEnvironment{
-// 			Name: "test-environment",
-// 		})
-// 		wantEqual(t, err, nil)
+		asUser := userClient(t)
+		withToken := withToken(t, asUser)
+		project := defaultProject(t, asUser)
+		_, err := withToken.CreateEnvironment(ctx, project.ID, types.CreateEnvironment{
+			Name: "test-environment",
+		})
+		wantEqual(t, err, nil)
 
-// 		err = asUser.DeleteEnvironment(ctx, randUUID(t))
-// 		wantEqual(t, err.Error(), "permission denied")
-// 	})
-// }
+		err = asUser.DeleteEnvironment(ctx, randUUID(t))
+		wantEqual(t, err.Error(), "permission denied")
+	})
+}
 
 func TestClient_EnvironmentAssociation(t *testing.T) {
 	t.Run("should create agent with default environment", func(t *testing.T) {
