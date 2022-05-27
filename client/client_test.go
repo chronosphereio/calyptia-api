@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
-	"github.com/google/uuid"
 	influxdb "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwk"
@@ -642,10 +641,10 @@ func ptrBytes(b []byte) *[]byte {
 	return &b
 }
 
-func randUUID(t *testing.T) string {
-	t.Helper()
-	return uuid.Must(uuid.NewRandom()).String()
-}
+// func randUUID(t *testing.T) string {
+// 	t.Helper()
+// 	return uuid.Must(uuid.NewRandom()).String()
+// }
 
 func retry(op func() error) error {
 	bo := backoff.NewExponentialBackOff()
