@@ -641,6 +641,11 @@ func ptrBytes(b []byte) *[]byte {
 	return &b
 }
 
+// func randUUID(t *testing.T) string {
+// 	t.Helper()
+// 	return uuid.Must(uuid.NewRandom()).String()
+// }
+
 func retry(op func() error) error {
 	bo := backoff.NewExponentialBackOff()
 	bo.MaxInterval = time.Second * 5

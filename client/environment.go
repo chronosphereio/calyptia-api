@@ -30,18 +30,12 @@ func (c *Client) Environments(ctx context.Context, projectID string, params type
 	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }
 
-// Environment by ID.
-func (c *Client) Environment(ctx context.Context, projectID, environmentID string) (types.Environment, error) {
-	var out types.Environment
-	return out, c.do(ctx, http.MethodGet, "/v1/projects/"+url.PathEscape(projectID)+"/environments/"+url.PathEscape(environmentID), nil, &out)
-}
-
 // UpdateEnvironment by its ID.
-func (c *Client) UpdateEnvironment(ctx context.Context, projectID, environmentID string, payload types.UpdateEnvironment) error {
-	return c.do(ctx, http.MethodPatch, "/v1/projects/"+url.PathEscape(projectID)+"/environments/"+url.PathEscape(environmentID), payload, nil)
+func (c *Client) UpdateEnvironment(ctx context.Context, environmentID string, payload types.UpdateEnvironment) error {
+	return c.do(ctx, http.MethodPatch, "/v1/environments/"+url.PathEscape(environmentID), payload, nil)
 }
 
 // DeleteEnvironment by its ID.
-func (c *Client) DeleteEnvironment(ctx context.Context, projectID, environmentID string) error {
-	return c.do(ctx, http.MethodDelete, "/v1/projects/"+url.PathEscape(projectID)+"/environments/"+url.PathEscape(environmentID), nil, nil)
+func (c *Client) DeleteEnvironment(ctx context.Context, environmentID string) error {
+	return c.do(ctx, http.MethodDelete, "/v1/environments/"+url.PathEscape(environmentID), nil, nil)
 }
