@@ -54,7 +54,7 @@ func TestClient_Environments(t *testing.T) {
 	asUser := userClient(t)
 	withToken := withToken(t, asUser)
 	project := defaultProject(t, asUser)
-	registered, err := withToken.CreateEnvironment(ctx, project.ID, types.CreateEnvironment{
+	created, err := withToken.CreateEnvironment(ctx, project.ID, types.CreateEnvironment{
 		Name: "test-environment",
 	})
 	wantEqual(t, err, nil)
@@ -62,7 +62,7 @@ func TestClient_Environments(t *testing.T) {
 	got, err := asUser.Environments(ctx, project.ID, types.EnvironmentsParams{})
 	wantEqual(t, err, nil)
 	wantEqual(t, len(got.Items), 2)
-	wantEqual(t, got.Items[0].ID, registered.ID)
+	wantEqual(t, got.Items[0].ID, created.ID)
 	wantNoTimeZero(t, got.Items[0].CreatedAt)
 
 	t.Run("pagination", func(t *testing.T) {
@@ -161,8 +161,8 @@ func TestClient_Environments(t *testing.T) {
 // 		})
 // 		wantEqual(t, err, nil)
 
-// 		err = asUser.DeleteEnvironment(ctx, "30bb5e7b-3647-49bd-8799-ee12b3eed432")
-// 		wantEqual(t, err.Error(), "environment not found")
+// 		err = asUser.DeleteEnvironment(ctx, randUUID(t))
+// 		wantEqual(t, err.Error(), "permission denied")
 // 	})
 // }
 
