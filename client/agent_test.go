@@ -84,7 +84,6 @@ func TestClient_RegisterAgent(t *testing.T) {
 		wantEqual(t, got.Name, "test-agent")
 		wantNoTimeZero(t, got.CreatedAt)
 	})
-
 }
 
 func TestClient_Agents(t *testing.T) {
