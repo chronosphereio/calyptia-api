@@ -37,6 +37,7 @@ tags:
   - name: config_validator
   - name: config_validator_v2
   - name: metric
+  - name: environment
 components:
   securitySchemes:
     user:
@@ -47,6 +48,34 @@ components:
       type: apiKey
       in: header
   schemas:
+    UpdateEnvironment:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+    CreateEnvironment:
+      type: object
+      properties:
+        name:
+          type: string
+    Environment:
+      type: object
+      description: Environment model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: DNS label format as of defined on RFC1123
+          example: development
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
     User:
       type: object
       description: User model.
@@ -2986,6 +3015,124 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ValidatedConfigV2"
+  "/v1/projects/{projectID}/environments":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: projectID
+        in: path
+        required: true
+    get:
+      tags:
+        - environment
+      summary: Project environments
+      operationId: projectEnvironments
+      description: Environments from a project.
+      security:
+        - user: [ ]
+        - project: [ ]
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last environments.
+        - schema:
+            type: string
+          in: query
+          name: before
+          description: Environments before the given cursor.
+      responses:
+        "200":
+          description: OK
+          headers:
+            Link:
+              schema:
+                type: string
+                example: </v1/projects/foo/environments?before=bar>; rel="next"
+              description: RFC5988 with `rel="next"`.
+          links:
+            NextEnvironmentsPage:
+              operationId: environments
+              parameters:
+                before: "$response.header.Link#rel=next"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Environment"
+    post:
+      tags:
+        - environment
+      summary: Create environment
+      operationId: createEnvironment
+      description: Create a environment to a given project.
+      security:
+        - user: [ ]
+        - project: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEnvironment"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  createdAt:
+                    type: string
+                    format: date-time
+
+  "/v1/environments/{environmentID}":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: environmentID
+        in: path
+        required: true
+    patch:
+      tags:
+        - environment
+      summary: Update environment
+      operationId: updateEnvironments
+      description: Updates a given environment
+      security:
+        - user: [ ]
+        - project: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateEnvironment"
+      responses:
+        "200":
+          description: No Content
+    delete:
+      tags:
+        - environment
+      summary: Delete environment
+      operationId: deleteEnvironment
+      description: Delete a given environment
+      security:
+        - user: [ ]
+        - project: [ ]
+      responses:
+        "200":
+          description: OK
+
+
 
   # TODO: due to limitations on the way x-msgpack body fields are processed
   # by schemathesis, we aren't not exposing this endpoint yet until
