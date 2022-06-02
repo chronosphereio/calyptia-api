@@ -35,15 +35,55 @@ func TestClient_RegisterAgent(t *testing.T) {
 		Type:      types.AgentTypeFluentBit,
 		Version:   "1.8.6",
 		Edition:   types.AgentEditionCommunity,
-		Flags:     []string{"test-flag"},
+		Flags:     []string{"FLB_HAVE_IN_STORAGE_BACKLOG"},
 		RawConfig: "test-raw-config",
 		Metadata:  (*json.RawMessage)(&metadata),
 	})
+
 	wantEqual(t, err, nil)
 	wantNoEqual(t, got.ID, "")
 	wantNoEqual(t, got.Token, "")
 	wantEqual(t, got.Name, "test-agent")
 	wantNoTimeZero(t, got.CreatedAt)
+
+	t.Run("invalid agent flags", func(t *testing.T) {
+		_, err := withToken.RegisterAgent(ctx, types.RegisterAgent{
+			Name:      "test-agent",
+			MachineID: "test-machine-id",
+			Type:      types.AgentTypeFluentBit,
+			Version:   "1.8.6",
+			Edition:   types.AgentEditionCommunity,
+			Flags:     []string{"\u0000"},
+			RawConfig: "test-raw-config",
+			Metadata:  (*json.RawMessage)(&metadata),
+		})
+		wantNoEqual(t, err, nil)
+	})
+
+	t.Run("multiple valid agent flags", func(t *testing.T) {
+		_, err := withToken.RegisterAgent(ctx, types.RegisterAgent{
+			Name:      "test-agent",
+			MachineID: "test-machine-id",
+			Type:      types.AgentTypeFluentBit,
+			Version:   "1.8.6",
+			Edition:   types.AgentEditionCommunity,
+			Flags: []string{
+				"FLB_HAVE_IN_STORAGE_BACKLOG",
+				"FLB_HAVE_PARSER",
+				"FLB_HAVE_RECORD_ACCESSOR",
+				"FLB_HAVE_STREAM_PROCESSOR",
+				"JSMN_PARENT_LINKS",
+			},
+			RawConfig: "test-raw-config",
+			Metadata:  (*json.RawMessage)(&metadata),
+		})
+
+		wantEqual(t, err, nil)
+		wantNoEqual(t, got.ID, "")
+		wantNoEqual(t, got.Token, "")
+		wantEqual(t, got.Name, "test-agent")
+		wantNoTimeZero(t, got.CreatedAt)
+	})
 }
 
 func TestClient_Agents(t *testing.T) {
@@ -68,10 +108,11 @@ func TestClient_Agents(t *testing.T) {
 		Type:      types.AgentTypeFluentBit,
 		Version:   "1.8.6",
 		Edition:   types.AgentEditionCommunity,
-		Flags:     []string{"test-flag"},
+		Flags:     []string{"FLB_HAVE_IN_STORAGE_BACKLOG"},
 		RawConfig: "test-raw-config",
 		Metadata:  &rawMetadata,
 	})
+
 	wantEqual(t, err, nil)
 
 	project := defaultProject(t, asUser)
@@ -85,7 +126,7 @@ func TestClient_Agents(t *testing.T) {
 	wantEqual(t, got.Items[0].Type, types.AgentTypeFluentBit)
 	wantEqual(t, got.Items[0].Version, "1.8.6")
 	wantEqual(t, got.Items[0].Edition, types.AgentEditionCommunity)
-	wantEqual(t, got.Items[0].Flags, []string{"test-flag"})
+	wantEqual(t, got.Items[0].Flags, []string{"FLB_HAVE_IN_STORAGE_BACKLOG"})
 	wantEqual(t, got.Items[0].RawConfig, "test-raw-config")
 	wantEqual(t, got.Items[0].Metadata, &rawMetadata)
 	wantNoTimeZero(t, got.Items[0].CreatedAt)
@@ -194,7 +235,7 @@ func TestClient_Agent(t *testing.T) {
 		Type:      types.AgentTypeFluentBit,
 		Version:   "1.8.6",
 		Edition:   types.AgentEditionCommunity,
-		Flags:     []string{"test-flag"},
+		Flags:     []string{"FLB_HAVE_IN_STORAGE_BACKLOG"},
 		RawConfig: "test-raw-config",
 		Metadata:  &rawMetadata,
 	})
@@ -209,7 +250,7 @@ func TestClient_Agent(t *testing.T) {
 	wantEqual(t, got.Type, types.AgentTypeFluentBit)
 	wantEqual(t, got.Version, "1.8.6")
 	wantEqual(t, got.Edition, types.AgentEditionCommunity)
-	wantEqual(t, got.Flags, []string{"test-flag"})
+	wantEqual(t, got.Flags, []string{"FLB_HAVE_IN_STORAGE_BACKLOG"})
 	wantEqual(t, got.RawConfig, "test-raw-config")
 	wantEqual(t, got.Metadata, &rawMetadata)
 	wantNoTimeZero(t, got.CreatedAt)
