@@ -3045,6 +3045,11 @@ paths:
           in: query
           name: before
           description: Environments before the given cursor.
+        - schema:
+            type: string
+          in: query
+          name: name
+          description: Name matching environmets.
       responses:
         "200":
           description: OK
