@@ -28,6 +28,7 @@ type Environments struct {
 type EnvironmentsParams struct {
 	Last   *uint64
 	Before *string
+	Name   *string
 }
 
 type UpdateEnvironment struct {

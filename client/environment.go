@@ -24,6 +24,9 @@ func (c *Client) Environments(ctx context.Context, projectID string, params type
 	if params.Before != nil {
 		q.Set("before", *params.Before)
 	}
+	if params.Name != nil {
+		q.Set("name", *params.Name)
+	}
 
 	var out types.Environments
 	path := "/v1/projects/" + url.PathEscape(projectID) + "/environments?" + q.Encode()
