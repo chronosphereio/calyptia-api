@@ -14,7 +14,7 @@ type Pipeline struct {
 	ResourceProfile ResourceProfile  `json:"resourceProfile" yaml:"resourceProfile"`
 	ReplicasCount   uint64           `json:"replicasCount" yaml:"replicasCount"`
 	Tags            []string         `json:"tags" yaml:"tags"`
-	Metadata        *json.RawMessage `json:"metadata"`
+	Metadata        *json.RawMessage `json:"metadata" yaml:"metadata"`
 	CreatedAt       time.Time        `json:"createdAt" yaml:"createdAt"`
 	UpdatedAt       time.Time        `json:"updatedAt" yaml:"updatedAt"`
 }
