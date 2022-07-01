@@ -19,9 +19,18 @@ type Aggregator struct {
 	PipelinesCount  uint64           `json:"pipelinesCount" yaml:"pipelinesCount"`
 	Tags            []string         `json:"tags" yaml:"tags"`
 	Metadata        *json.RawMessage `json:"metadata" yaml:"metadata"`
+	Status          AggregatorStatus `json:"status" yaml:"status"`
 	CreatedAt       time.Time        `json:"createdAt" yaml:"createdAt"`
 	UpdatedAt       time.Time        `json:"updatedAt" yaml:"updatedAt"`
 }
+
+type AggregatorStatus string
+
+const (
+	AggregatorStatusWaiting    AggregatorStatus = "waiting"
+	AggregatorStatusRunning    AggregatorStatus = "running"
+	AggregatorStatusTerminated AggregatorStatus = "terminated"
+)
 
 // Aggregators paginated list.
 type Aggregators struct {
