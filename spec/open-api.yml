@@ -280,6 +280,14 @@ components:
         - id
         - rawConfig
         - createdAt
+    AggregatorPingResponse:
+      type: object
+      description: Aggregator Ping Response model.
+      properties:
+        nextPing:
+          type: string
+          format: duration
+          default: "30s"
     Aggregator:
       type: object
       description: Aggregator model.
@@ -297,6 +305,16 @@ components:
         version:
           type: string
           example: v0.1.12
+        status:
+          type: string
+          description: |
+            Running status of the aggregator instance in reference to the last ping.
+            Refer to https://pkg.go.dev/github.com/calyptia/api@main/types#pkg-constants
+            if looking up for the current timeout defaults.
+          enum:
+            - running
+            - waiting
+            - unreachable
         pipelinesCount:
           type: integer
           format: int64
@@ -2143,6 +2161,30 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Aggregator"
+  "/v1/aggregators/{aggregatorID}/ping":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: aggregatorID
+        in: path
+        required: true
+    post:
+      tags:
+        - aggregator
+      summary: Ping Cloud API by Aggregator ID
+      operationId: aggregatorPing
+      description: Ping Cloud API by aggregator ID
+      security:
+        - user: []
+        - project: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AggregatorPingResponse"
   "/v1/aggregators/{aggregatorID}":
     parameters:
       - schema:
