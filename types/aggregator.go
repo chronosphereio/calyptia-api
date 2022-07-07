@@ -27,9 +27,19 @@ type Aggregator struct {
 type AggregatorStatus string
 
 const (
-	AggregatorStatusWaiting    AggregatorStatus = "waiting"
-	AggregatorStatusRunning    AggregatorStatus = "running"
-	AggregatorStatusTerminated AggregatorStatus = "terminated"
+	AggregatorStatusWaiting     AggregatorStatus = "waiting"
+	AggregatorStatusRunning     AggregatorStatus = "running"
+	AggregatorStatusUnreachable AggregatorStatus = "unreachable"
+)
+
+// Aggregator ping constants.
+const (
+	// AggregatorNextPing is the time between pings to an aggregator.
+	AggregatorNextPing = time.Second * 30
+	// AggregatorNextPingDelta is the extra time acceptable for a ping to be delayed.
+	AggregatorNextPingDelta = time.Second * 5
+	// AggregatorNextPingTimeout is the time after an aggregator is considered "unreachable".
+	AggregatorNextPingTimeout = AggregatorNextPing + AggregatorNextPingDelta
 )
 
 // Aggregators paginated list.
