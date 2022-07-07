@@ -48,6 +48,11 @@ type Aggregators struct {
 	EndCursor *string
 }
 
+// AggregatorPingResponse response from an aggregator ping call.
+type AggregatorPingResponse struct {
+	NextPing time.Duration `json:"nextPing"`
+}
+
 // CreateAggregator request payload for creating a new aggregator.
 type CreateAggregator struct {
 	Name                    string           `json:"name"`
