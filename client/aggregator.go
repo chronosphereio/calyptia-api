@@ -1,4 +1,3 @@
-//nolint:dupl // Certain level of code duplication is a good trade off to avoid complexity.
 package client
 
 import (
@@ -53,4 +52,10 @@ func (c *Client) UpdateAggregator(ctx context.Context, aggregatorID string, payl
 // DeleteAggregator by its ID.
 func (c *Client) DeleteAggregator(ctx context.Context, aggregatorID string) error {
 	return c.do(ctx, http.MethodDelete, "/v1/aggregators/"+url.PathEscape(aggregatorID), nil, nil)
+}
+
+// AggregatorPing by its ID.
+func (c *Client) AggregatorPing(ctx context.Context, aggregatorID string) (types.AggregatorPingResponse, error) {
+	var out types.AggregatorPingResponse
+	return out, c.do(ctx, http.MethodPost, "/v1/aggregators/"+url.PathEscape(aggregatorID)+"/ping", nil, &out)
 }
