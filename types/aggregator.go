@@ -32,6 +32,14 @@ const (
 	AggregatorStatusUnreachable AggregatorStatus = "unreachable"
 )
 
+// Aggregator ping constants
+const (
+	// AggregatorNextPing is the time between pings to an aggregator.
+	AggregatorNextPing = time.Second * 30
+	// AggregatorNextPingTimeout is the time after an aggregator is considered "unreachable".
+	AggregatorNextPingTimeout = AggregatorNextPing + (time.Second * 5)
+)
+
 // Aggregators paginated list.
 type Aggregators struct {
 	Items     []Aggregator
