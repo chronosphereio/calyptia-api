@@ -27,9 +27,9 @@ type Aggregator struct {
 type AggregatorStatus string
 
 const (
-	AggregatorStatusWaiting    AggregatorStatus = "waiting"
-	AggregatorStatusRunning    AggregatorStatus = "running"
-	AggregatorStatusTerminated AggregatorStatus = "terminated"
+	AggregatorStatusWaiting     AggregatorStatus = "waiting"
+	AggregatorStatusRunning     AggregatorStatus = "running"
+	AggregatorStatusUnreachable AggregatorStatus = "unreachable"
 )
 
 // Aggregators paginated list.
