@@ -69,6 +69,7 @@ func TestClient_Aggregators(t *testing.T) {
 	wantEqual(t, got.Items[0].PipelinesCount, uint64(1))
 	wantEqual(t, got.Items[0].CreatedAt, created.CreatedAt)
 	wantEqual(t, got.Items[0].UpdatedAt, created.CreatedAt)
+	wantEqual(t, got.Items[0].Status, types.AggregatorStatusWaiting)
 
 	t.Run("pagination", func(t *testing.T) {
 		for i := 0; i < 10; i++ {
@@ -165,6 +166,7 @@ func TestClient_Aggregator(t *testing.T) {
 	wantEqual(t, got.PipelinesCount, uint64(1))
 	wantEqual(t, got.CreatedAt, created.CreatedAt)
 	wantEqual(t, got.UpdatedAt, created.CreatedAt)
+	wantEqual(t, got.Status, types.AggregatorStatusWaiting)
 }
 
 func TestClient_UpdateAggregator(t *testing.T) {
@@ -217,6 +219,32 @@ func TestClient_DeleteAggregator(t *testing.T) {
 
 	err = withToken.DeleteAggregator(ctx, created.ID)
 	wantEqual(t, err, nil)
+}
+
+func TestClient_AggregatorPing(t *testing.T) {
+	ctx := context.Background()
+	asUser := userClient(t)
+	withToken := withToken(t, asUser)
+
+	created, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+		Name:                   "test-aggregator",
+		AddHealthCheckPipeline: true,
+	})
+
+	wantEqual(t, err, nil)
+	wantNoEqual(t, created, nil)
+
+	got, err := asUser.Aggregator(ctx, created.ID)
+	wantEqual(t, err, nil)
+	wantEqual(t, got.Status, types.AggregatorStatusWaiting)
+
+	pingResponse, err := withToken.AggregatorPing(ctx, created.ID)
+	wantEqual(t, err, nil)
+	wantNoEqual(t, pingResponse, nil)
+
+	got, err = asUser.Aggregator(ctx, created.ID)
+	wantEqual(t, err, nil)
+	wantEqual(t, got.Status, types.AggregatorStatusRunning)
 }
 
 func setupAggregator(t *testing.T, withToken *client.Client) types.CreatedAggregator {
