@@ -53,6 +53,47 @@ type AggregatorPingResponse struct {
 	NextPing time.Duration `json:"nextPing"`
 }
 
+// AggregatorMetadata See: https://github.com/fluent/fluent-bit/blob/d059a5a5dca6aff4ff5d0694887355480d6f2c1d/plugins/out_calyptia/calyptia.c#L206-L229
+// Those are the only supported metadata fields that will be marshaled by the Calyptia Cloud API, please send a PR if further
+// fields are required.
+type AggregatorMetadata struct {
+	// Notice that all of these are embedded on purpose since
+	// metadata is flattened.
+	MetadataK8S
+	MetadataAWS
+	MetadataGCP
+}
+
+// MetadataK8S See: https://github.com/kubernetes/website/blob/60390ff3c0ef0043a58568ad2e4c2b7634028074/content/en/examples/pods/inject/dapi-volume.yaml#L5
+type MetadataK8S struct {
+	Namespace   string `json:"k8s.namespace"`
+	ClusterName string `json:"k8s.cluster_name"`
+	Zone        string `json:"k8s.zone"`
+}
+
+// MetadataAWS See: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-data-retrieval.html
+type MetadataAWS struct {
+	AMIID           string `json:"aws.ami_id"`
+	AccountID       string `json:"aws.account_id"`
+	Hostname        string `json:"aws.hostname"`
+	VPCID           string `json:"aws.vpc_id"`
+	PrivateIP       string `json:"aws.private_ip"`
+	EC2InstanceID   string `json:"aws.ec2_instance_id"`
+	EC2InstanceType string `json:"aws.ec2_instance_type"`
+	AZ              string `json:"aws.az"`
+}
+
+// MetadataGCP See: https://cloud.google.com/compute/docs/metadata/default-metadata-values
+type MetadataGCP struct {
+	ProjectNumber uint64 `json:"gcp.project_number"`
+	ProjectID     string `json:"gcp.project_id"`
+	InstanceID    uint64 `json:"gcp.instance_id"`
+	InstanceImage string `json:"gcp.instance_image"`
+	MachineType   string `json:"gcp.machine_type"`
+	InstanceName  string `json:"gcp.instance_name"`
+	Zone          string `json:"gcp.zone"`
+}
+
 // CreateAggregator request payload for creating a new aggregator.
 type CreateAggregator struct {
 	Name                    string           `json:"name"`
