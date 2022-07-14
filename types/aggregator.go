@@ -65,10 +65,13 @@ type AggregatorMetadata struct {
 }
 
 // MetadataK8S See: https://github.com/kubernetes/website/blob/60390ff3c0ef0043a58568ad2e4c2b7634028074/content/en/examples/pods/inject/dapi-volume.yaml#L5
+// For further cluster information data that can be included check: https://pkg.go.dev/k8s.io/client-go/discovery#DiscoveryClient.
 type MetadataK8S struct {
-	Namespace   string `json:"k8s.namespace"`
-	ClusterName string `json:"k8s.cluster_name"`
-	Zone        string `json:"k8s.zone"`
+	Namespace       string `json:"k8s.namespace"`
+	ClusterName     string `json:"k8s.cluster_name"`
+	Zone            string `json:"k8s.zone"`
+	ClusterVersion  string `json:"k8s.cluster_version"`
+	ClusterPlatform string `json:"k8s.cluster_platform"`
 }
 
 // MetadataAWS See: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-data-retrieval.html
