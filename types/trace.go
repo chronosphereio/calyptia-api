@@ -37,8 +37,8 @@ type TraceSessions struct {
 
 // UpdateTraceSession request payload for updating a trace session.
 type UpdateTraceSession struct {
-	Plugins *[]string `json:"plugins"`
-	Lifespan *time.Duration `json:"lifespan"
+	Plugins  *[]string      `json:"plugins"`
+	Lifespan *time.Duration `json:"lifespan"`
 }
 
 // TraceRecord represents a single record in a trace session.
