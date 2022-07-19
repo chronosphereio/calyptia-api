@@ -12,6 +12,7 @@ type Pipeline struct {
 	Config          PipelineConfig   `json:"config" yaml:"config"`
 	Status          PipelineStatus   `json:"status" yaml:"status"`
 	ResourceProfile ResourceProfile  `json:"resourceProfile" yaml:"resourceProfile"`
+	TracingEnabled  bool             `json:"tracingEnabled" yaml:"tracingEnabled"`
 	ReplicasCount   uint64           `json:"replicasCount" yaml:"replicasCount"`
 	Tags            []string         `json:"tags" yaml:"tags"`
 	Metadata        *json.RawMessage `json:"metadata" yaml:"metadata"`
@@ -35,6 +36,8 @@ type CreatePipeline struct {
 	Files                     []CreatePipelineFile   `json:"files"`
 	ResourceProfileName       string                 `json:"resourceProfile"`
 	AutoCreatePortsFromConfig bool                   `json:"autoCreatePortsFromConfig"`
+	TracingEnabled            bool                   `json:"tracingEnabled"`
+	TracingLifespan           *time.Duration         `json:"tracingLifespan"`
 	Metadata                  *json.RawMessage       `json:"metadata"`
 	Tags                      []string               `json:"tags"`
 }
@@ -49,6 +52,7 @@ type CreatedPipeline struct {
 	Status          PipelineStatus   `json:"status"`
 	ResourceProfile ResourceProfile  `json:"resourceProfile"`
 	ReplicasCount   uint64           `json:"replicasCount"`
+	TraceSessionID  *string          `json:"traceSessionID"`
 	CreatedAt       time.Time        `json:"createdAt"`
 }
 
@@ -63,6 +67,8 @@ type UpdatePipeline struct {
 	Status                    *PipelineStatusKind    `json:"status"`
 	ResourceProfile           *string                `json:"resourceProfile"`
 	AutoCreatePortsFromConfig *bool                  `json:"autoCreatePortsFromConfig"`
+	TracingEnabled            *bool                  `json:"tracingEnabled"`
+	TracingLifespan           *time.Duration         `json:"tracingLifespan"`
 	Metadata                  *json.RawMessage       `json:"metadata"`
 }
 
@@ -82,6 +88,7 @@ type PipelineParams struct {
 
 // UpdatedPipeline response payload after updating a pipeline successfully.
 type UpdatedPipeline struct {
-	AddedPorts   []PipelinePort `json:"addedPorts"`
-	RemovedPorts []PipelinePort `json:"removedPorts"`
+	AddedPorts     []PipelinePort `json:"addedPorts"`
+	RemovedPorts   []PipelinePort `json:"removedPorts"`
+	TraceSessionID *string        `json:"traceSessionID"`
 }
