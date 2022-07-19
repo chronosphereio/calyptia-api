@@ -17,6 +17,11 @@ type TraceSession struct {
 	UpdatedAt  time.Time     `json:"updatedAt" yaml:"updatedAt"`
 }
 
+// Active tells whether a session is still within its lifespan.
+func (ts TraceSession) Active() bool {
+	return ts.CreatedAt.Add(ts.Lifespan).After(time.Now())
+}
+
 // TraceSessionsParams request payload for querying trace sessions.
 type TraceSessionsParams struct {
 	Last   *uint64
