@@ -37,7 +37,7 @@ type CreatePipeline struct {
 	ResourceProfileName       string                 `json:"resourceProfile"`
 	AutoCreatePortsFromConfig bool                   `json:"autoCreatePortsFromConfig"`
 	TracingEnabled            bool                   `json:"tracingEnabled"`
-	TracingLifespan           *time.Duration         `json:"tracingLifespan"`
+	TraceLifespan             *time.Duration         `json:"traceLifespan"`
 	Metadata                  *json.RawMessage       `json:"metadata"`
 	Tags                      []string               `json:"tags"`
 }
@@ -68,7 +68,7 @@ type UpdatePipeline struct {
 	ResourceProfile           *string                `json:"resourceProfile"`
 	AutoCreatePortsFromConfig *bool                  `json:"autoCreatePortsFromConfig"`
 	TracingEnabled            *bool                  `json:"tracingEnabled"`
-	TracingLifespan           *time.Duration         `json:"tracingLifespan"`
+	TraceLifespan             *time.Duration         `json:"traceLifespan"`
 	Metadata                  *json.RawMessage       `json:"metadata"`
 }
 
