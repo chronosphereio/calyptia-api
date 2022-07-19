@@ -23,6 +23,12 @@ type TraceSessionsParams struct {
 	Before *string
 }
 
+// TraceSessions paginated list.
+type TraceSessions struct {
+	Items     []TraceSession
+	EndCursor *string
+}
+
 // TraceRecord represents a single record in a trace session.
 // Holds information about the plugin it represents
 // and the trace record data.
@@ -38,4 +44,10 @@ type TraceRecord struct {
 type TraceRecordsParams struct {
 	Last   *uint64
 	Before *string
+}
+
+// TraceRecords paginated list.
+type TraceRecords struct {
+	Items     []TraceRecord
+	EndCursor *string
 }
