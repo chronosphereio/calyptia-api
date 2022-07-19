@@ -12,6 +12,7 @@ import (
 type TraceSession struct {
 	ID         string        `json:"id" yaml:"id"`
 	PipelineID string        `json:"pipelineID" yaml:"pipelineID"`
+	Plugins    []string      `json:"plugins" yaml:"plugins"`
 	Lifespan   time.Duration `json:"lifespan" yaml:"lifespan"`
 	CreatedAt  time.Time     `json:"createdAt" yaml:"createdAt"`
 	UpdatedAt  time.Time     `json:"updatedAt" yaml:"updatedAt"`
@@ -35,12 +36,10 @@ type TraceSessions struct {
 }
 
 // TraceRecord represents a single record in a trace session.
-// Holds information about the plugin it represents
-// and the trace record data.
+// Holds information about the trace record data.
 type TraceRecord struct {
 	ID        string          `json:"id" yaml:"id"`
 	SessionID string          `json:"sessionID" yaml:"sessionID"`
-	Plugin    string          `json:"plugin" yaml:"plugin"`
 	Record    json.RawMessage `json:"record" yaml:"record"`
 	CreatedAt time.Time       `json:"createdAt" yaml:"createdAt"`
 }
