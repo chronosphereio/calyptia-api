@@ -5,10 +5,7 @@ import (
 	"time"
 )
 
-// TraceSession gets created alongside a pipeline
-// when tracing is enabled.
-// This will run for the configured lifespan
-// and process records during that time.
+// TraceSession model.
 type TraceSession struct {
 	ID         string        `json:"id" yaml:"id"`
 	PipelineID string        `json:"pipelineID" yaml:"pipelineID"`
@@ -21,6 +18,12 @@ type TraceSession struct {
 // Active tells whether a session is still within its lifespan.
 func (ts TraceSession) Active() bool {
 	return ts.CreatedAt.Add(ts.Lifespan).After(time.Now())
+}
+
+// CreateTraceSession request payload for creating a new trace session.
+type CreateTraceSession struct {
+	Plugins  []string      `json:"tracePlugins"`
+	Lifespan time.Duration `json:"traceLifespan"`
 }
 
 // TraceSessionsParams request payload for querying trace sessions.
@@ -41,14 +44,35 @@ type UpdateTraceSession struct {
 	Lifespan *time.Duration `json:"lifespan"`
 }
 
-// TraceRecord represents a single record in a trace session.
-// Holds information about the trace record data.
+// TraceRecord model.
 type TraceRecord struct {
-	ID        string          `json:"id" yaml:"id"`
-	SessionID string          `json:"sessionID" yaml:"sessionID"`
-	Record    json.RawMessage `json:"record" yaml:"record"`
-	CreatedAt time.Time       `json:"createdAt" yaml:"createdAt"`
+	ID        string    `json:"id" yaml:"id"`
+	SessionID string    `json:"sessionID" yaml:"sessionID"`
+	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
+
+	// fluent-bit data from here on.
+	Kind           TraceRecordKind `json:"type" yaml:"type"`
+	TraceID        string          `json:"traceID" yaml:"traceID"`
+	StartTime      time.Time       `json:"start_time" yaml:"start_time"`
+	EndTime        time.Time       `json:"end_time" yaml:"end_time"`
+	InputInstance  string          `json:"input_instance" yaml:"input_instance"`
+	FilterInstance string          `json:"filter_instance" yaml:"filter_instance"`
+	OutputInstance string          `json:"outputInstance" yaml:"outputInstance"`
+	ReturnCode     int             `json:"return_code" yaml:"return_code"`
+	// Each record is a JSON object,
+	// warranted to have a flb_time `timestamp` field.
+	Records []json.RawMessage `json:"records" yaml:"records"`
 }
+
+// TraceRecordKind enum.
+type TraceRecordKind string
+
+const (
+	TraceRecordKindInput     TraceRecordKind = "input"
+	TraceRecordKindFilter    TraceRecordKind = "filter"
+	TraceRecordKindPreOutput TraceRecordKind = "pre_output"
+	TraceRecordKindOutput    TraceRecordKind = "output"
+)
 
 // TraceRecordsParams request payload for querying trace records.
 type TraceRecordsParams struct {
