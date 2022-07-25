@@ -55,9 +55,7 @@ type TraceRecord struct {
 	TraceID        string          `json:"traceID" yaml:"traceID"`
 	StartTime      time.Time       `json:"start_time" yaml:"start_time"`
 	EndTime        time.Time       `json:"end_time" yaml:"end_time"`
-	InputInstance  string          `json:"input_instance" yaml:"input_instance"`
-	FilterInstance string          `json:"filter_instance" yaml:"filter_instance"`
-	OutputInstance string          `json:"outputInstance" yaml:"outputInstance"`
+	PluginInstance string          `json:"plugin_instance" yaml:"plugin_instance"`
 	ReturnCode     int             `json:"return_code" yaml:"return_code"`
 	// Each record is a JSON object,
 	// warranted to have a flb_time `timestamp` field.
@@ -76,17 +74,15 @@ const (
 
 // CreateTraceRecord request payload for creating a new trace record.
 type CreateTraceRecord struct {
-	Kind           TraceRecordKind `json:"type" yaml:"type"`
-	TraceID        string          `json:"traceID" yaml:"traceID"`
-	StartTime      time.Time       `json:"start_time" yaml:"start_time"`
-	EndTime        time.Time       `json:"end_time" yaml:"end_time"`
-	InputInstance  string          `json:"input_instance" yaml:"input_instance"`
-	FilterInstance string          `json:"filter_instance" yaml:"filter_instance"`
-	OutputInstance string          `json:"outputInstance" yaml:"outputInstance"`
-	ReturnCode     int             `json:"return_code" yaml:"return_code"`
+	Kind           TraceRecordKind `json:"type"`
+	TraceID        string          `json:"traceID"`
+	StartTime      time.Time       `json:"start_time"`
+	EndTime        time.Time       `json:"end_time"`
+	PluginInstance string          `json:"plugin_instance"`
+	ReturnCode     int             `json:"return_code"`
 	// Each record is a JSON object,
 	// warranted to have a flb_time `timestamp` field.
-	Records []json.RawMessage `json:"records" yaml:"records"`
+	Records []json.RawMessage `json:"records"`
 }
 
 // TraceRecordsParams request payload for querying trace records.
