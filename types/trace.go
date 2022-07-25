@@ -56,6 +56,7 @@ type TraceRecord struct {
 	StartTime      time.Time       `json:"start_time" yaml:"start_time"`
 	EndTime        time.Time       `json:"end_time" yaml:"end_time"`
 	PluginInstance string          `json:"plugin_instance" yaml:"plugin_instance"`
+	PluginAlias    string          `json:"plugin_alias" yaml:"plugin_alias"`
 	ReturnCode     int             `json:"return_code" yaml:"return_code"`
 	// Each record is a JSON object,
 	// warranted to have a flb_time `timestamp` field.
@@ -79,6 +80,7 @@ type CreateTraceRecord struct {
 	StartTime      time.Time       `json:"start_time"`
 	EndTime        time.Time       `json:"end_time"`
 	PluginInstance string          `json:"plugin_instance"`
+	PluginAlias    string          `json:"plugin_alias"`
 	ReturnCode     int             `json:"return_code"`
 	// Each record is a JSON object,
 	// warranted to have a flb_time `timestamp` field.
