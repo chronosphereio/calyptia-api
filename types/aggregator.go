@@ -80,7 +80,8 @@ type MetadataAWS struct {
 	AccountID       string `json:"aws.account_id"`
 	Hostname        string `json:"aws.hostname"`
 	VPCID           string `json:"aws.vpc_id"`
-	PrivateIP       string `json:"aws.private_ip"`
+	PrivateIPv4     string `json:"aws.private_ipv4"`
+	PublicIPv4      string `json:"aws.public_ipv4"`
 	EC2InstanceID   string `json:"aws.ec2_instance_id"`
 	EC2InstanceType string `json:"aws.ec2_instance_type"`
 	AZ              string `json:"aws.az"`
