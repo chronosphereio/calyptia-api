@@ -2,6 +2,7 @@ package client_test
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -245,6 +246,48 @@ func TestClient_AggregatorPing(t *testing.T) {
 	got, err = asUser.Aggregator(ctx, created.ID)
 	wantEqual(t, err, nil)
 	wantEqual(t, got.Status, types.AggregatorStatusRunning)
+}
+
+func TestClient_CoreInstanceMetadata(t *testing.T) {
+	ctx := context.Background()
+	asUser := userClient(t)
+	withToken := withToken(t, asUser)
+
+	created, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+		Name:                   "test-core-instance",
+		AddHealthCheckPipeline: false,
+	})
+
+	wantEqual(t, err, nil)
+	wantNoEqual(t, created, nil)
+
+	metadata := types.AggregatorMetadata{
+		MetadataAWS: types.MetadataAWS{
+			PrivateIPv4: "192.168.0.1",
+			PublicIPv4:  "1.1.1.1",
+		},
+		MetadataK8S: types.MetadataK8S{},
+		MetadataGCP: types.MetadataGCP{},
+	}
+
+	m, err := json.Marshal(metadata)
+	wantEqual(t, err, nil)
+	wantNoEqual(t, m, nil)
+
+	err = withToken.UpdateAggregator(ctx, created.ID, types.UpdateAggregator{
+		Metadata: (*json.RawMessage)(&m),
+	})
+	wantEqual(t, err, nil)
+
+	got, err := asUser.Aggregator(ctx, created.ID)
+	wantEqual(t, err, nil)
+	wantNoEqual(t, got, nil)
+
+	var gotMetadata types.AggregatorMetadata
+
+	err = json.Unmarshal(*got.Metadata, &gotMetadata)
+	wantEqual(t, err, nil)
+	wantEqual(t, metadata, gotMetadata)
 }
 
 func setupAggregator(t *testing.T, withToken *client.Client) types.CreatedAggregator {
