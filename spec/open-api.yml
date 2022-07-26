@@ -315,6 +315,13 @@ components:
             - running
             - waiting
             - unreachable
+        metadata:
+          type: object
+          nullable: true
+          properties:
+            nodeSelector:
+              type: object
+              nullable: true
         pipelinesCount:
           type: integer
           format: int64
@@ -978,6 +985,13 @@ components:
           type: integer
           format: int32
           minimum: 0
+        metadata:
+          type: object
+          nullable: true
+          properties:
+            nodeSelector:
+              type: object
+              nullable: true
       required:
         - name
         - version
@@ -996,6 +1010,13 @@ components:
           type: string
           example: v0.1.12
           nullable: true
+        metadata:
+          type: object
+          nullable: true
+          properties:
+            nodeSelector:
+              type: object
+              nullable: true
     CreateResourceProfile:
       description: Create resource profile request body.
       type: object
