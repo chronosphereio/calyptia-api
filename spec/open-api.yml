@@ -262,6 +262,7 @@ components:
         - flags
         - rawConfig
         - metadata
+        - environmentName
         - firstMetricsAddedAt
         - lastMetricsAddedAt
         - metricsCount
@@ -347,6 +348,7 @@ components:
         - token
         - name
         - pipelinesCount
+        - environmentName
         - createdAt
         - updatedAt
     ResourceProfile:
