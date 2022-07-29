@@ -190,7 +190,7 @@ func TestClient_Aggregators(t *testing.T) {
 			Last: ptrUint64(0),
 		})
 		wantEqual(t, err, nil)
-		wantEqual(t, len(bothEnvsAggregators.Items), 2)
+		wantNoEqual(t, len(bothEnvsAggregators.Items), 1)
 	})
 }
 

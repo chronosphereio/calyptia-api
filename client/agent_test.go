@@ -224,16 +224,22 @@ func TestClient_Agents(t *testing.T) {
 
 		aggregatorOne, err := withToken.RegisterAgent(ctx, types.RegisterAgent{
 			Name:          "core-instance",
-			Version:       types.DefaultAggregatorVersion,
+			Version:       "v1.9.5",
+			Edition:       types.AgentEditionCommunity,
 			EnvironmentID: envOne.ID,
+			MachineID:     "core-instance-one",
+			Type:          types.AgentTypeFluentBit,
 		})
 		wantEqual(t, err, nil)
 		wantNoEqual(t, aggregatorOne, nil)
 
 		aggregatorTwo, err := withToken.RegisterAgent(ctx, types.RegisterAgent{
 			Name:          "core-instance",
-			Version:       types.DefaultAggregatorVersion,
+			Version:       "v1.9.5",
+			Edition:       types.AgentEditionCommunity,
 			EnvironmentID: envTwo.ID,
+			MachineID:     "core-instance-two",
+			Type:          types.AgentTypeFluentBit,
 		})
 		wantEqual(t, err, nil)
 		wantNoEqual(t, aggregatorTwo, nil)
@@ -256,7 +262,7 @@ func TestClient_Agents(t *testing.T) {
 			Last: ptrUint64(0),
 		})
 		wantEqual(t, err, nil)
-		wantEqual(t, len(bothEnvsAggregators.Items), 2)
+		wantNoEqual(t, len(bothEnvsAggregators.Items), 1)
 	})
 }
 

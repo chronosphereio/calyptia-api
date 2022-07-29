@@ -2002,6 +2002,11 @@ paths:
           in: query
           name: tags_query
           description: Tag query.
+        - schema:
+            type: string
+          in: query
+          name: environment_id
+          description: Environment ID for matching agents.
       responses:
         "200":
           description: OK
@@ -2170,6 +2175,11 @@ paths:
           in: query
           name: name
           description: Name matching aggregators.
+        - schema:
+            type: string
+          in: query
+          name: environment_id
+          description: Environment ID for matching aggregators.
         - schema:
             type: string
             example: tagone AND tagtwo
