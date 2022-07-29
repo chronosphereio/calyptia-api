@@ -111,25 +111,25 @@ type CreateAggregator struct {
 
 // CreatedAggregator response payload after creating an aggregator successfully.
 type CreatedAggregator struct {
-	ID            string    `json:"id"`
-	Token         string    `json:"token"`
-	PrivateRSAKey []byte    `json:"privateRSAKey"`
-	PublicRSAKey  []byte    `json:"publicRSAKey"`
-	Name          string    `json:"name"`
-	Version       string    `json:"version"`
-	CreatedAt     time.Time `json:"createdAt"`
-	Tags          []string  `json:"tags"`
-
+	ID                  string            `json:"id"`
+	Token               string            `json:"token"`
+	PrivateRSAKey       []byte            `json:"privateRSAKey"`
+	PublicRSAKey        []byte            `json:"publicRSAKey"`
+	Name                string            `json:"name"`
+	Version             string            `json:"version"`
+	CreatedAt           time.Time         `json:"createdAt"`
+	Tags                []string          `json:"tags"`
 	HealthCheckPipeline *Pipeline         `json:"healthCheckPipeline"`
 	ResourceProfiles    []ResourceProfile `json:"resourceProfiles"`
 }
 
 // AggregatorsParams request payload for querying aggregators.
 type AggregatorsParams struct {
-	Last   *uint64
-	Before *string
-	Name   *string
-	Tags   *string
+	Last          *uint64
+	Before        *string
+	Name          *string
+	Tags          *string
+	EnvironmentID *string
 }
 
 // UpdateAggregator request payload for updating an aggregator.

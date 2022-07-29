@@ -247,6 +247,10 @@ components:
         updatedAt:
           type: string
           format: date-time
+        environmentName:
+          type: string
+          default: default
+          example: default
       required:
         - id
         - token
@@ -334,6 +338,10 @@ components:
           uniqueItems: true
           items:
             type: string
+        environmentName:
+          type: string
+          default: default
+          example: default
       required:
         - id
         - token
@@ -926,6 +934,10 @@ components:
         metadata:
           type: object
           nullable: true
+        environmentID:
+          type: string
+          nullable: true
+          description: environment ID to associate this agent with.
       required:
         - name
         - machineID
@@ -964,6 +976,10 @@ components:
         metadata:
           type: object
           nullable: true
+        environmentID:
+          type: string
+          nullable: true
+          description: environment ID to associate this agent with.
     CreateAggregator:
       description: Create aggregator request body.
       type: object
@@ -984,6 +1000,10 @@ components:
         metadata:
           type: object
           nullable: true
+        environmentID:
+          type: string
+          nullable: true
+          description: environment ID to associate this aggregator with.
       required:
         - name
         - version
@@ -1005,6 +1025,10 @@ components:
         metadata:
           type: object
           nullable: true
+        environmentID:
+          type: string
+          nullable: true
+          description: environment ID to associate this aggregator with.
     CreateResourceProfile:
       description: Create resource profile request body.
       type: object
