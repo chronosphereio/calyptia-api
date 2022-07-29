@@ -77,10 +77,11 @@ type RegisteredAgent struct {
 
 // AgentsParams request payload for querying agents.
 type AgentsParams struct {
-	Last   *uint64
-	Before *string
-	Name   *string
-	Tags   *string
+	Last          *uint64
+	Before        *string
+	Name          *string
+	Tags          *string
+	EnvironmentID *string
 }
 
 // UpdateAgent request payload for updating an agent.
