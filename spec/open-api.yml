@@ -1379,6 +1379,10 @@ components:
         createdAt:
           type: string
           format: date-time
+        environmentName:
+          type: string
+          description: environment name on which the agent belongs to.
+          default: default
       required:
         - id
         - token
@@ -1416,6 +1420,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ResourceProfile"
+        environmentName:
+          type: string
+          description: environment name on which the agent belongs to.
+          default: default
       required:
         - id
         - token
