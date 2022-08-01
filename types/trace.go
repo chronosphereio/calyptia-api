@@ -58,9 +58,9 @@ type TraceRecord struct {
 	PluginInstance string          `json:"plugin_instance" yaml:"plugin_instance"`
 	PluginAlias    string          `json:"plugin_alias" yaml:"plugin_alias"`
 	ReturnCode     int             `json:"return_code" yaml:"return_code"`
-	// Each record is a JSON object,
+	// Records array, each record is a JSON object,
 	// warranted to have a flb_time `timestamp` field.
-	Records []json.RawMessage `json:"records" yaml:"records"`
+	Records json.RawMessage `json:"records" yaml:"records"`
 }
 
 // TraceRecordKind enum.
@@ -82,9 +82,9 @@ type CreateTraceRecord struct {
 	PluginInstance string          `json:"plugin_instance"`
 	PluginAlias    string          `json:"plugin_alias"`
 	ReturnCode     int             `json:"return_code"`
-	// Each record is a JSON object,
+	// Records array, each record is a JSON object,
 	// warranted to have a flb_time `timestamp` field.
-	Records []json.RawMessage `json:"records"`
+	Records json.RawMessage `json:"records"`
 }
 
 // TraceRecordsParams request payload for querying trace records.
