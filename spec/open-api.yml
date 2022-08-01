@@ -247,6 +247,10 @@ components:
         updatedAt:
           type: string
           format: date-time
+        environmentName:
+          type: string
+          default: default
+          example: default
       required:
         - id
         - token
@@ -258,6 +262,7 @@ components:
         - flags
         - rawConfig
         - metadata
+        - environmentName
         - firstMetricsAddedAt
         - lastMetricsAddedAt
         - metricsCount
@@ -315,6 +320,9 @@ components:
             - running
             - waiting
             - unreachable
+        metadata:
+          type: object
+          nullable: true
         pipelinesCount:
           type: integer
           format: int64
@@ -331,11 +339,16 @@ components:
           uniqueItems: true
           items:
             type: string
+        environmentName:
+          type: string
+          default: default
+          example: default
       required:
         - id
         - token
         - name
         - pipelinesCount
+        - environmentName
         - createdAt
         - updatedAt
     ResourceProfile:
@@ -923,6 +936,10 @@ components:
         metadata:
           type: object
           nullable: true
+        environmentID:
+          type: string
+          nullable: true
+          description: environment ID to associate this agent with.
       required:
         - name
         - machineID
@@ -961,6 +978,10 @@ components:
         metadata:
           type: object
           nullable: true
+        environmentID:
+          type: string
+          nullable: true
+          description: environment ID to associate this agent with.
     CreateAggregator:
       description: Create aggregator request body.
       type: object
@@ -978,6 +999,13 @@ components:
           type: integer
           format: int32
           minimum: 0
+        metadata:
+          type: object
+          nullable: true
+        environmentID:
+          type: string
+          nullable: true
+          description: environment ID to associate this aggregator with.
       required:
         - name
         - version
@@ -996,6 +1024,13 @@ components:
           type: string
           example: v0.1.12
           nullable: true
+        metadata:
+          type: object
+          nullable: true
+        environmentID:
+          type: string
+          nullable: true
+          description: environment ID to associate this aggregator with.
     CreateResourceProfile:
       description: Create resource profile request body.
       type: object
@@ -1344,6 +1379,10 @@ components:
         createdAt:
           type: string
           format: date-time
+        environmentName:
+          type: string
+          description: environment name on which the agent belongs to.
+          default: default
       required:
         - id
         - token
@@ -1381,6 +1420,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ResourceProfile"
+        environmentName:
+          type: string
+          description: environment name on which the agent belongs to.
+          default: default
       required:
         - id
         - token
@@ -1967,6 +2010,11 @@ paths:
           in: query
           name: tags_query
           description: Tag query.
+        - schema:
+            type: string
+          in: query
+          name: environment_id
+          description: Environment ID for matching agents.
       responses:
         "200":
           description: OK
@@ -2135,6 +2183,11 @@ paths:
           in: query
           name: name
           description: Name matching aggregators.
+        - schema:
+            type: string
+          in: query
+          name: environment_id
+          description: Environment ID for matching aggregators.
         - schema:
             type: string
             example: tagone AND tagtwo

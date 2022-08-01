@@ -69,18 +69,20 @@ type RegisterAgent struct {
 
 // RegisteredAgent response payload after registering an agent successfully.
 type RegisteredAgent struct {
-	ID        string    `json:"id"`
-	Token     string    `json:"token"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"createdAt"`
+	ID              string    `json:"id"`
+	Token           string    `json:"token"`
+	Name            string    `json:"name"`
+	CreatedAt       time.Time `json:"createdAt"`
+	EnvironmentName string    `json:"environmentName"`
 }
 
 // AgentsParams request payload for querying agents.
 type AgentsParams struct {
-	Last   *uint64
-	Before *string
-	Name   *string
-	Tags   *string
+	Last          *uint64
+	Before        *string
+	Name          *string
+	Tags          *string
+	EnvironmentID *string
 }
 
 // UpdateAgent request payload for updating an agent.

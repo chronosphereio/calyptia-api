@@ -2,6 +2,7 @@ package client_test
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -143,6 +144,54 @@ func TestClient_Aggregators(t *testing.T) {
 		wantEqual(t, err, nil)
 		wantEqual(t, len(tag4.Items), 0)
 	})
+
+	t.Run("multiple env", func(t *testing.T) {
+		envOne, err := withToken.CreateEnvironment(
+			ctx, project.ID, types.CreateEnvironment{Name: "one"})
+		wantEqual(t, err, nil)
+		wantNoEqual(t, envOne, nil)
+
+		envTwo, err := withToken.CreateEnvironment(
+			ctx, project.ID, types.CreateEnvironment{Name: "two"})
+		wantEqual(t, err, nil)
+		wantNoEqual(t, envTwo, nil)
+
+		aggregatorOne, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+			Name:          "core-instance",
+			Version:       types.DefaultAggregatorVersion,
+			EnvironmentID: envOne.ID,
+		})
+		wantEqual(t, err, nil)
+		wantNoEqual(t, aggregatorOne, nil)
+
+		aggregatorTwo, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+			Name:          "core-instance",
+			Version:       types.DefaultAggregatorVersion,
+			EnvironmentID: envTwo.ID,
+		})
+		wantEqual(t, err, nil)
+		wantNoEqual(t, aggregatorTwo, nil)
+
+		envOneAggregators, err := asUser.Aggregators(ctx, project.ID, types.AggregatorsParams{
+			EnvironmentID: ptrStr(envOne.ID),
+			Last:          ptrUint64(0),
+		})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(envOneAggregators.Items), 1)
+
+		envTwoAggregators, err := asUser.Aggregators(ctx, project.ID, types.AggregatorsParams{
+			EnvironmentID: ptrStr(envTwo.ID),
+			Last:          ptrUint64(0),
+		})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(envTwoAggregators.Items), 1)
+
+		bothEnvsAggregators, err := asUser.Aggregators(ctx, project.ID, types.AggregatorsParams{
+			Last: ptrUint64(0),
+		})
+		wantEqual(t, err, nil)
+		wantNoEqual(t, len(bothEnvsAggregators.Items), 1)
+	})
 }
 
 func TestClient_Aggregator(t *testing.T) {
@@ -245,6 +294,48 @@ func TestClient_AggregatorPing(t *testing.T) {
 	got, err = asUser.Aggregator(ctx, created.ID)
 	wantEqual(t, err, nil)
 	wantEqual(t, got.Status, types.AggregatorStatusRunning)
+}
+
+func TestClient_CoreInstanceMetadata(t *testing.T) {
+	ctx := context.Background()
+	asUser := userClient(t)
+	withToken := withToken(t, asUser)
+
+	created, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+		Name:                   "test-core-instance",
+		AddHealthCheckPipeline: false,
+	})
+
+	wantEqual(t, err, nil)
+	wantNoEqual(t, created, nil)
+
+	metadata := types.AggregatorMetadata{
+		MetadataAWS: types.MetadataAWS{
+			PrivateIPv4: "192.168.0.1",
+			PublicIPv4:  "1.1.1.1",
+		},
+		MetadataK8S: types.MetadataK8S{},
+		MetadataGCP: types.MetadataGCP{},
+	}
+
+	m, err := json.Marshal(metadata)
+	wantEqual(t, err, nil)
+	wantNoEqual(t, m, nil)
+
+	err = withToken.UpdateAggregator(ctx, created.ID, types.UpdateAggregator{
+		Metadata: (*json.RawMessage)(&m),
+	})
+	wantEqual(t, err, nil)
+
+	got, err := asUser.Aggregator(ctx, created.ID)
+	wantEqual(t, err, nil)
+	wantNoEqual(t, got, nil)
+
+	var gotMetadata types.AggregatorMetadata
+
+	err = json.Unmarshal(*got.Metadata, &gotMetadata)
+	wantEqual(t, err, nil)
+	wantEqual(t, metadata, gotMetadata)
 }
 
 func setupAggregator(t *testing.T, withToken *client.Client) types.CreatedAggregator {

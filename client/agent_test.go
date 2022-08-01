@@ -132,7 +132,6 @@ func TestClient_Agents(t *testing.T) {
 	wantNoTimeZero(t, got.Items[0].CreatedAt)
 
 	// skipping metrics tests here.
-
 	t.Run("pagination", func(t *testing.T) {
 		for i := 0; i < 10; i++ {
 			_, err := withToken.RegisterAgent(ctx, types.RegisterAgent{
@@ -210,6 +209,60 @@ func TestClient_Agents(t *testing.T) {
 		tag4, err := asUser.Agents(ctx, project.ID, opts)
 		wantEqual(t, err, nil)
 		wantEqual(t, len(tag4.Items), 0)
+	})
+
+	t.Run("multiple env", func(t *testing.T) {
+		envOne, err := withToken.CreateEnvironment(
+			ctx, project.ID, types.CreateEnvironment{Name: "one"})
+		wantEqual(t, err, nil)
+		wantNoEqual(t, envOne, nil)
+
+		envTwo, err := withToken.CreateEnvironment(
+			ctx, project.ID, types.CreateEnvironment{Name: "two"})
+		wantEqual(t, err, nil)
+		wantNoEqual(t, envTwo, nil)
+
+		aggregatorOne, err := withToken.RegisterAgent(ctx, types.RegisterAgent{
+			Name:          "core-instance",
+			Version:       "v1.9.5",
+			Edition:       types.AgentEditionCommunity,
+			EnvironmentID: envOne.ID,
+			MachineID:     "core-instance-one",
+			Type:          types.AgentTypeFluentBit,
+		})
+		wantEqual(t, err, nil)
+		wantNoEqual(t, aggregatorOne, nil)
+
+		aggregatorTwo, err := withToken.RegisterAgent(ctx, types.RegisterAgent{
+			Name:          "core-instance",
+			Version:       "v1.9.5",
+			Edition:       types.AgentEditionCommunity,
+			EnvironmentID: envTwo.ID,
+			MachineID:     "core-instance-two",
+			Type:          types.AgentTypeFluentBit,
+		})
+		wantEqual(t, err, nil)
+		wantNoEqual(t, aggregatorTwo, nil)
+
+		envOneAggregators, err := asUser.Agents(ctx, project.ID, types.AgentsParams{
+			EnvironmentID: ptrStr(envOne.ID),
+			Last:          ptrUint64(0),
+		})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(envOneAggregators.Items), 1)
+
+		envTwoAggregators, err := asUser.Agents(ctx, project.ID, types.AgentsParams{
+			EnvironmentID: ptrStr(envTwo.ID),
+			Last:          ptrUint64(0),
+		})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(envTwoAggregators.Items), 1)
+
+		bothEnvsAggregators, err := asUser.Agents(ctx, project.ID, types.AgentsParams{
+			Last: ptrUint64(0),
+		})
+		wantEqual(t, err, nil)
+		wantNoEqual(t, len(bothEnvsAggregators.Items), 1)
 	})
 }
 
