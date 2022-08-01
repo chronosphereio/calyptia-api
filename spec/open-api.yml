@@ -1388,7 +1388,6 @@ components:
         - token
         - name
         - createdAt
-        - environmentName
     CreatedAggregator:
       type: object
       description: Created aggregator response body.
@@ -1433,7 +1432,6 @@ components:
         - name
         - createdAt
         - resourceProfiles
-        - environmentName
     CreatedResourceProfile:
       type: object
       description: Created resource profile response body.
