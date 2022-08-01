@@ -34,8 +34,8 @@ type TraceSessionsParams struct {
 
 // TraceSessions paginated list.
 type TraceSessions struct {
-	Items     []TraceSession
-	EndCursor *string
+	Items     []TraceSession `json:"items"`
+	EndCursor *string        `json:"endCursor"`
 }
 
 // UpdateTraceSession request payload for updating a trace session.
@@ -95,6 +95,6 @@ type TraceRecordsParams struct {
 
 // TraceRecords paginated list.
 type TraceRecords struct {
-	Items     []TraceRecord
-	EndCursor *string
+	Items     []TraceRecord `json:"items"`
+	EndCursor *string       `json:"endCursor"`
 }
