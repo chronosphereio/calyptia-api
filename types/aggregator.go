@@ -121,6 +121,7 @@ type CreatedAggregator struct {
 	Tags                []string          `json:"tags"`
 	HealthCheckPipeline *Pipeline         `json:"healthCheckPipeline"`
 	ResourceProfiles    []ResourceProfile `json:"resourceProfiles"`
+	EnvironmentName     string            `json:"environmentName"`
 }
 
 // AggregatorsParams request payload for querying aggregators.
