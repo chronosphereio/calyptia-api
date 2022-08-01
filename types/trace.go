@@ -22,8 +22,8 @@ func (ts TraceSession) Active() bool {
 
 // CreateTraceSession request payload for creating a new trace session.
 type CreateTraceSession struct {
-	Plugins  []string      `json:"tracePlugins"`
-	Lifespan time.Duration `json:"traceLifespan"`
+	Plugins  []string      `json:"plugins"`
+	Lifespan time.Duration `json:"lifespan"`
 }
 
 // TraceSessionsParams request payload for querying trace sessions.
