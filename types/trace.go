@@ -53,7 +53,7 @@ type TraceRecord struct {
 
 	// fluent-bit data from here on.
 	Kind           TraceRecordKind `json:"type" yaml:"type"`
-	TraceID        string          `json:"traceID" yaml:"traceID"`
+	TraceID        string          `json:"trace_id" yaml:"trace_id"`
 	StartTime      time.Time       `json:"start_time" yaml:"start_time"`
 	EndTime        time.Time       `json:"end_time" yaml:"end_time"`
 	PluginInstance string          `json:"plugin_instance" yaml:"plugin_instance"`
@@ -65,19 +65,19 @@ type TraceRecord struct {
 }
 
 // TraceRecordKind enum.
-type TraceRecordKind string
+type TraceRecordKind uint
 
 const (
-	TraceRecordKindInput     TraceRecordKind = "input"
-	TraceRecordKindFilter    TraceRecordKind = "filter"
-	TraceRecordKindPreOutput TraceRecordKind = "pre_output"
-	TraceRecordKindOutput    TraceRecordKind = "output"
+	TraceRecordKindInput TraceRecordKind = iota + 1
+	TraceRecordKindFilter
+	TraceRecordKindPreOutput
+	TraceRecordKindOutput
 )
 
 // CreateTraceRecord request payload for creating a new trace record.
 type CreateTraceRecord struct {
 	Kind           TraceRecordKind `json:"type"`
-	TraceID        string          `json:"traceID"`
+	TraceID        string          `json:"trace_id"`
 	StartTime      time.Time       `json:"start_time"`
 	EndTime        time.Time       `json:"end_time"`
 	PluginInstance string          `json:"plugin_instance"`
