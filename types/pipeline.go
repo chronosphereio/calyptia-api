@@ -12,6 +12,7 @@ type Pipeline struct {
 	Config          PipelineConfig   `json:"config" yaml:"config"`
 	Status          PipelineStatus   `json:"status" yaml:"status"`
 	ResourceProfile ResourceProfile  `json:"resourceProfile" yaml:"resourceProfile"`
+	TracingEnabled  bool             `json:"tracingEnabled" yaml:"tracingEnabled"`
 	ReplicasCount   uint64           `json:"replicasCount" yaml:"replicasCount"`
 	Tags            []string         `json:"tags" yaml:"tags"`
 	Metadata        *json.RawMessage `json:"metadata" yaml:"metadata"`
