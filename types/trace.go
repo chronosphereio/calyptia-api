@@ -76,13 +76,15 @@ const (
 
 // CreateTraceRecord request payload for creating a new trace record.
 type CreateTraceRecord struct {
-	Kind           TraceRecordKind `json:"type"`
-	TraceID        string          `json:"trace_id"`
-	StartTime      time.Time       `json:"start_time"`
-	EndTime        time.Time       `json:"end_time"`
-	PluginInstance string          `json:"plugin_instance"`
-	PluginAlias    string          `json:"plugin_alias"`
-	ReturnCode     int             `json:"return_code"`
+	Kind    TraceRecordKind `json:"type"`
+	TraceID string          `json:"trace_id"`
+	// StartTime in unix seconds.
+	StartTime int64 `json:"start_time"`
+	// EndTime in unix seconds.
+	EndTime        int64  `json:"end_time"`
+	PluginInstance string `json:"plugin_instance"`
+	PluginAlias    string `json:"plugin_alias"`
+	ReturnCode     int    `json:"return_code"`
 	// Records array, each record is a JSON object,
 	// warranted to have a flb_time `timestamp` field.
 	Records json.RawMessage `json:"records"`
