@@ -40,6 +40,7 @@ tags:
   - name: environment
   - name: trace_session
   - name: trace_record
+
 components:
   securitySchemes:
     user:
@@ -120,8 +121,8 @@ components:
           example: my-project
         membersCount:
           type: integer
-          minimum: 1
           format: int64
+          minimum: 1
         agentsCount:
           type: integer
           format: int64
@@ -610,8 +611,8 @@ components:
                 type: object
                 additionalProperties:
                   type: number
-                  nullable: true
                   format: float
+                  nullable: true
               plugins:
                 type: object
                 additionalProperties:
@@ -625,8 +626,8 @@ components:
             type: object
             additionalProperties:
               type: number
-              nullable: true
               format: float
+              nullable: true
       required:
         - measurements
         - topPlugins
@@ -844,8 +845,8 @@ components:
           format: date-time
         value:
           type: number
-          nullable: true
           format: float
+          nullable: true
       required:
         - time
         - value
@@ -1188,6 +1189,7 @@ components:
         replicasCount:
           type: integer
           format: int64
+          minimum: 0
           nullable: true
         rawConfig:
           type: string
@@ -1656,10 +1658,12 @@ components:
           type: array
           items:
             type: string
+            example: "dummy.0"
         lifespan:
           description: For how long will this session be active and process records.
           type: string
           format: duration
+          example: "10m"
         createdAt:
           type: string
           format: date-time
@@ -1684,10 +1688,12 @@ components:
           type: array
           items:
             type: string
+            example: "dummy.0"
         lifespan:
           description: For how long will this session be active and process records.
           type: string
           format: duration
+          example: "10m"
       required:
         - plugins
         - lifespan
@@ -1702,11 +1708,13 @@ components:
           type: array
           items:
             type: string
+            example: "dummy.0"
           nullable: true
         lifespan:
           description: For how long will this session be active and process records.
           type: string
           format: duration
+          example: "10m"
           nullable: true
 
     TraceRecord:
@@ -1726,20 +1734,26 @@ components:
           $ref: "#/components/schemas/TraceRecordKind"
         trace_id:
           type: string
+          example: trace.5
         start_time:
-          type: number
           description: Unix timestamp with seconds precision.
+          type: integer
           format: int64
+          example: 1658953439
         end_time:
-          type: number
           description: Unix timestamp with seconds precision.
+          type: integer
           format: int64
+          example: 1658953439
         plugin_instance:
           type: string
+          example: nest.2
         plugin_alias:
           type: string
+          example: nest_2
         return_code:
-          type: number
+          type: integer
+          format: int64
         records:
           type: array
           items:
@@ -1747,10 +1761,21 @@ components:
             properties:
               timestamp:
                 description: Unix timestamp with seconds precision.
-                type: number
+                type: integer
+                format: int64
+                example: 1658953439
               record:
                 type: object
                 additionalProperties: true
+                example: |-
+                  {
+                    "dummy": "dummy_0",
+                    "powered_by": "calyptia",
+                    "data": {
+                      "key_name": "foo",
+                      "key_cnt": "1"
+                    }
+                  }
             additionalProperties: true
             required:
               - timestamp
@@ -1772,7 +1797,7 @@ components:
         - createdAt
 
     TraceRecordKind:
-      type: number
+      type: integer
       enum: [1, 2, 3, 4]
       # Custom enum names supported by openapi-typescript-codegen.
       # See https://github.com/ferdikoomen/openapi-typescript-codegen/blob/master/docs/custom-enums.md
@@ -1787,20 +1812,25 @@ components:
           $ref: "#/components/schemas/TraceRecordKind"
         trace_id:
           type: string
+          example: trace.5
         start_time:
-          type: number
           description: Unix timestamp with seconds precision.
+          type: integer
           format: int64
+          example: 1658953439
         end_time:
-          type: number
           description: Unix timestamp with seconds precision.
+          type: integer
           format: int64
+          example: 1658953439
         plugin_instance:
           type: string
+          example: nest.2
         plugin_alias:
           type: string
+          example: nest_2
         return_code:
-          type: number
+          type: integer
         records:
           type: array
           items:
@@ -1808,10 +1838,21 @@ components:
             properties:
               timestamp:
                 description: Unix timestamp with seconds precision.
-                type: number
+                type: integer
+                format: int64
+                example: 1658953439
               record:
                 type: object
                 additionalProperties: true
+                example: |-
+                  {
+                    "dummy": "dummy_0",
+                    "powered_by": "calyptia",
+                    "data": {
+                      "key_name": "foo",
+                      "key_cnt": "1"
+                    }
+                  }
             additionalProperties: true
             required:
               - timestamp
@@ -1825,6 +1866,39 @@ components:
         - plugin_alias
         - return_code
         - records
+
+    StoredFields:
+      type: object
+      description: Common stored fields.
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, createdAt]
+
+    UpdatedFields:
+      type: object
+      description: Common stored fields.
+      properties:
+        updatedAt:
+          type: string
+          format: date-time
+      required: [updatedAt]
+
+    UpdatedFieldsFound:
+      type: object
+      description: Common stored fields.
+      properties:
+        id:
+          type: string
+          format: uuid
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, updatedAt]
 
 paths:
   /v1/verification_email:
@@ -3617,3 +3691,201 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AggregatorMetrics"
+
+  "/v1/pipelines/{pipelineID}/trace_sessions":
+    parameters:
+      - name: pipelineID
+        in: path
+        schema:
+          type: string
+          format: uuid
+        required: true
+    post:
+      tags: [trace_session]
+      security:
+        - user: []
+        - project: []
+      summary: Create trace session
+      operationId: createTraceSession
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTraceSession"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StoredFields"
+    get:
+      tags: [trace_session]
+      security:
+        - user: []
+        - project: []
+      summary: Trace sessions
+      operationId: traceSessions
+      responses:
+        "200":
+          description: OK
+          headers:
+            Link:
+              schema:
+                type: string
+                example: </v1/pipelines/foo/trace_sessions?before=bar>; rel="next"
+              description: RFC5988 with `rel="next"`.
+          links:
+            NextTraceSessionsPage:
+              operationId: traceSessions
+              parameters:
+                before: "$response.header.Link#rel=next"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TraceSession"
+
+  "/v1/pipelines/{pipelineID}/trace_session":
+    parameters:
+      - name: pipelineID
+        in: path
+        schema:
+          type: string
+          format: uuid
+        required: true
+    get:
+      tags: [trace_session]
+      security:
+        - user: []
+        - project: []
+      summary: Active trace session
+      operationId: activeTraceSession
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TraceSession"
+    delete:
+      tags: [trace_session]
+      security:
+        - user: []
+        - project: []
+      summary: Terminate active trace session
+      operationId: terminateActiveTraceSession
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatedFieldsFound"
+
+  "/v1/trace_sessions/{sessionID}":
+    parameters:
+      - name: sessionID
+        in: path
+        schema:
+          type: string
+          format: uuid
+        required: true
+    get:
+      tags: [trace_session]
+      security:
+        - user: []
+        - project: []
+      summary: Trace session
+      operationId: traceSession
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TraceSession"
+    patch:
+      tags: [trace_session]
+      security:
+        - user: []
+        - project: []
+      summary: Update trace session
+      operationId: updateTraceSession
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTraceSession"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatedFields"
+
+  "/v1/pipelines/{pipelineID}/trace_session/records":
+    parameters:
+      - name: pipelineID
+        in: path
+        schema:
+          type: string
+          format: uuid
+        required: true
+    post:
+      tags: [trace_record]
+      security:
+        - user: []
+        - project: []
+      summary: Create trace record
+      operationId: createTraceRecord
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTraceRecord"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StoredFields"
+
+  "/v1/trace_sessions/{sessionID}/records":
+    parameters:
+      - name: sessionID
+        in: path
+        schema:
+          type: string
+          format: uuid
+        required: true
+    get:
+      tags: [trace_record]
+      security:
+        - user: []
+        - project: []
+      summary: Trace records
+      operationId: traceRecords
+      responses:
+        "200":
+          description: OK
+          headers:
+            Link:
+              schema:
+                type: string
+                example: </v1/trace_sessions/foo/records?before=bar>; rel="next"
+              description: RFC5988 with `rel="next"`.
+          links:
+            NextTraceRecordsPage:
+              operationId: traceRecords
+              parameters:
+                before: "$response.header.Link#rel=next"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TraceRecord"
