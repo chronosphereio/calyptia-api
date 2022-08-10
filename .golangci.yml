@@ -12,8 +12,6 @@ linters-settings:
     threshold: 300
   goimports:
     local-prefixes: github.com/calyptia/api
-  golint:
-    min-confidence: 0.8
   gocyclo:
     min-complexity: 15
   govet:
@@ -54,11 +52,10 @@ linters:
     - gocyclo
     - godot
     - gofumpt
-    - golint
+    - revive
     - gomnd
     - goprintffuncname
     - gosec
-    - ifshort
     - misspell
     - noctx
     - nolintlint
