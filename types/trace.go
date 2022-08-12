@@ -18,7 +18,13 @@ type TraceSession struct {
 
 // Active tells whether a session is still within its lifespan.
 func (ts TraceSession) Active() bool {
-	return ts.CreatedAt.Add(time.Duration(ts.Lifespan)).After(time.Now())
+	now := time.Now()
+	return ts.EndTime().Equal(now) || ts.EndTime().After(now)
+}
+
+// EndTime returns the time when the session will stop being active.
+func (ts TraceSession) EndTime() time.Time {
+	return ts.CreatedAt.Add(time.Duration(ts.Lifespan))
 }
 
 // CreateTraceSession request payload for creating a new trace session.
@@ -59,6 +65,7 @@ type UpdatedTraceSession struct {
 // TerminatedTraceSession response payload after terminating the active trace session successfully.
 type TerminatedTraceSession struct {
 	ID        string    `json:"id" yaml:"id"`
+	Lifespan  Duration  `json:"lifespan" yaml:"lifespan"`
 	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
 
@@ -90,6 +97,25 @@ const (
 	TraceRecordKindPreOutput
 	TraceRecordKindOutput
 )
+
+// String implements fmt.Stringer.
+func (k TraceRecordKind) String() string {
+	switch k {
+	case TraceRecordKindInput:
+		return "input"
+	case TraceRecordKindFilter:
+		return "filter"
+	case TraceRecordKindPreOutput:
+		return "pre_output"
+	case TraceRecordKindOutput:
+		return "output"
+	default:
+		return ""
+	}
+}
+
+// GoString implements fmt.GoStringer.
+func (k TraceRecordKind) GoString() string { return k.String() }
 
 // CreateTraceRecord request payload for creating a new trace record.
 type CreateTraceRecord struct {
@@ -154,4 +180,8 @@ func (d *Duration) UnmarshalJSON(b []byte) error {
 	default:
 		return errors.New("invalid duration")
 	}
+}
+
+func (d Duration) AsDuration() time.Duration {
+	return time.Duration(d)
 }
