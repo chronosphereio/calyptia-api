@@ -3849,7 +3849,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Updated"
+                $ref: "#/components/schemas/UpdatedTraceSession"
 
   "/v1/pipelines/{pipelineID}/trace_session/records":
     parameters:
