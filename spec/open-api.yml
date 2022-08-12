@@ -1645,7 +1645,7 @@ components:
       description: |
         Trace session model.
         There can only be one active session at a moment on a pipeline.
-        Either terminate it and create a new one, or update and extend the lifespan of the current active one.
+        Either terminate it and create a new one, or update and extend the endTime of the current active one.
       properties:
         id:
           type: string
@@ -1659,11 +1659,10 @@ components:
           items:
             type: string
             example: "dummy.0"
-        lifespan:
+        endTime:
           description: For how long will this session be active and process records.
           type: string
-          format: duration
-          example: "10m"
+          format: date-time
         createdAt:
           type: string
           format: date-time
@@ -1674,7 +1673,7 @@ components:
         - id
         - pipelineID
         - plugins
-        - lifespan
+        - endTime
         - createdAt
         - updatedAt
 
@@ -1689,14 +1688,13 @@ components:
           items:
             type: string
             example: "dummy.0"
-        lifespan:
+        endTime:
           description: For how long will this session be active and process records.
           type: string
-          format: duration
-          example: "10m"
+          format: date-time
       required:
         - plugins
-        - lifespan
+        - endTime
 
     UpdateTraceSession:
       type: object
@@ -1710,11 +1708,10 @@ components:
             type: string
             example: "dummy.0"
           nullable: true
-        lifespan:
+        endTime:
           description: For how long will this session be active and process records.
           type: string
-          format: duration
-          example: "10m"
+          format: date-time
           nullable: true
 
     TraceRecord:
@@ -1888,17 +1885,23 @@ components:
           format: date-time
       required: [updatedAt]
 
-    UpdatedFieldsFound:
+    TerminatedTraceSession:
       type: object
-      description: Common stored fields.
+      description: Result of terminating a trace session.
       properties:
         id:
           type: string
           format: uuid
+        endTime:
+          type: string
+          format: date-time
         updatedAt:
           type: string
           format: date-time
-      required: [id, updatedAt]
+      required:
+        - id
+        - endTime
+        - updatedAt
 
 paths:
   /v1/verification_email:
@@ -3782,7 +3785,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UpdatedFieldsFound"
+                $ref: "#/components/schemas/TerminatedTraceSession"
 
   "/v1/trace_sessions/{sessionID}":
     parameters:
