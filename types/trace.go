@@ -136,6 +136,7 @@ type CreateTraceRecord struct {
 // CreatedTraceRecord response payload after creating an session record successfully.
 type CreatedTraceRecord struct {
 	ID        string    `json:"id" yaml:"id"`
+	SessionID string    `json:"sessionID" yaml:"sessionID"`
 	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
 }
 
