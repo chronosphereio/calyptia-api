@@ -196,6 +196,7 @@ type setupTraceRecordOpts struct {
 	Input      *types.CreateTraceRecord
 }
 
+//nolint:unparam // returning trace record might be used in the tests later.
 func setupTraceRecord(t *testing.T, opts setupTraceRecordOpts) types.TraceRecord {
 	t.Helper()
 
