@@ -64,7 +64,7 @@ func TestMain(m *testing.M) {
 	os.Exit(testMain(m))
 }
 
-//nolint //gocyclo this function setups all the components required by tests.
+//nolint:gocyclo // this function setups all the components required by tests.
 func testMain(m *testing.M) int {
 	jwksServer, privateKey, err := setupJWKSServer()
 	if err != nil {

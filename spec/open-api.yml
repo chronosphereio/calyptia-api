@@ -1698,6 +1698,18 @@ components:
         - plugins
         - lifespan
 
+    CreatedTraceSession:
+      type: object
+      description: Response body for a newly created trace session.
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, createdAt]
+
     UpdateTraceSession:
       type: object
       description: |
@@ -1716,6 +1728,15 @@ components:
           format: duration
           example: "10m"
           nullable: true
+
+    UpdatedTraceSession:
+      type: object
+      description: Response body for an updated trace session.
+      properties:
+        updatedAt:
+          type: string
+          format: date-time
+      required: [updatedAt]
 
     TraceRecord:
       type: object
@@ -1867,38 +1888,42 @@ components:
         - return_code
         - records
 
-    StoredFields:
+    CreatedTraceRecord:
       type: object
-      description: Common stored fields.
+      description: Response body when a trace record is created.
       properties:
         id:
+          type: string
+          format: uuid
+        sessionID:
           type: string
           format: uuid
         createdAt:
           type: string
           format: date-time
-      required: [id, createdAt]
+      required:
+        - id
+        - sessionID
+        - createdAt
 
-    UpdatedFields:
+    TerminatedTraceSession:
       type: object
-      description: Common stored fields.
-      properties:
-        updatedAt:
-          type: string
-          format: date-time
-      required: [updatedAt]
-
-    UpdatedFieldsFound:
-      type: object
-      description: Common stored fields.
+      description: Response body when a trace session is terminated.
       properties:
         id:
           type: string
           format: uuid
+        lifespan:
+          type: string
+          format: duration
+          example: "10m"
         updatedAt:
           type: string
           format: date-time
-      required: [id, updatedAt]
+      required:
+        - id
+        - lifespan
+        - updatedAt
 
 paths:
   /v1/verification_email:
@@ -3718,7 +3743,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StoredFields"
+                $ref: "#/components/schemas/CreatedTraceSession"
     get:
       tags: [trace_session]
       security:
@@ -3782,7 +3807,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UpdatedFieldsFound"
+                $ref: "#/components/schemas/TerminatedTraceSession"
 
   "/v1/trace_sessions/{sessionID}":
     parameters:
@@ -3824,7 +3849,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UpdatedFields"
+                $ref: "#/components/schemas/UpdatedTraceSession"
 
   "/v1/pipelines/{pipelineID}/trace_session/records":
     parameters:
@@ -3852,7 +3877,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StoredFields"
+                $ref: "#/components/schemas/CreatedTraceRecord"
 
   "/v1/trace_sessions/{sessionID}/records":
     parameters:
