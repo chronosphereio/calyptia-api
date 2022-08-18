@@ -140,3 +140,9 @@ type UpdateAggregator struct {
 	EnvironmentID *string          `json:"environmentID"`
 	Metadata      *json.RawMessage `json:"metadata"`
 }
+
+// PipelinesMetricsParams request payload for bulk querying pipeline metrics for a given aggregator.
+type PipelinesMetricsParams struct {
+	*MetricsParams
+	PipelineIDs *[]string
+}
