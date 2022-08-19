@@ -41,7 +41,6 @@ func (c *Client) PipelineMetrics(ctx context.Context, pipelineID string, params 
 		"start":    []string{params.Start.String()},
 		"interval": []string{params.Interval.String()},
 	}
-
 	var out types.AgentMetrics
 	path := "/v1/pipeline_metrics/" + url.PathEscape(pipelineID) + "?" + q.Encode()
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)

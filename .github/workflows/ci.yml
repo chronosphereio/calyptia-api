@@ -28,6 +28,17 @@ jobs:
           username: ${{ secrets.CI_USERNAME }}
           password: ${{ secrets.CI_PAT }}
 
+      - name: Create k8s Kind Cluster
+        uses: helm/kind-action@v1.3.0
+        timeout-minutes: 5
+        with:
+          config: ./.github/workflows/kind/config
+
+      - name: Fix Kind dockerhost
+        run: ./dockerhost.sh
+        shell: bash
+        working-directory: .github/workflows/kind
+
       - name: Test
         run: |
           go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
@@ -37,8 +48,9 @@ jobs:
           FLUENTD_CONFIG_VALIDATOR_API_KEY: ${{ secrets.FLUENTD_CONFIG_VALIDATOR_API_KEY }}
           SMTP_USERNAME: ${{ secrets.MAILTRAP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.MAILTRAP_PASSWORD }}
-          # This is a known limitation with github actions runners as they don't expose host.docker.internal properly.
+          # This is a known limitation with GitHub actions runners as they don't expose host.docker.internal properly.
           HOST_IP: ${{ env.DOCKER_HOST_IP }}
+          TEST_CLOUD_IMAGE: ghcr.io/calyptia/cloud:pr-530
 
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v3
