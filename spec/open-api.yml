@@ -1654,7 +1654,7 @@ components:
           type: string
           format: uuid
         plugins:
-          description: List of Fluent-bit plugins to trace.
+          description: List of Fluent-bit plugin IDs ar aliases to trace.
           type: array
           items:
             type: string
@@ -1684,7 +1684,7 @@ components:
         Request body to create a new trace session on a pipeline.
       properties:
         plugins:
-          description: List of Fluent-bit plugins to trace.
+          description: List of Fluent-bit plugin IDs ar aliases to trace.
           type: array
           items:
             type: string
@@ -1716,7 +1716,7 @@ components:
         Request body to update an active trace session on a pipeline.
       properties:
         plugins:
-          description: List of Fluent-bit plugins to trace.
+          description: List of Fluent-bit plugin IDs ar aliases to trace.
           type: array
           items:
             type: string
