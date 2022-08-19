@@ -103,7 +103,7 @@ func (a *AgentMetrics) AddMeasurementMetrics(measurement string, metrics []Metri
 // PipelineMetric response payload for pipeline level metric.
 type PipelineMetric struct {
 	Data  AgentMetrics `json:"data"`
-	Error string       `json:"error"`
+	Error error        `json:"error"`
 }
 
 // AgentMeasurement stores per plugin and total agent level metrics.

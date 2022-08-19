@@ -143,6 +143,6 @@ type UpdateAggregator struct {
 
 // PipelinesMetricsParams request payload for bulk querying pipeline metrics for a given aggregator.
 type PipelinesMetricsParams struct {
-	*MetricsParams
-	PipelineIDs *[]string
+	MetricsParams
+	PipelineIDs []string
 }
