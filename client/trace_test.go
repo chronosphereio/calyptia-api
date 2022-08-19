@@ -1,5 +1,5 @@
 // TODO: enable these back when plugin ids and alias are supported.
-// package client_test
+package client_test
 
 // import (
 // 	"context"
