@@ -8,12 +8,13 @@ import (
 
 // TraceSession model.
 type TraceSession struct {
-	ID         string    `json:"id" yaml:"id"`
-	PipelineID string    `json:"pipelineID" yaml:"pipelineID"`
-	Plugins    []string  `json:"plugins" yaml:"plugins"`
-	Lifespan   Duration  `json:"lifespan" yaml:"lifespan"`
-	CreatedAt  time.Time `json:"createdAt" yaml:"createdAt"`
-	UpdatedAt  time.Time `json:"updatedAt" yaml:"updatedAt"`
+	ID         string `json:"id" yaml:"id"`
+	PipelineID string `json:"pipelineID" yaml:"pipelineID"`
+	// Plugins list of fluent-bit plugin IDs or aliases. Example ["forward.0", "myplugin"]
+	Plugins   []string  `json:"plugins" yaml:"plugins"`
+	Lifespan  Duration  `json:"lifespan" yaml:"lifespan"`
+	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
 
 // Active tells whether a session is still within its lifespan.
