@@ -121,15 +121,12 @@ components:
           example: my-project
         membersCount:
           type: integer
-          format: int64
           minimum: 1
         agentsCount:
           type: integer
-          format: int64
           minimum: 0
         aggregatorsCount:
           type: integer
-          format: int64
           maximum: 0
         createdAt:
           type: string
@@ -242,7 +239,6 @@ components:
           format: date-time
         metricsCount:
           type: integer
-          format: int64
           minimum: 0
         createdAt:
           type: string
@@ -328,7 +324,6 @@ components:
           nullable: true
         pipelinesCount:
           type: integer
-          format: int64
           minimum: 0
         createdAt:
           type: string
@@ -432,7 +427,6 @@ components:
           $ref: "#/components/schemas/ResourceProfile"
         replicasCount:
           type: integer
-          format: int64
           minimum: 0
         tags:
           type: array
@@ -1137,7 +1131,6 @@ components:
           example: new-pipeline
         replicasCount:
           type: integer
-          format: int64
           minimum: 0
         rawConfig:
           type: string
@@ -1188,7 +1181,6 @@ components:
           nullable: true
         replicasCount:
           type: integer
-          format: int64
           minimum: 0
           nullable: true
         rawConfig:
@@ -1475,7 +1467,6 @@ components:
           $ref: "#/components/schemas/ResourceProfile"
         replicasCount:
           type: integer
-          format: int64
           minimum: 0
         createdAt:
           type: string
@@ -1976,7 +1967,6 @@ paths:
       parameters:
         - schema:
             type: integer
-            format: int64
             minimum: 0
           in: query
           name: last
@@ -2081,7 +2071,6 @@ paths:
       parameters:
         - schema:
             type: integer
-            format: int64
             minimum: 0
           in: query
           name: last
@@ -2173,7 +2162,6 @@ paths:
       parameters:
         - schema:
             type: integer
-            format: int64
             minimum: 0
           in: query
           name: last
@@ -2278,7 +2266,6 @@ paths:
       parameters:
         - schema:
             type: integer
-            format: int64
             minimum: 0
           in: query
           name: last
@@ -2399,7 +2386,6 @@ paths:
       parameters:
         - schema:
             type: integer
-            format: int64
             minimum: 0
           in: query
           name: last
@@ -2457,7 +2443,6 @@ paths:
       parameters:
         - schema:
             type: integer
-            format: int64
             minimum: 0
           in: query
           name: last
@@ -2627,7 +2612,6 @@ paths:
       parameters:
         - schema:
             type: integer
-            format: int64
             minimum: 0
           in: query
           name: last
@@ -2739,7 +2723,6 @@ paths:
       parameters:
         - schema:
             type: integer
-            format: int64
             minimum: 0
           in: query
           name: last
@@ -2809,7 +2792,6 @@ paths:
       parameters:
         - schema:
             type: integer
-            format: int64
             minimum: 0
           in: query
           name: last
@@ -2932,7 +2914,6 @@ paths:
       parameters:
         - schema:
             type: integer
-            format: int64
             minimum: 0
           in: query
           name: last
@@ -2968,7 +2949,6 @@ paths:
       parameters:
         - schema:
             type: integer
-            format: int64
             minimum: 0
           in: query
           name: last
@@ -3047,7 +3027,6 @@ paths:
       parameters:
         - schema:
             type: integer
-            format: int64
             minimum: 0
           in: query
           name: last
@@ -3162,7 +3141,6 @@ paths:
       parameters:
         - schema:
             type: integer
-            format: int64
             minimum: 0
           in: query
           name: last
@@ -3275,7 +3253,6 @@ paths:
       parameters:
         - schema:
             type: integer
-            format: int64
             minimum: 0
           in: query
           name: last
@@ -3419,7 +3396,6 @@ paths:
       parameters:
         - schema:
             type: integer
-            format: int64
             minimum: 0
           in: query
           name: last
