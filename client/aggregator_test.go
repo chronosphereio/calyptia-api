@@ -383,7 +383,7 @@ func TestClient_AggregatorPipelinesMetrics(t *testing.T) {
 		})
 
 		wantEqual(t, err, nil)
-		wantNoEqual(t, metrics, types.PipelinesMetrics{})
+		wantNoEqual(t, metrics[notFoundPipelineID].Error, "")
 	})
 }
 

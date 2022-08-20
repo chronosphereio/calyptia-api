@@ -1,6 +1,8 @@
 package types
 
-import "time"
+import (
+	"time"
+)
 
 // AggregatorMeasurement stores a list of metrics and totals for an aggregator.
 type AggregatorMeasurement struct {
