@@ -14,7 +14,7 @@ import (
 func (c *Client) AgentConfigHistory(ctx context.Context, agentID string, params types.AgentConfigHistoryParams) (types.AgentConfigHistory, error) {
 	q := url.Values{}
 	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
+		q.Set("last", strconv.FormatUint(uint64(*params.Last), uintBase))
 	}
 	if params.Before != nil {
 		q.Set("before", *params.Before)

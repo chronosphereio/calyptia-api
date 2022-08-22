@@ -26,7 +26,7 @@ type Environments struct {
 }
 
 type EnvironmentsParams struct {
-	Last   *uint64
+	Last   *uint
 	Before *string
 	Name   *string
 }

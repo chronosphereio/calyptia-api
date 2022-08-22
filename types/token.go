@@ -23,7 +23,7 @@ type CreateToken struct {
 
 // TokensParams request payload for querying tokens.
 type TokensParams struct {
-	Last   *uint64
+	Last   *uint
 	Before *string
 	Name   *string
 }

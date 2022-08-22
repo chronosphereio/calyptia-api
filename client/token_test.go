@@ -54,9 +54,9 @@ func TestClient_Tokens(t *testing.T) {
 
 		allTokens, err := asUser.Tokens(ctx, project.ID, types.TokensParams{})
 		wantEqual(t, err, nil)
-		page1, err := asUser.Tokens(ctx, project.ID, types.TokensParams{Last: ptrUint64(3)})
+		page1, err := asUser.Tokens(ctx, project.ID, types.TokensParams{Last: ptrUint(3)})
 		wantEqual(t, err, nil)
-		page2, err := asUser.Tokens(ctx, project.ID, types.TokensParams{Last: ptrUint64(3), Before: page1.EndCursor})
+		page2, err := asUser.Tokens(ctx, project.ID, types.TokensParams{Last: ptrUint(3), Before: page1.EndCursor})
 		wantEqual(t, err, nil)
 
 		want := allTokens.Items[3:6]

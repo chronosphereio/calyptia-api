@@ -562,6 +562,8 @@ func withToken(t *testing.T, asUser *client.Client) *client.Client {
 	return asUser
 }
 
+var errNoKubeConfig = errors.New("no kubeconfig")
+
 func setupCoreInstance(pool *dockertest.Pool, baseURL string, token types.Token) (*dockertest.Resource, error) {
 	// Determine kubernetes config location
 	if kubeConfig == "" {
@@ -574,7 +576,11 @@ func setupCoreInstance(pool *dockertest.Pool, baseURL string, token types.Token)
 	}
 
 	if _, err := os.Stat(kubeConfig); err != nil {
-		return nil, fmt.Errorf("%w: invalid kubeconfig=%q", err, kubeConfig)
+		if os.IsNotExist(err) {
+			return nil, errNoKubeConfig
+		}
+
+		return nil, err
 	}
 
 	parsed, err := url.Parse(baseURL)
@@ -632,7 +638,7 @@ func defaultProject(t *testing.T, asUser *client.Client) types.Project {
 
 	ctx := context.Background()
 	// every new user should have a default project.
-	pp, err := asUser.Projects(ctx, types.ProjectsParams{Last: ptrUint64(1)})
+	pp, err := asUser.Projects(ctx, types.ProjectsParams{Last: ptrUint(1)})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -651,7 +657,7 @@ func defaultToken(t *testing.T, asUser *client.Client) types.Token {
 	project := defaultProject(t, asUser)
 
 	// every new project should have a default token.
-	tt, err := asUser.Tokens(ctx, project.ID, types.TokensParams{Last: ptrUint64(1)})
+	tt, err := asUser.Tokens(ctx, project.ID, types.TokensParams{Last: ptrUint(1)})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -704,10 +710,6 @@ func ptrStr(s string) *string {
 
 func ptrBool(b bool) *bool {
 	return &b
-}
-
-func ptrUint64(u uint64) *uint64 {
-	return &u
 }
 
 func ptrUint(u uint) *uint {

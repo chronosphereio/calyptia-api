@@ -17,6 +17,6 @@ type AgentConfigHistory struct {
 
 // AgentConfigHistoryParams request payload for querying the agent config history.
 type AgentConfigHistoryParams struct {
-	Last   *uint64
+	Last   *uint
 	Before *string
 }

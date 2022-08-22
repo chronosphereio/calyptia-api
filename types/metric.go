@@ -141,7 +141,7 @@ type MetricsParams struct {
 
 // CreatedAgentMetrics response model for created agent metrics.
 type CreatedAgentMetrics struct {
-	Total uint64 `json:"totalInserted"`
+	Total uint `json:"totalInserted"`
 }
 
 // PipelinesMetrics response payload for aggregator level pipeline metrics.

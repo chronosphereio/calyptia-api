@@ -35,7 +35,7 @@ type CreatedPipelinePort struct {
 
 // PipelinePortsParams request payload for querying the pipeline ports.
 type PipelinePortsParams struct {
-	Last   *uint64
+	Last   *uint
 	Before *string
 }
 

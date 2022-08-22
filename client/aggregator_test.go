@@ -67,7 +67,7 @@ func TestClient_Aggregators(t *testing.T) {
 	wantEqual(t, got.Items[0].Name, created.Name)
 	wantEqual(t, got.Items[0].Version, created.Version)
 	wantEqual(t, got.Items[0].Token, created.Token)
-	wantEqual(t, got.Items[0].PipelinesCount, uint64(1))
+	wantEqual(t, got.Items[0].PipelinesCount, uint(1))
 	wantEqual(t, got.Items[0].CreatedAt, created.CreatedAt)
 	wantEqual(t, got.Items[0].UpdatedAt, created.CreatedAt)
 	wantEqual(t, got.Items[0].Status, types.AggregatorStatusWaiting)
@@ -82,14 +82,14 @@ func TestClient_Aggregators(t *testing.T) {
 		}
 
 		page1, err := asUser.Aggregators(ctx, project.ID, types.AggregatorsParams{
-			Last: ptrUint64(3),
+			Last: ptrUint(3),
 		})
 		wantEqual(t, err, nil)
 		wantEqual(t, len(page1.Items), 3)
 		wantNoEqual(t, page1.EndCursor, (*string)(nil))
 
 		page2, err := asUser.Aggregators(ctx, project.ID, types.AggregatorsParams{
-			Last:   ptrUint64(3),
+			Last:   ptrUint(3),
 			Before: page1.EndCursor,
 		})
 		wantEqual(t, err, nil)
@@ -174,20 +174,20 @@ func TestClient_Aggregators(t *testing.T) {
 
 		envOneAggregators, err := asUser.Aggregators(ctx, project.ID, types.AggregatorsParams{
 			EnvironmentID: ptrStr(envOne.ID),
-			Last:          ptrUint64(0),
+			Last:          ptrUint(0),
 		})
 		wantEqual(t, err, nil)
 		wantEqual(t, len(envOneAggregators.Items), 1)
 
 		envTwoAggregators, err := asUser.Aggregators(ctx, project.ID, types.AggregatorsParams{
 			EnvironmentID: ptrStr(envTwo.ID),
-			Last:          ptrUint64(0),
+			Last:          ptrUint(0),
 		})
 		wantEqual(t, err, nil)
 		wantEqual(t, len(envTwoAggregators.Items), 1)
 
 		bothEnvsAggregators, err := asUser.Aggregators(ctx, project.ID, types.AggregatorsParams{
-			Last: ptrUint64(0),
+			Last: ptrUint(0),
 		})
 		wantEqual(t, err, nil)
 		wantNoEqual(t, len(bothEnvsAggregators.Items), 1)
@@ -212,7 +212,7 @@ func TestClient_Aggregator(t *testing.T) {
 	wantEqual(t, got.Name, created.Name)
 	wantEqual(t, got.Version, created.Version)
 	wantEqual(t, got.Token, created.Token)
-	wantEqual(t, got.PipelinesCount, uint64(1))
+	wantEqual(t, got.PipelinesCount, uint(1))
 	wantEqual(t, got.CreatedAt, created.CreatedAt)
 	wantEqual(t, got.UpdatedAt, created.CreatedAt)
 	wantEqual(t, got.Status, types.AggregatorStatusWaiting)

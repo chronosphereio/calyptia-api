@@ -13,7 +13,7 @@ type Pipeline struct {
 	Status          PipelineStatus   `json:"status" yaml:"status"`
 	ResourceProfile ResourceProfile  `json:"resourceProfile" yaml:"resourceProfile"`
 	TracingEnabled  bool             `json:"tracingEnabled" yaml:"tracingEnabled"`
-	ReplicasCount   uint64           `json:"replicasCount" yaml:"replicasCount"`
+	ReplicasCount   uint             `json:"replicasCount" yaml:"replicasCount"`
 	Tags            []string         `json:"tags" yaml:"tags"`
 	Metadata        *json.RawMessage `json:"metadata" yaml:"metadata"`
 	CreatedAt       time.Time        `json:"createdAt" yaml:"createdAt"`
@@ -29,7 +29,7 @@ type Pipelines struct {
 // CreatePipeline request payload for creating a new pipeline.
 type CreatePipeline struct {
 	Name                      string                 `json:"name"`
-	ReplicasCount             uint64                 `json:"replicasCount"`
+	ReplicasCount             uint                   `json:"replicasCount"`
 	RawConfig                 string                 `json:"rawConfig"`
 	ConfigFormat              ConfigFormat           `json:"configFormat"`
 	Secrets                   []CreatePipelineSecret `json:"secrets"`
@@ -49,14 +49,14 @@ type CreatedPipeline struct {
 	Files           []PipelineFile   `json:"files"`
 	Status          PipelineStatus   `json:"status"`
 	ResourceProfile ResourceProfile  `json:"resourceProfile"`
-	ReplicasCount   uint64           `json:"replicasCount"`
+	ReplicasCount   uint             `json:"replicasCount"`
 	CreatedAt       time.Time        `json:"createdAt"`
 }
 
 // UpdatePipeline request payload for updating a pipeline.
 type UpdatePipeline struct {
 	Name                      *string                `json:"name"`
-	ReplicasCount             *uint64                `json:"replicasCount"`
+	ReplicasCount             *uint                  `json:"replicasCount"`
 	RawConfig                 *string                `json:"rawConfig"`
 	ConfigFormat              *ConfigFormat          `json:"configFormat"`
 	Secrets                   []UpdatePipelineSecret `json:"secrets"`
@@ -69,7 +69,7 @@ type UpdatePipeline struct {
 
 // PipelinesParams request payload for querying pipelines.
 type PipelinesParams struct {
-	Last         *uint64
+	Last         *uint
 	Before       *string
 	Name         *string
 	Tags         *string

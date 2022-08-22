@@ -34,7 +34,7 @@ func TestClient_Projects(t *testing.T) {
 		wantEqual(t, len(got.Items), 1) // a default project must be created for the user as a side effect.
 		wantNoEqual(t, got.Items[0].ID, "")
 		wantEqual(t, got.Items[0].Name, "default")
-		wantEqual(t, got.Items[0].MembersCount, uint64(1))
+		wantEqual(t, got.Items[0].MembersCount, uint(1))
 		wantNoTimeZero(t, got.Items[0].CreatedAt)
 		wantNoEqual(t, got.Items[0].Membership, nil)
 		wantNoEqual(t, got.Items[0].Membership.ID, "")
@@ -50,9 +50,9 @@ func TestClient_Projects(t *testing.T) {
 		}
 		allProjects, err := asUser.Projects(ctx, types.ProjectsParams{})
 		wantEqual(t, err, nil)
-		page1, err := asUser.Projects(ctx, types.ProjectsParams{Last: ptrUint64(3)})
+		page1, err := asUser.Projects(ctx, types.ProjectsParams{Last: ptrUint(3)})
 		wantEqual(t, err, nil)
-		page2, err := asUser.Projects(ctx, types.ProjectsParams{Last: ptrUint64(3), Before: page1.EndCursor})
+		page2, err := asUser.Projects(ctx, types.ProjectsParams{Last: ptrUint(3), Before: page1.EndCursor})
 		wantEqual(t, err, nil)
 
 		want := allProjects.Items[3:6]
@@ -70,7 +70,7 @@ func TestClient_Project(t *testing.T) {
 	wantEqual(t, err, nil)
 	wantEqual(t, got.ID, project.ID)
 	wantEqual(t, got.Name, "default")
-	wantEqual(t, got.MembersCount, uint64(1))
+	wantEqual(t, got.MembersCount, uint(1))
 	wantEqual(t, got.CreatedAt, project.CreatedAt)
 	wantNoEqual(t, got.Membership, nil)
 	wantEqual(t, *got.Membership, *project.Membership)
