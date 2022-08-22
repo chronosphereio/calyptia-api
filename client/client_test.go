@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	math_rand "math/rand"
@@ -16,6 +17,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"syscall"
@@ -44,6 +46,7 @@ const (
 )
 
 var (
+	dockerPool                *dockertest.Pool
 	testBearerTokenPrivateKey jwk.RSAPrivateKey
 	testCloudURL              string
 )
@@ -58,10 +61,21 @@ var (
 	testSMTPPort                       = env("TEST_SMTP_PORT", "465")
 	testSMTPUsername                   = os.Getenv("TEST_SMTP_USERNAME")
 	testSMTPPassword                   = os.Getenv("TEST_SMTP_PASSWORD")
+	kubeConfig                         = os.Getenv("KUBECONFIG")
 )
 
 func TestMain(m *testing.M) {
+	flag.Parse()
 	os.Exit(testMain(m))
+}
+
+func setupDockerPool() (*dockertest.Pool, error) {
+	pool, err := dockertest.NewPool("")
+	if err != nil {
+		return nil, err
+	}
+
+	return pool, pool.Client.Ping()
 }
 
 //nolint:gocyclo // this function setups all the components required by tests.
@@ -76,18 +90,13 @@ func testMain(m *testing.M) int {
 
 	testBearerTokenPrivateKey = privateKey
 
-	pool, err := dockertest.NewPool("")
+	dockerPool, err = setupDockerPool()
 	if err != nil {
-		fmt.Printf("could not setup docker pool: %v\n", err)
+		fmt.Printf("error setting up docker pool: %v\n", err)
 		return 1
 	}
 
-	if err := pool.Client.Ping(); err != nil {
-		fmt.Printf("could not ping docker: %v\n", err)
-		return 1
-	}
-
-	postgres, err := setupPostgres(pool)
+	postgres, err := setupPostgres(dockerPool)
 	if err != nil {
 		fmt.Printf("could not setup postgres: %v\n", err)
 		return 1
@@ -105,9 +114,9 @@ func testMain(m *testing.M) int {
 		if err != nil {
 			return
 		}
-	}(pool, postgres)
+	}(dockerPool, postgres)
 
-	influx, err := setupInflux(pool)
+	influx, err := setupInflux(dockerPool)
 	if err != nil {
 		fmt.Printf("could not setup influx: %v\n", err)
 		return 1
@@ -125,7 +134,7 @@ func testMain(m *testing.M) int {
 		if err != nil {
 			return
 		}
-	}(pool, influx)
+	}(dockerPool, influx)
 
 	err = pingPostgres(postgres)
 	if err != nil {
@@ -148,7 +157,7 @@ func testMain(m *testing.M) int {
 	jwksURL.Host = "host.docker.internal:" + jwksURL.Port()
 	jwksURL.Path = "/.well-known/jwks.json"
 
-	cloud, err := setupCloud(pool, setupCloudConfig{
+	cloud, err := setupCloud(dockerPool, setupCloudConfig{
 		port:                           testCloudPort,
 		jwksURL:                        jwksURL.String(),
 		accessTokenAudience:            "http://cloud-api-testing.localhost",
@@ -179,21 +188,23 @@ func testMain(m *testing.M) int {
 		if err != nil {
 			return
 		}
-	}(pool, cloud)
+	}(dockerPool, cloud)
 
-	for _, name := range []string{cloud.Container.ID} {
-		name := name
-		go func() {
-			err := pool.Client.Logs(docker.LogsOptions{
-				Container:   name,
-				ErrorStream: os.Stderr,
-				Stderr:      true,
-				Follow:      true,
-			})
-			if err != nil {
-				fmt.Println(err)
-			}
-		}()
+	if testing.Verbose() {
+		for _, name := range []string{cloud.Container.ID} {
+			name := name
+			go func() {
+				err := dockerPool.Client.Logs(docker.LogsOptions{
+					Container:   name,
+					ErrorStream: os.Stderr,
+					Stderr:      true,
+					Follow:      true,
+				})
+				if err != nil {
+					fmt.Fprintln(os.Stderr, err)
+				}
+			}()
+		}
 	}
 
 	err = pingCloud(cloud)
@@ -551,6 +562,71 @@ func withToken(t *testing.T, asUser *client.Client) *client.Client {
 	return asUser
 }
 
+func setupCoreInstance(pool *dockertest.Pool, baseURL string, token types.Token) (*dockertest.Resource, error) {
+	// Determine kubernetes config location
+	if kubeConfig == "" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return nil, err
+		}
+
+		kubeConfig = filepath.Join(home, ".kube", "config")
+	}
+
+	if _, err := os.Stat(kubeConfig); err != nil {
+		return nil, fmt.Errorf("%w: invalid kubeconfig=%q", err, kubeConfig)
+	}
+
+	parsed, err := url.Parse(baseURL)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := pool.RunWithOptions(&dockertest.RunOptions{
+		Repository: "ghcr.io/calyptia/core",
+		Tag:        "latest",
+		Privileged: true,
+		Env: []string{
+			"AGGREGATOR_FLUENTBIT_CLOUD_URL=" + "http://host.docker.internal:" + parsed.Port(),
+			"AGGREGATOR_FLUENTBIT_TLS=off",
+			"AGGREGATOR_FLUENTBIT_TLS_VERIFY=off",
+			"PROJECT_TOKEN=" + token.Token,
+			"KUBECONFIG=/opt/calyptia-aggregator/kubeconfig",
+		},
+		ExtraHosts: []string{"host.docker.internal:" + hostIP},
+	}, func(hc *docker.HostConfig) {
+		hc.Mounts = []docker.HostMount{
+			{
+				Target: "/opt/calyptia-aggregator/kubeconfig",
+				Source: kubeConfig,
+				Type:   "bind",
+			},
+		}
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if testing.Verbose() {
+		go func() {
+			name := res.Container.ID
+			err := pool.Client.Logs(docker.LogsOptions{
+				Container:    name,
+				OutputStream: os.Stdout,
+				ErrorStream:  os.Stderr,
+				Stdout:       true,
+				Stderr:       true,
+				Follow:       true,
+			})
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "unable to get logs for container %q: %v\n", name, err)
+			}
+		}()
+	}
+
+	return res, nil
+}
+
 func defaultProject(t *testing.T, asUser *client.Client) types.Project {
 	t.Helper()
 
@@ -655,10 +731,8 @@ func retry(op func() error) error {
 		if bo.NextBackOff() == backoff.Stop {
 			return fmt.Errorf("reached retry deadline: %w", err)
 		}
-
 		return err
 	}
-
 	return nil
 }
 
