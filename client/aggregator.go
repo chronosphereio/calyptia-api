@@ -62,18 +62,3 @@ func (c *Client) AggregatorPing(ctx context.Context, aggregatorID string) (types
 	var out types.AggregatorPingResponse
 	return out, c.do(ctx, http.MethodPost, "/v1/aggregators/"+url.PathEscape(aggregatorID)+"/ping", nil, &out)
 }
-
-// AggregatorPipelinesMetrics get the metrics for a set of pipelineIDs belonging to an aggregator (bulk mode).
-func (c *Client) AggregatorPipelinesMetrics(ctx context.Context, aggregatorID string, params types.PipelinesMetricsParams) (types.PipelinesMetrics, error) {
-	var out types.PipelinesMetrics
-	q := url.Values{
-		"start":    []string{params.Start.String()},
-		"interval": []string{params.Interval.String()},
-	}
-
-	for _, pipelineID := range params.PipelineIDs {
-		q.Add("pipeline_id", pipelineID)
-	}
-
-	return out, c.do(ctx, http.MethodGet, "/v1/aggregators/"+url.PathEscape(aggregatorID)+"/pipelines_metrics?"+q.Encode(), nil, &out)
-}
