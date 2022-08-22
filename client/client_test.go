@@ -70,12 +70,12 @@ func TestMain(m *testing.M) {
 }
 
 func setupDockerPool() (*dockertest.Pool, error) {
-	dockerPool, err := dockertest.NewPool("")
+	pool, err := dockertest.NewPool("")
 	if err != nil {
 		return nil, err
 	}
 
-	return dockerPool, dockerPool.Client.Ping()
+	return pool, pool.Client.Ping()
 }
 
 //nolint:gocyclo // this function setups all the components required by tests.
