@@ -56,6 +56,8 @@ type AggregatorPingResponse struct {
 // AggregatorMetadata See: https://github.com/fluent/fluent-bit/blob/d059a5a5dca6aff4ff5d0694887355480d6f2c1d/plugins/out_calyptia/calyptia.c#L206-L229
 // Those are the only supported metadata fields that will be marshaled by the Calyptia Cloud API, please send a PR if further
 // fields are required.
+// This represents a blob of JSON that will be stored as it is in the Cloud database.
+// That's why all fields have an omitempty json tag; to avoid filling the blob with empty data.
 type AggregatorMetadata struct {
 	// Notice that all of these are embedded on purpose since
 	// metadata is flattened.
