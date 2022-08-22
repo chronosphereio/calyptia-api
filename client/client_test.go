@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	math_rand "math/rand"
@@ -45,6 +46,7 @@ const (
 )
 
 var (
+	dockerPool                *dockertest.Pool
 	testBearerTokenPrivateKey jwk.RSAPrivateKey
 	testCloudURL              string
 )
@@ -63,19 +65,17 @@ var (
 )
 
 func TestMain(m *testing.M) {
+	flag.Parse()
 	os.Exit(testMain(m))
 }
 
 func setupDockerPool() (*dockertest.Pool, error) {
-	dockerPool, err := dockertest.NewPool("")
+	pool, err := dockertest.NewPool("")
 	if err != nil {
 		return nil, err
 	}
 
-	if err := dockerPool.Client.Ping(); err != nil {
-		return nil, err
-	}
-	return dockerPool, nil
+	return pool, pool.Client.Ping()
 }
 
 //nolint:gocyclo // this function setups all the components required by tests.
@@ -90,7 +90,7 @@ func testMain(m *testing.M) int {
 
 	testBearerTokenPrivateKey = privateKey
 
-	dockerPool, err := setupDockerPool()
+	dockerPool, err = setupDockerPool()
 	if err != nil {
 		fmt.Printf("error setting up docker pool: %v\n", err)
 		return 1
@@ -190,19 +190,21 @@ func testMain(m *testing.M) int {
 		}
 	}(dockerPool, cloud)
 
-	for _, name := range []string{cloud.Container.ID} {
-		name := name
-		go func() {
-			err := dockerPool.Client.Logs(docker.LogsOptions{
-				Container:   name,
-				ErrorStream: os.Stderr,
-				Stderr:      true,
-				Follow:      true,
-			})
-			if err != nil {
-				fmt.Println(err)
-			}
-		}()
+	if testing.Verbose() {
+		for _, name := range []string{cloud.Container.ID} {
+			name := name
+			go func() {
+				err := dockerPool.Client.Logs(docker.LogsOptions{
+					Container:   name,
+					ErrorStream: os.Stderr,
+					Stderr:      true,
+					Follow:      true,
+				})
+				if err != nil {
+					fmt.Fprintln(os.Stderr, err)
+				}
+			}()
+		}
 	}
 
 	err = pingCloud(cloud)
@@ -560,33 +562,15 @@ func withToken(t *testing.T, asUser *client.Client) *client.Client {
 	return asUser
 }
 
-var tearDownResource = func(pool *dockertest.Pool, r *dockertest.Resource) error {
-	var err error
-	if pool == nil {
-		pool, err = setupDockerPool()
-		if err != nil {
-			return err
-		}
-	}
-	err = pool.Purge(r)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func setupCoreInstance(pool *dockertest.Pool, baseURL string, token types.Token) (*dockertest.Resource, error) {
-	var err error
-	if pool == nil {
-		pool, err = setupDockerPool()
+	// Determine kubernetes config location
+	if kubeConfig == "" {
+		home, err := os.UserHomeDir()
 		if err != nil {
 			return nil, err
 		}
-	}
 
-	// Determine kubernetes config location
-	if kubeConfig == "" {
-		kubeConfig = filepath.Join(os.Getenv("HOME"), "/.kube/config")
+		kubeConfig = filepath.Join(home, ".kube", "config")
 	}
 
 	if _, err := os.Stat(kubeConfig); err != nil {
@@ -603,15 +587,13 @@ func setupCoreInstance(pool *dockertest.Pool, baseURL string, token types.Token)
 		Tag:        "latest",
 		Privileged: true,
 		Env: []string{
-			"AGGREGATOR_FLUENTBIT_CLOUD_URL=" + "http://dockerhost:" + parsed.Port(),
+			"AGGREGATOR_FLUENTBIT_CLOUD_URL=" + "http://host.docker.internal:" + parsed.Port(),
 			"AGGREGATOR_FLUENTBIT_TLS=off",
 			"AGGREGATOR_FLUENTBIT_TLS_VERIFY=off",
 			"PROJECT_TOKEN=" + token.Token,
 			"KUBECONFIG=/opt/calyptia-aggregator/kubeconfig",
 		},
-		ExtraHosts: []string{
-			"dockerhost:" + hostIP,
-		},
+		ExtraHosts: []string{"host.docker.internal:" + hostIP},
 	}, func(hc *docker.HostConfig) {
 		hc.Mounts = []docker.HostMount{
 			{
@@ -625,20 +607,22 @@ func setupCoreInstance(pool *dockertest.Pool, baseURL string, token types.Token)
 		return nil, err
 	}
 
-	go func() {
-		name := res.Container.ID
-		err := pool.Client.Logs(docker.LogsOptions{
-			Container:    name,
-			OutputStream: os.Stdout,
-			ErrorStream:  os.Stderr,
-			Stdout:       true,
-			Stderr:       true,
-			Follow:       true,
-		})
-		if err != nil {
-			fmt.Printf("%s: unable to get logs for container %s\n", err.Error(), name)
-		}
-	}()
+	if testing.Verbose() {
+		go func() {
+			name := res.Container.ID
+			err := pool.Client.Logs(docker.LogsOptions{
+				Container:    name,
+				OutputStream: os.Stdout,
+				ErrorStream:  os.Stderr,
+				Stdout:       true,
+				Stderr:       true,
+				Follow:       true,
+			})
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "unable to get logs for container %q: %v\n", name, err)
+			}
+		}()
+	}
 
 	return res, nil
 }
