@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	math_rand "math/rand"
@@ -64,6 +65,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
+	flag.Parse()
 	os.Exit(testMain(m))
 }
 
