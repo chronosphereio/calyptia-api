@@ -832,26 +832,6 @@ components:
             nullable: true
         required: [data, error]
 
-    Measurements:
-      type: object
-      additionalProperties:
-        type: object
-        properties:
-          metrics:
-            type: object
-            additionalProperties:
-              type: array
-              items:
-                $ref: "#/components/schemas/MetricFields"
-          totals:
-            type: object
-            additionalProperties:
-              type: array
-              items:
-                $ref: "#/components/schemas/MetricFields"
-        required:
-          - metrics
-          - totals
     Metrics:
       type: object
       description: Metrics model.
