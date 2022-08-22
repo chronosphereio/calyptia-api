@@ -33,7 +33,7 @@ type CreatedPipelineFile struct {
 
 // PipelineFilesParams request payload for querying the pipeline files.
 type PipelineFilesParams struct {
-	Last   *uint64
+	Last   *uint
 	Before *string
 }
 

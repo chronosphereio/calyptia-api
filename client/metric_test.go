@@ -2,6 +2,7 @@ package client_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -17,6 +18,11 @@ func TestClient_AggregatorPipelinesMetrics(t *testing.T) {
 	token := defaultToken(t, asUser)
 
 	coreInstance, err := setupCoreInstance(dockerPool, asUser.BaseURL, token)
+	if errors.Is(err, errNoKubeConfig) {
+		t.SkipNow()
+		return
+	}
+
 	wantEqual(t, err, nil)
 	t.Cleanup(func() {
 		_ = coreInstance.Close()

@@ -24,7 +24,7 @@ func (c *Client) CreatePipelineSecret(ctx context.Context, pipelineID string, pa
 func (c *Client) PipelineSecrets(ctx context.Context, pipelineID string, params types.PipelineSecretsParams) (types.PipelineSecrets, error) {
 	q := url.Values{}
 	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
+		q.Set("last", strconv.FormatUint(uint64(*params.Last), uintBase))
 	}
 	if params.Before != nil {
 		q.Set("before", *params.Before)

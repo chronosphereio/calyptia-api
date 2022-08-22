@@ -16,7 +16,7 @@ type Aggregator struct {
 	Name            string           `json:"name" yaml:"name"`
 	EnvironmentName string           `json:"environmentName" yaml:"environmentName"`
 	Version         string           `json:"version" yaml:"version"`
-	PipelinesCount  uint64           `json:"pipelinesCount" yaml:"pipelinesCount"`
+	PipelinesCount  uint             `json:"pipelinesCount" yaml:"pipelinesCount"`
 	Tags            []string         `json:"tags" yaml:"tags"`
 	Metadata        *json.RawMessage `json:"metadata" yaml:"metadata"`
 	Status          AggregatorStatus `json:"status" yaml:"status"`
@@ -126,7 +126,7 @@ type CreatedAggregator struct {
 
 // AggregatorsParams request payload for querying aggregators.
 type AggregatorsParams struct {
-	Last          *uint64
+	Last          *uint
 	Before        *string
 	Name          *string
 	Tags          *string

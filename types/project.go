@@ -6,9 +6,9 @@ import "time"
 type Project struct {
 	ID               string    `json:"id" yaml:"id"`
 	Name             string    `json:"name" yaml:"name"`
-	MembersCount     uint64    `json:"membersCount" yaml:"membersCount"`
-	AgentsCount      uint64    `json:"agentsCount" yaml:"agentsCount"`
-	AggregatorsCount uint64    `json:"aggregatorsCount" yaml:"aggregatorsCount"`
+	MembersCount     uint      `json:"membersCount" yaml:"membersCount"`
+	AgentsCount      uint      `json:"agentsCount" yaml:"agentsCount"`
+	AggregatorsCount uint      `json:"aggregatorsCount" yaml:"aggregatorsCount"`
 	CreatedAt        time.Time `json:"createdAt" yaml:"createdAt"`
 
 	Membership *Membership `json:"membership" yaml:"membership"`
@@ -35,7 +35,7 @@ type CreatedProject struct {
 
 // ProjectsParams request payload for querying projects.
 type ProjectsParams struct {
-	Last   *uint64
+	Last   *uint
 	Before *string
 	Name   *string
 }

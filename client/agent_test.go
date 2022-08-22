@@ -145,14 +145,14 @@ func TestClient_Agents(t *testing.T) {
 		}
 
 		page1, err := asUser.Agents(ctx, project.ID, types.AgentsParams{
-			Last: ptrUint64(3),
+			Last: ptrUint(3),
 		})
 		wantEqual(t, err, nil)
 		wantEqual(t, len(page1.Items), 3)
 		wantNoEqual(t, page1.EndCursor, (*string)(nil))
 
 		page2, err := asUser.Agents(ctx, project.ID, types.AgentsParams{
-			Last:   ptrUint64(3),
+			Last:   ptrUint(3),
 			Before: page1.EndCursor,
 		})
 		wantEqual(t, err, nil)
@@ -246,20 +246,20 @@ func TestClient_Agents(t *testing.T) {
 
 		envOneAggregators, err := asUser.Agents(ctx, project.ID, types.AgentsParams{
 			EnvironmentID: ptrStr(envOne.ID),
-			Last:          ptrUint64(0),
+			Last:          ptrUint(0),
 		})
 		wantEqual(t, err, nil)
 		wantEqual(t, len(envOneAggregators.Items), 1)
 
 		envTwoAggregators, err := asUser.Agents(ctx, project.ID, types.AgentsParams{
 			EnvironmentID: ptrStr(envTwo.ID),
-			Last:          ptrUint64(0),
+			Last:          ptrUint(0),
 		})
 		wantEqual(t, err, nil)
 		wantEqual(t, len(envTwoAggregators.Items), 1)
 
 		bothEnvsAggregators, err := asUser.Agents(ctx, project.ID, types.AgentsParams{
-			Last: ptrUint64(0),
+			Last: ptrUint(0),
 		})
 		wantEqual(t, err, nil)
 		wantNoEqual(t, len(bothEnvsAggregators.Items), 1)

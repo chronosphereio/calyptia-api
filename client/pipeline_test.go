@@ -107,7 +107,7 @@ func TestClient_CreatePipeline(t *testing.T) {
 	wantNoTimeZero(t, got.ResourceProfile.CreatedAt)
 	wantNoTimeZero(t, got.ResourceProfile.UpdatedAt)
 
-	wantEqual(t, got.ReplicasCount, uint64(3))
+	wantEqual(t, got.ReplicasCount, uint(3))
 	wantNoTimeZero(t, got.CreatedAt)
 }
 
@@ -188,14 +188,14 @@ func TestClient_Pipelines(t *testing.T) {
 		}
 
 		page1, err := asUser.Pipelines(ctx, aggregator.ID, types.PipelinesParams{
-			Last: ptrUint64(3),
+			Last: ptrUint(3),
 		})
 		wantEqual(t, err, nil)
 		wantEqual(t, len(page1.Items), 3)
 		wantNoEqual(t, page1.EndCursor, (*string)(nil))
 
 		page2, err := asUser.Pipelines(ctx, aggregator.ID, types.PipelinesParams{
-			Last:   ptrUint64(3),
+			Last:   ptrUint(3),
 			Before: page1.EndCursor,
 		})
 		wantEqual(t, err, nil)
@@ -318,14 +318,14 @@ func TestClient_ProjectPipelines(t *testing.T) {
 		}
 
 		page1, err := asUser.Pipelines(ctx, aggregator.ID, types.PipelinesParams{
-			Last: ptrUint64(3),
+			Last: ptrUint(3),
 		})
 		wantEqual(t, err, nil)
 		wantEqual(t, len(page1.Items), 3)
 		wantNoEqual(t, page1.EndCursor, (*string)(nil))
 
 		page2, err := asUser.Pipelines(ctx, aggregator.ID, types.PipelinesParams{
-			Last:   ptrUint64(3),
+			Last:   ptrUint(3),
 			Before: page1.EndCursor,
 		})
 		wantEqual(t, err, nil)
@@ -475,7 +475,7 @@ func TestClient_UpdatePipeline(t *testing.T) {
 
 	got, err := asUser.UpdatePipeline(ctx, pipeline.ID, types.UpdatePipeline{
 		Name:          ptrStr("test-pipeline-updated"),
-		ReplicasCount: ptrUint64(4),
+		ReplicasCount: ptrUint(4),
 		RawConfig:     ptrStr(testFbitConfigWithAddr3),
 		Secrets: []types.UpdatePipelineSecret{
 			{

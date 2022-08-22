@@ -42,7 +42,7 @@ type CreatedTraceSession struct {
 
 // TraceSessionsParams request payload for querying trace sessions.
 type TraceSessionsParams struct {
-	Last   *uint64
+	Last   *uint
 	Before *string
 }
 
@@ -143,7 +143,7 @@ type CreatedTraceRecord struct {
 
 // TraceRecordsParams request payload for querying trace records.
 type TraceRecordsParams struct {
-	Last   *uint64
+	Last   *uint
 	Before *string
 }
 

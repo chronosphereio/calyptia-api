@@ -64,9 +64,9 @@ func TestClient_PipelineSecrets(t *testing.T) {
 		}
 		allSecrets, err := asUser.PipelineSecrets(ctx, pipeline.ID, types.PipelineSecretsParams{})
 		wantEqual(t, err, nil)
-		page1, err := asUser.PipelineSecrets(ctx, pipeline.ID, types.PipelineSecretsParams{Last: ptrUint64(3)})
+		page1, err := asUser.PipelineSecrets(ctx, pipeline.ID, types.PipelineSecretsParams{Last: ptrUint(3)})
 		wantEqual(t, err, nil)
-		page2, err := asUser.PipelineSecrets(ctx, pipeline.ID, types.PipelineSecretsParams{Last: ptrUint64(3), Before: page1.EndCursor})
+		page2, err := asUser.PipelineSecrets(ctx, pipeline.ID, types.PipelineSecretsParams{Last: ptrUint(3), Before: page1.EndCursor})
 		wantEqual(t, err, nil)
 
 		want := allSecrets.Items[3:6]

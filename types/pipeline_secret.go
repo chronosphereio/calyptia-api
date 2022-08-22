@@ -31,7 +31,7 @@ type CreatedPipelineSecret struct {
 
 // PipelineSecretsParams request payload for querying the pipeline secrets.
 type PipelineSecretsParams struct {
-	Last   *uint64
+	Last   *uint
 	Before *string
 }
 

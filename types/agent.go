@@ -22,7 +22,7 @@ type Agent struct {
 	Tags                []string         `json:"tags" yaml:"tags"`
 	FirstMetricsAddedAt time.Time        `json:"firstMetricsAddedAt" yaml:"firstMetricsAddedAt"`
 	LastMetricsAddedAt  time.Time        `json:"lastMetricsAddedAt" yaml:"lastMetricsAddedAt"`
-	MetricsCount        uint64           `json:"metricsCount" yaml:"metricsCount"`
+	MetricsCount        uint             `json:"metricsCount" yaml:"metricsCount"`
 	CreatedAt           time.Time        `json:"createdAt" yaml:"createdAt"`
 	UpdatedAt           time.Time        `json:"updatedAt" yaml:"updatedAt"`
 }
@@ -78,7 +78,7 @@ type RegisteredAgent struct {
 
 // AgentsParams request payload for querying agents.
 type AgentsParams struct {
-	Last          *uint64
+	Last          *uint
 	Before        *string
 	Name          *string
 	Tags          *string

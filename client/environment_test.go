@@ -74,14 +74,14 @@ func TestClient_Environments(t *testing.T) {
 		}
 
 		page1, err := asUser.Environments(ctx, project.ID, types.EnvironmentsParams{
-			Last: ptrUint64(3),
+			Last: ptrUint(3),
 		})
 		wantEqual(t, err, nil)
 		wantEqual(t, len(page1.Items), 3)
 		wantNoEqual(t, page1.EndCursor, (*string)(nil))
 
 		page2, err := asUser.Environments(ctx, project.ID, types.EnvironmentsParams{
-			Last:   ptrUint64(3),
+			Last:   ptrUint(3),
 			Before: page1.EndCursor,
 		})
 		wantEqual(t, err, nil)

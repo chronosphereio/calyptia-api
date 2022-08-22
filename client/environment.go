@@ -19,7 +19,7 @@ func (c *Client) CreateEnvironment(ctx context.Context, projectID string, payloa
 func (c *Client) Environments(ctx context.Context, projectID string, params types.EnvironmentsParams) (types.Environments, error) {
 	q := url.Values{}
 	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
+		q.Set("last", strconv.FormatUint(uint64(*params.Last), uintBase))
 	}
 	if params.Before != nil {
 		q.Set("before", *params.Before)

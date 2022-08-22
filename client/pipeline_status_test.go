@@ -54,9 +54,9 @@ func TestClient_PipelineStatusHistory(t *testing.T) {
 		}
 		allStatusHistory, err := asUser.PipelineStatusHistory(ctx, pipeline.ID, types.PipelineStatusHistoryParams{})
 		wantEqual(t, err, nil)
-		page1, err := asUser.PipelineStatusHistory(ctx, pipeline.ID, types.PipelineStatusHistoryParams{Last: ptrUint64(3)})
+		page1, err := asUser.PipelineStatusHistory(ctx, pipeline.ID, types.PipelineStatusHistoryParams{Last: ptrUint(3)})
 		wantEqual(t, err, nil)
-		page2, err := asUser.PipelineStatusHistory(ctx, pipeline.ID, types.PipelineStatusHistoryParams{Last: ptrUint64(3), Before: page1.EndCursor})
+		page2, err := asUser.PipelineStatusHistory(ctx, pipeline.ID, types.PipelineStatusHistoryParams{Last: ptrUint(3), Before: page1.EndCursor})
 		wantEqual(t, err, nil)
 
 		want := allStatusHistory.Items[3:6]

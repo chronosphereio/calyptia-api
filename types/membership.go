@@ -29,6 +29,6 @@ const (
 
 // MembersParams request payload for querying members.
 type MembersParams struct {
-	Last   *uint64
+	Last   *uint
 	Before *string
 }

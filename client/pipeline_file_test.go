@@ -65,9 +65,9 @@ func TestClient_PipelineFiles(t *testing.T) {
 
 		allPipelineFiles, err := asUser.PipelineFiles(ctx, pipeline.ID, types.PipelineFilesParams{})
 		wantEqual(t, err, nil)
-		page1, err := asUser.PipelineFiles(ctx, pipeline.ID, types.PipelineFilesParams{Last: ptrUint64(3)})
+		page1, err := asUser.PipelineFiles(ctx, pipeline.ID, types.PipelineFilesParams{Last: ptrUint(3)})
 		wantEqual(t, err, nil)
-		page2, err := asUser.PipelineFiles(ctx, pipeline.ID, types.PipelineFilesParams{Last: ptrUint64(3), Before: page1.EndCursor})
+		page2, err := asUser.PipelineFiles(ctx, pipeline.ID, types.PipelineFilesParams{Last: ptrUint(3), Before: page1.EndCursor})
 		wantEqual(t, err, nil)
 
 		want := allPipelineFiles.Items[3:6]

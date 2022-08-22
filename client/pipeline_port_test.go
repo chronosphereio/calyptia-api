@@ -77,9 +77,9 @@ func TestClient_PipelinePorts(t *testing.T) {
 		}
 		allPorts, err := asUser.PipelinePorts(ctx, pipeline.ID, types.PipelinePortsParams{})
 		wantEqual(t, err, nil)
-		page1, err := asUser.PipelinePorts(ctx, pipeline.ID, types.PipelinePortsParams{Last: ptrUint64(3)})
+		page1, err := asUser.PipelinePorts(ctx, pipeline.ID, types.PipelinePortsParams{Last: ptrUint(3)})
 		wantEqual(t, err, nil)
-		page2, err := asUser.PipelinePorts(ctx, pipeline.ID, types.PipelinePortsParams{Last: ptrUint64(3), Before: page1.EndCursor})
+		page2, err := asUser.PipelinePorts(ctx, pipeline.ID, types.PipelinePortsParams{Last: ptrUint(3), Before: page1.EndCursor})
 		wantEqual(t, err, nil)
 
 		want := allPorts.Items[3:6]

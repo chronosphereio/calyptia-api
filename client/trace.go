@@ -25,7 +25,7 @@ func (c *Client) CreateTraceSession(ctx context.Context, pipelineID string, in t
 func (c *Client) TraceSessions(ctx context.Context, pipelineID string, params types.TraceSessionsParams) (types.TraceSessions, error) {
 	q := url.Values{}
 	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
+		q.Set("last", strconv.FormatUint(uint64(*params.Last), uintBase))
 	}
 	if params.Before != nil {
 		q.Set("before", *params.Before)
@@ -74,7 +74,7 @@ func (c *Client) CreateTraceRecord(ctx context.Context, pipelineID string, in ty
 func (c *Client) TraceRecords(ctx context.Context, sessionID string, params types.TraceRecordsParams) (types.TraceRecords, error) {
 	q := url.Values{}
 	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(*params.Last, uintBase))
+		q.Set("last", strconv.FormatUint(uint64(*params.Last), uintBase))
 	}
 	if params.Before != nil {
 		q.Set("before", *params.Before)

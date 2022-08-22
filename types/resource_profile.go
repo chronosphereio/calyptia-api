@@ -61,7 +61,7 @@ type CreatedResourceProfile struct {
 
 // ResourceProfilesParams request payload for querying resource profiles.
 type ResourceProfilesParams struct {
-	Last   *uint64
+	Last   *uint
 	Before *string
 }
 

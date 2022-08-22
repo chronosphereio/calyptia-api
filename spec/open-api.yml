@@ -1765,7 +1765,6 @@ components:
           example: nest_2
         return_code:
           type: integer
-          format: int64
         records:
           type: array
           items:
@@ -3529,7 +3528,6 @@ paths:
   #                properties:
   #                  totalInserted:
   #                    type: integer
-  #                    format: int64
   #                    minimum: 0
   #                required:
   #                  - totalInserted
