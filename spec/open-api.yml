@@ -818,6 +818,40 @@ components:
             }
           }
         }
+    AggregatorPipelinesMetrics:
+      type: object
+      description: Map of metrics/error for each pipeline ID.
+      additionalProperties:
+        type: object
+        properties:
+          data:
+            nullable: true
+            $ref: "#/components/schemas/AgentMetrics"
+          error:
+            type: string
+            nullable: true
+        required: [data, error]
+
+    Measurements:
+      type: object
+      additionalProperties:
+        type: object
+        properties:
+          metrics:
+            type: object
+            additionalProperties:
+              type: array
+              items:
+                $ref: "#/components/schemas/MetricFields"
+          totals:
+            type: object
+            additionalProperties:
+              type: array
+              items:
+                $ref: "#/components/schemas/MetricFields"
+        required:
+          - metrics
+          - totals
     Metrics:
       type: object
       description: Metrics model.
@@ -3690,6 +3724,57 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AggregatorMetrics"
+  "/v1/aggregators/{aggregatorID}/pipelines_metrics":
+    parameters:
+      - name: aggregatorID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      parameters:
+        - name: start
+          required: false
+          in: query
+          description: |
+            Option to filter metrics since the given time ago
+          schema:
+            type: string
+            format: duration
+            default: -24h
+        - name: interval
+          required: false
+          in: query
+          description: |
+            Option to set the time window to group metrics
+          schema:
+            type: string
+            format: duration
+            default: 1h
+        - name: pipeline_id
+          required: true
+          in: query
+          description: List of pipeline IDs.
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+      security:
+        - user: []
+        - project: []
+      summary: Aggregator pipelines metrics (bulk)
+      operationId: aggregatorPipelinesMetrics
+      tags:
+        - metric
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AggregatorPipelinesMetrics"
 
   "/v1/pipelines/{pipelineID}/trace_sessions":
     parameters:
