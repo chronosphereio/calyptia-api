@@ -50,7 +50,6 @@ jobs:
           SMTP_PASSWORD: ${{ secrets.MAILTRAP_PASSWORD }}
           # This is a known limitation with GitHub actions runners as they don't expose host.docker.internal properly.
           HOST_IP: ${{ env.DOCKER_HOST_IP }}
-          TEST_CLOUD_IMAGE: ghcr.io/calyptia/cloud:pr-530
 
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v3
