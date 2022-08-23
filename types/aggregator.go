@@ -56,6 +56,8 @@ type AggregatorPingResponse struct {
 // AggregatorMetadata See: https://github.com/fluent/fluent-bit/blob/d059a5a5dca6aff4ff5d0694887355480d6f2c1d/plugins/out_calyptia/calyptia.c#L206-L229
 // Those are the only supported metadata fields that will be marshaled by the Calyptia Cloud API, please send a PR if further
 // fields are required.
+// This represents a blob of JSON that will be stored as it is in the Cloud database.
+// That's why all fields have an omitempty json tag; to avoid filling the blob with empty data.
 type AggregatorMetadata struct {
 	// Notice that all of these are embedded on purpose since
 	// metadata is flattened.
@@ -67,35 +69,35 @@ type AggregatorMetadata struct {
 // MetadataK8S See: https://github.com/kubernetes/website/blob/60390ff3c0ef0043a58568ad2e4c2b7634028074/content/en/examples/pods/inject/dapi-volume.yaml#L5
 // For further cluster information data that can be included check: https://pkg.go.dev/k8s.io/client-go/discovery#DiscoveryClient.
 type MetadataK8S struct {
-	Namespace       string `json:"k8s.namespace"`
-	ClusterName     string `json:"k8s.cluster_name"`
-	Zone            string `json:"k8s.zone"`
-	ClusterVersion  string `json:"k8s.cluster_version"`
-	ClusterPlatform string `json:"k8s.cluster_platform"`
+	Namespace       string `json:"k8s.namespace,omitempty"`
+	ClusterName     string `json:"k8s.cluster_name,omitempty"`
+	Zone            string `json:"k8s.zone,omitempty"`
+	ClusterVersion  string `json:"k8s.cluster_version,omitempty"`
+	ClusterPlatform string `json:"k8s.cluster_platform,omitempty"`
 }
 
 // MetadataAWS See: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-data-retrieval.html
 type MetadataAWS struct {
-	AMIID           string `json:"aws.ami_id"`
-	AccountID       string `json:"aws.account_id"`
-	Hostname        string `json:"aws.hostname"`
-	VPCID           string `json:"aws.vpc_id"`
-	PrivateIPv4     string `json:"aws.private_ipv4"`
-	PublicIPv4      string `json:"aws.public_ipv4"`
-	EC2InstanceID   string `json:"aws.ec2_instance_id"`
-	EC2InstanceType string `json:"aws.ec2_instance_type"`
-	AZ              string `json:"aws.az"`
+	AMIID           string `json:"aws.ami_id,omitempty"`
+	AccountID       string `json:"aws.account_id,omitempty"`
+	Hostname        string `json:"aws.hostname,omitempty"`
+	VPCID           string `json:"aws.vpc_id,omitempty"`
+	PrivateIPv4     string `json:"aws.private_ipv4,omitempty"`
+	PublicIPv4      string `json:"aws.public_ipv4,omitempty"`
+	EC2InstanceID   string `json:"aws.ec2_instance_id,omitempty"`
+	EC2InstanceType string `json:"aws.ec2_instance_type,omitempty"`
+	AZ              string `json:"aws.az,omitempty"`
 }
 
 // MetadataGCP See: https://cloud.google.com/compute/docs/metadata/default-metadata-values
 type MetadataGCP struct {
-	ProjectNumber uint64 `json:"gcp.project_number"`
-	ProjectID     string `json:"gcp.project_id"`
-	InstanceID    uint64 `json:"gcp.instance_id"`
-	InstanceImage string `json:"gcp.instance_image"`
-	MachineType   string `json:"gcp.machine_type"`
-	InstanceName  string `json:"gcp.instance_name"`
-	Zone          string `json:"gcp.zone"`
+	ProjectNumber uint64 `json:"gcp.project_number,omitempty"`
+	ProjectID     string `json:"gcp.project_id,omitempty"`
+	InstanceID    uint64 `json:"gcp.instance_id,omitempty"`
+	InstanceImage string `json:"gcp.instance_image,omitempty"`
+	MachineType   string `json:"gcp.machine_type,omitempty"`
+	InstanceName  string `json:"gcp.instance_name,omitempty"`
+	Zone          string `json:"gcp.zone,omitempty"`
 }
 
 // CreateAggregator request payload for creating a new aggregator.
