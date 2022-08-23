@@ -578,6 +578,18 @@ components:
           minimum: 0
         endpoint:
           type: string
+        pluginID:
+          type: string
+          nullable: true
+          example: forward.0
+        pluginName:
+          type: string
+          nullable: true
+          example: forward
+        pluginAlias:
+          type: string
+          nullable: true
+          example: myforwardinput
         createdAt:
           type: string
           format: date-time
@@ -590,6 +602,9 @@ components:
         - frontendPort
         - backendPort
         - endpoint
+        - pluginID
+        - pluginName
+        - pluginAlias
         - createdAt
         - updatedAt
     ProjectMetrics:
@@ -1526,11 +1541,26 @@ components:
         id:
           type: string
           format: uuid
+        pluginID:
+          type: string
+          nullable: true
+          example: forward.0
+        pluginName:
+          type: string
+          nullable: true
+          example: forward
+        pluginAlias:
+          type: string
+          nullable: true
+          example: myforwardinput
         createdAt:
           type: string
           format: date-time
       required:
         - id
+        - pluginID
+        - pluginName
+        - pluginAlias
         - createdAt
     ValidatedConfig:
       type: object
