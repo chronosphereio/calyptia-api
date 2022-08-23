@@ -39,7 +39,7 @@ func TestClient_PipelinePorts(t *testing.T) {
 			Protocol:     "tcp",
 			FrontendPort: 4000,
 			BackendPort:  4000,
-			Endpoint:     "http://localhost:4000",
+			Endpoint:     "0.0.0.0",
 		})
 		wantEqual(t, err, nil)
 
@@ -48,6 +48,16 @@ func TestClient_PipelinePorts(t *testing.T) {
 
 		wantEqual(t, len(got.Items), 2) // The setup pipeline already contains ports in its config.
 
+		// port created as a side-effect of pipeline creation
+		// with a config with forward plugin (tcp/24224)
+		wantEqual(t, got.Items[1].Protocol, "tcp")
+		wantEqual(t, got.Items[1].FrontendPort, uint(24224))
+		wantEqual(t, got.Items[1].BackendPort, uint(24224))
+		wantEqual(t, *got.Items[1].PluginID, "forward.0")
+		wantEqual(t, *got.Items[1].PluginName, "forward")
+		wantEqual(t, got.Items[1].PluginAlias, nil)
+
+		// just created one
 		wantEqual(t, got.Items[0].ID, port.ID)
 		wantEqual(t, got.Items[0].Protocol, "tcp")
 		wantEqual(t, got.Items[0].FrontendPort, uint(4000))
@@ -55,14 +65,6 @@ func TestClient_PipelinePorts(t *testing.T) {
 		wantEqual(t, got.Items[0].Endpoint, "http://localhost:4000")
 		wantEqual(t, got.Items[0].CreatedAt, port.CreatedAt)
 		wantEqual(t, got.Items[0].UpdatedAt, port.CreatedAt)
-
-		wantNoEqual(t, got.Items[1].ID, "")
-		wantEqual(t, got.Items[1].Protocol, "tcp")           // from the test config.
-		wantEqual(t, got.Items[1].FrontendPort, uint(24224)) // from the test config.
-		wantEqual(t, got.Items[1].BackendPort, uint(24224))  // from the test config.
-		wantEqual(t, got.Items[1].Endpoint, "")
-		wantNoTimeZero(t, got.Items[1].CreatedAt)
-		wantNoTimeZero(t, got.Items[1].UpdatedAt)
 	})
 
 	t.Run("pagination", func(t *testing.T) {
