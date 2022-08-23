@@ -2,7 +2,6 @@ package client_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/calyptia/api/types"
@@ -20,7 +19,7 @@ func TestClient_CreatePipelinePort(t *testing.T) {
 		Protocol:     "tcp",
 		FrontendPort: 4000,
 		BackendPort:  4000,
-		Endpoint:     "http://localhost:4000",
+		Endpoint:     "0.0.0.0",
 	})
 	wantEqual(t, err, nil)
 	wantNoEqual(t, got.ID, "")
@@ -39,7 +38,7 @@ func TestClient_PipelinePorts(t *testing.T) {
 			Protocol:     "tcp",
 			FrontendPort: 4000,
 			BackendPort:  4000,
-			Endpoint:     "http://localhost:4000",
+			Endpoint:     "0.0.0.0",
 		})
 		wantEqual(t, err, nil)
 
@@ -48,21 +47,23 @@ func TestClient_PipelinePorts(t *testing.T) {
 
 		wantEqual(t, len(got.Items), 2) // The setup pipeline already contains ports in its config.
 
+		// port created as a side-effect of pipeline creation
+		// with a config with forward plugin (tcp/24224)
+		wantEqual(t, got.Items[1].Protocol, "tcp")
+		wantEqual(t, got.Items[1].FrontendPort, uint(24224))
+		wantEqual(t, got.Items[1].BackendPort, uint(24224))
+		wantEqual(t, *got.Items[1].PluginID, "forward.0")
+		wantEqual(t, *got.Items[1].PluginName, "forward")
+		wantNilString(t, got.Items[1].PluginAlias)
+
+		// just created one
 		wantEqual(t, got.Items[0].ID, port.ID)
 		wantEqual(t, got.Items[0].Protocol, "tcp")
 		wantEqual(t, got.Items[0].FrontendPort, uint(4000))
 		wantEqual(t, got.Items[0].BackendPort, uint(4000))
-		wantEqual(t, got.Items[0].Endpoint, "http://localhost:4000")
+		wantEqual(t, got.Items[0].Endpoint, "0.0.0.0")
 		wantEqual(t, got.Items[0].CreatedAt, port.CreatedAt)
 		wantEqual(t, got.Items[0].UpdatedAt, port.CreatedAt)
-
-		wantNoEqual(t, got.Items[1].ID, "")
-		wantEqual(t, got.Items[1].Protocol, "tcp")           // from the test config.
-		wantEqual(t, got.Items[1].FrontendPort, uint(24224)) // from the test config.
-		wantEqual(t, got.Items[1].BackendPort, uint(24224))  // from the test config.
-		wantEqual(t, got.Items[1].Endpoint, "")
-		wantNoTimeZero(t, got.Items[1].CreatedAt)
-		wantNoTimeZero(t, got.Items[1].UpdatedAt)
 	})
 
 	t.Run("pagination", func(t *testing.T) {
@@ -71,7 +72,7 @@ func TestClient_PipelinePorts(t *testing.T) {
 				Protocol:     "tcp",
 				FrontendPort: 400 + uint(i),
 				BackendPort:  400 + uint(i),
-				Endpoint:     fmt.Sprintf("http://localhost:400%d", i),
+				Endpoint:     "0.0.0.0",
 			})
 			wantEqual(t, err, nil)
 		}
@@ -99,7 +100,7 @@ func TestClient_PipelinePort(t *testing.T) {
 		Protocol:     "tcp",
 		FrontendPort: 4000,
 		BackendPort:  4000,
-		Endpoint:     "http://localhost:4000",
+		Endpoint:     "0.0.0.0",
 	})
 	wantEqual(t, err, nil)
 
@@ -110,7 +111,7 @@ func TestClient_PipelinePort(t *testing.T) {
 	wantEqual(t, got.Protocol, "tcp")
 	wantEqual(t, got.FrontendPort, uint(4000))
 	wantEqual(t, got.BackendPort, uint(4000))
-	wantEqual(t, got.Endpoint, "http://localhost:4000")
+	wantEqual(t, got.Endpoint, "0.0.0.0")
 	wantEqual(t, got.CreatedAt, port.CreatedAt)
 	wantEqual(t, got.UpdatedAt, port.CreatedAt)
 }
@@ -128,7 +129,7 @@ func TestClient_UpdatePipelinePort(t *testing.T) {
 		Protocol:     "tcp",
 		FrontendPort: 4000,
 		BackendPort:  4000,
-		Endpoint:     "http://localhost:4000",
+		Endpoint:     "0.0.0.0",
 	})
 	wantEqual(t, err, nil)
 
@@ -136,7 +137,7 @@ func TestClient_UpdatePipelinePort(t *testing.T) {
 		Protocol:     ptrStr("udp"),
 		FrontendPort: ptrUint(4001),
 		BackendPort:  ptrUint(4001),
-		Endpoint:     ptrStr("http://localhost:4001"),
+		Endpoint:     ptrStr("10.10.10.10"),
 	})
 	wantEqual(t, err, nil)
 }
@@ -153,7 +154,7 @@ func TestClient_DeletePipelinePort(t *testing.T) {
 		Protocol:     "tcp",
 		FrontendPort: 4000,
 		BackendPort:  4000,
-		Endpoint:     "http://localhost:4000",
+		Endpoint:     "0.0.0.0",
 	})
 	wantEqual(t, err, nil)
 
