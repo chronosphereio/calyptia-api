@@ -690,6 +690,13 @@ func wantNoEqual(t *testing.T, got, want interface{}) {
 	}
 }
 
+func wantNilString(t *testing.T, got *string) {
+	t.Helper()
+	if got != nil {
+		t.Fatalf("want nil; got %+v", got)
+	}
+}
+
 func wantEqual(t *testing.T, got, want interface{}) {
 	t.Helper()
 	if !reflect.DeepEqual(got, want) {

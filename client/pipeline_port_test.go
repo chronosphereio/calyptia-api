@@ -54,7 +54,7 @@ func TestClient_PipelinePorts(t *testing.T) {
 		wantEqual(t, got.Items[1].BackendPort, uint(24224))
 		wantEqual(t, *got.Items[1].PluginID, "forward.0")
 		wantEqual(t, *got.Items[1].PluginName, "forward")
-		wantEqual(t, got.Items[1].PluginAlias, nil)
+		wantNilString(t, got.Items[1].PluginAlias)
 
 		// just created one
 		wantEqual(t, got.Items[0].ID, port.ID)
