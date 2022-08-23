@@ -26,7 +26,7 @@ const testFbitConfigWithAddr3 = `[INPUT]
 	Port     5140
 	Mode     tcp
 [INPUT]
-	Name     syslog.1
+	Name     syslog
 	Listen   0.0.0.0
 	Port     5140
 	Mode     udp`
