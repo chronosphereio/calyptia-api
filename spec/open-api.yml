@@ -640,6 +640,26 @@ components:
       required:
         - measurements
         - topPlugins
+
+    PipelineMetric:
+      type: object
+      description: Metric object for a specific pipeline (bulk).
+      properties:
+        data:
+          $ref: "#/components/schemas/AgentMetrics"
+        error:
+          type: string
+          nullable: true
+
+    AggregatorPipelinesMetrics:
+      type: object
+      description: Bulk pipelines Metrics for an aggregator.
+      properties:
+        default:
+          $ref: "#/components/schemas/PipelineMetric"
+      additionalProperties:
+        $ref: "#/components/schemas/PipelineMetric"
+
     AgentMetrics:
       type: object
       description: Agent metrics model.
@@ -2531,6 +2551,55 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Aggregator"
+
+  /v1/aggregators/{aggregatorID}/pipelines_metrics:
+    parameters:
+      - schema:
+            type: string
+            format: uuid
+        name: aggregatorID
+        in: path
+        required: true
+    get:
+      tags:
+        - aggregator
+      summary: Bulk aggregator pipelines metrics
+      operationId: pipelinesMetrics
+      description: |-
+        Get metrics for a set of given pipelines.
+      security:
+        - user: [ ]
+        - project: [ ]
+      parameters:
+        - schema:
+            type: string
+            format: duration
+            default: "-24h"
+          name: start
+          in: query
+        - schema:
+            type: string
+            format: duration
+            default: 1h
+          name: interval
+          in: query
+        - name: pipeline_id[]
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AggregatorPipelinesMetrics"
+
   "/v1/aggregators/{aggregatorID}/ping":
     parameters:
       - schema:
