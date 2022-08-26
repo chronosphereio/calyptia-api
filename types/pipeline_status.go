@@ -28,8 +28,8 @@ const (
 	PipelineStatusStarting PipelineStatusKind = "STARTING"
 	// PipelineStatusStarted is the status of a started pipeline.
 	PipelineStatusStarted PipelineStatusKind = "STARTED"
-	// PipelineStatusDeleted is the status of a deleted pipeline.
-	PipelineStatusDeleted PipelineStatusKind = "DELETED"
+	// PipelineStatusScaling is the status of a pipeline while scaling up/down.
+	PipelineStatusScaling PipelineStatusKind = "SCALING"
 )
 
 // PipelineStatusHistoryParams request payload for querying the pipeline status history.

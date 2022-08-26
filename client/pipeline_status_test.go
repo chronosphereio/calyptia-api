@@ -62,4 +62,21 @@ func TestClient_PipelineStatusHistory(t *testing.T) {
 		want := allStatusHistory.Items[3:6]
 		wantEqual(t, page2.Items, want)
 	})
+
+	t.Run("pipeline statuses", func(t *testing.T) {
+		statuses := []types.PipelineStatusKind{
+			types.PipelineStatusFailed,
+			types.PipelineStatusStarted,
+			types.PipelineStatusStarting,
+			types.PipelineStatusNew,
+			types.PipelineStatusScaling,
+		}
+
+		for _, status := range statuses {
+			_, err := withToken.UpdatePipeline(ctx, pipeline.ID, types.UpdatePipeline{
+				Status: (*types.PipelineStatusKind)(ptrStr(string(status))),
+			})
+			wantEqual(t, err, nil)
+		}
+	})
 }
