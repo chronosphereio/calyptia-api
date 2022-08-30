@@ -1050,6 +1050,11 @@ components:
           type: string
           example: v0.1.12
           nullable: true
+        tags:
+          type: array
+          nullable: true
+          items:
+            type: string
         metadata:
           type: object
           nullable: true
