@@ -125,7 +125,7 @@ func (c *Client) do(ctx context.Context, method, path string, v, dest interface{
 		e := &types.Error{}
 		err = json.NewDecoder(resp.Body).Decode(&e)
 		if err != nil {
-			return fmt.Errorf("could not json decode error response: %w", err)
+			return fmt.Errorf("could not json decode error response: status_code=%d: %w", resp.StatusCode, err)
 		}
 
 		return e
