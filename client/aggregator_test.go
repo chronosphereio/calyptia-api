@@ -231,7 +231,7 @@ func TestClient_UpdateAggregator(t *testing.T) {
 
 	err = withToken.UpdateAggregator(ctx, created.ID, types.UpdateAggregator{
 		Name: ptrStr("test-aggregator-updated"),
-		Tags: ptrSliceStr([]string{"updated-tag"}),
+		Tags: ptrSliceStr([]string{"updatedtag"}),
 	})
 	wantEqual(t, err, nil)
 
