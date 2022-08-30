@@ -715,6 +715,10 @@ func ptrStr(s string) *string {
 	return &s
 }
 
+func ptrSliceStr(ss []string) *[]string {
+	return &ss
+}
+
 func ptrBool(b bool) *bool {
 	return &b
 }
