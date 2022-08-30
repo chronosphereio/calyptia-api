@@ -140,6 +140,7 @@ type UpdateAggregator struct {
 	Name          *string          `json:"name"`
 	Version       *string          `json:"version"`
 	EnvironmentID *string          `json:"environmentID"`
+	Tags          *[]string        `json:"tags"`
 	Metadata      *json.RawMessage `json:"metadata"`
 }
 
