@@ -230,30 +230,19 @@ func TestClient_UpdateAggregator(t *testing.T) {
 	wantEqual(t, err, nil)
 
 	err = withToken.UpdateAggregator(ctx, created.ID, types.UpdateAggregator{
-		Name: ptrStr("test-aggregator-updated"),
-		Tags: ptrSliceStr([]string{"updatedtag"}),
+		Name:     ptrStr("updated-core-instance"),
+		Version:  ptrStr("v1.0.0"),
+		Tags:     ptrSliceStr([]string{"updatedtag"}),
+		Metadata: ptrJSON(json.RawMessage(`{"k8s.cluster_name":"test"}`)),
 	})
 	wantEqual(t, err, nil)
 
-	t.Run("version", func(t *testing.T) {
-		err = withToken.UpdateAggregator(ctx, created.ID, types.UpdateAggregator{
-			Version: ptrStr(types.DefaultAggregatorVersion),
-		})
-
-		wantEqual(t, err, nil)
-
-		err = withToken.UpdateAggregator(ctx, created.ID, types.UpdateAggregator{
-			Version: ptrStr("non-semver-version"),
-		})
-
-		wantErrMsg(t, err, "invalid aggregator version")
-
-		err = withToken.UpdateAggregator(ctx, created.ID, types.UpdateAggregator{
-			Version: ptrStr(""),
-		})
-
-		wantErrMsg(t, err, "invalid aggregator version")
-	})
+	found, err := asUser.Aggregator(ctx, created.ID)
+	wantEqual(t, err, nil)
+	wantEqual(t, found.Name, "updated-core-instance")
+	wantEqual(t, found.Version, "v1.0.0")
+	wantEqual(t, found.Tags, []string{"updatedtag"})
+	wantEqual(t, *found.Metadata, json.RawMessage(`{"k8s.cluster_name":"test"}`))
 }
 
 func TestClient_DeleteAggregator(t *testing.T) {

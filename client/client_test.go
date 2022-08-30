@@ -731,6 +731,10 @@ func ptrBytes(b []byte) *[]byte {
 	return &b
 }
 
+func ptrJSON(b json.RawMessage) *json.RawMessage {
+	return &b
+}
+
 func randUUID(t *testing.T) string {
 	t.Helper()
 	return uuid.Must(uuid.NewRandom()).String()
