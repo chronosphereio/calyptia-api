@@ -2359,6 +2359,27 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Agent"
+    delete:
+      tags:
+        - agent
+      summary: Delete Agents
+      operationId: deleteAgents
+      description: Delete agents from a project.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          in: query
+          name: agent_id
+          description: List of agent IDs to delete.
+      responses:
+        "204":
+          description: Deleted
   "/v1/agents/{agentID}":
     parameters:
       - schema:
@@ -2536,6 +2557,27 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Aggregator"
+    delete:
+      tags:
+        - aggregator
+      summary: Delete Aggregators
+      operationId: deleteAggregators
+      description: Delete aggregators from a project.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          in: query
+          name: aggregator_id
+          description: List of aggregator IDs to delete.
+      responses:
+        "204":
+          description: Deleted
   "/v1/aggregators/{aggregatorID}/ping":
     parameters:
       - schema:
@@ -2820,6 +2862,27 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Pipeline"
+    delete:
+      tags:
+        - pipeline
+      summary: Delete Pipelines
+      operationId: deletePipelines
+      description: Delete pipelines from an aggregator.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          in: query
+          name: pipeline_id
+          description: List of pipeline IDs to delete.
+      responses:
+        "204":
+          description: Deleted
   "/v1/projects/{projectID}/pipelines":
     parameters:
       - schema:
