@@ -88,3 +88,12 @@ func (c *Client) UpdatePipeline(ctx context.Context, pipelineID string, opts typ
 func (c *Client) DeletePipeline(ctx context.Context, pipelineID string) error {
 	return c.do(ctx, http.MethodDelete, "/v1/aggregator_pipelines/"+url.PathEscape(pipelineID), nil, nil)
 }
+
+// DeletePipelines from an aggregator passing a list of the IDs to be deleted.
+func (c *Client) DeletePipelines(ctx context.Context, aggregatorID string, pipelineIDs ...string) error {
+	q := url.Values{}
+	for _, id := range pipelineIDs {
+		q.Add("pipeline_id", id)
+	}
+	return c.do(ctx, http.MethodDelete, "/v1/aggregators/"+url.PathEscape(aggregatorID)+"/pipelines?"+q.Encode(), nil, nil)
+}

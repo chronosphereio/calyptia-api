@@ -569,6 +569,39 @@ func TestClient_DeletePipeline(t *testing.T) {
 	wantEqual(t, err, nil)
 }
 
+func TestClient_DeletePipelines(t *testing.T) {
+	ctx := context.Background()
+
+	asUser := userClient(t)
+	agg := setupAggregator(t, withToken(t, asUser))
+
+	pip1, err := asUser.CreatePipeline(ctx, agg.ID, types.CreatePipeline{
+		Name:      "test-pipeline-1",
+		RawConfig: testFbitConfigWithAddr,
+	})
+	wantEqual(t, err, nil)
+
+	pip2, err := asUser.CreatePipeline(ctx, agg.ID, types.CreatePipeline{
+		Name:      "test-pipeline-2",
+		RawConfig: testFbitConfigWithAddr,
+	})
+	wantEqual(t, err, nil)
+
+	defer func() {
+		err := asUser.DeletePipeline(ctx, pip2.ID)
+		wantEqual(t, err, nil)
+	}()
+
+	err = asUser.DeletePipelines(ctx, agg.ID, pip1.ID)
+	wantEqual(t, err, nil)
+
+	_, err = asUser.Pipeline(ctx, pip1.ID, types.PipelineParams{})
+	wantErrMsg(t, err, "pipeline not found")
+
+	_, err = asUser.Pipeline(ctx, pip2.ID, types.PipelineParams{})
+	wantEqual(t, err, nil)
+}
+
 func setupPipeline(t *testing.T, asUser *client.Client, aggregatorID string) types.CreatedPipeline {
 	t.Helper()
 	ctx := context.Background()
