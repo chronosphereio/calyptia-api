@@ -260,6 +260,37 @@ func TestClient_DeleteAggregator(t *testing.T) {
 	wantEqual(t, err, nil)
 }
 
+func TestClient_DeleteAggregators(t *testing.T) {
+	ctx := context.Background()
+	asUser := userClient(t)
+	project := defaultProject(t, asUser)
+	withToken := withToken(t, asUser)
+
+	agg1, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+		Name: "test-aggregator-1",
+	})
+	wantEqual(t, err, nil)
+
+	agg2, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+		Name: "test-aggregator-2",
+	})
+	wantEqual(t, err, nil)
+
+	defer func() {
+		err := asUser.DeleteAggregator(ctx, agg2.ID)
+		wantEqual(t, err, nil)
+	}()
+
+	err = asUser.DeleteAggregators(ctx, project.ID, agg1.ID)
+	wantEqual(t, err, nil)
+
+	_, err = asUser.Aggregator(ctx, agg1.ID)
+	wantErrMsg(t, err, "aggregator not found")
+
+	_, err = asUser.Aggregator(ctx, agg2.ID)
+	wantEqual(t, err, nil)
+}
+
 func TestClient_AggregatorPing(t *testing.T) {
 	ctx := context.Background()
 	asUser := userClient(t)

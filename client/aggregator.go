@@ -62,3 +62,12 @@ func (c *Client) AggregatorPing(ctx context.Context, aggregatorID string) (types
 	var out types.AggregatorPingResponse
 	return out, c.do(ctx, http.MethodPost, "/v1/aggregators/"+url.PathEscape(aggregatorID)+"/ping", nil, &out)
 }
+
+// DeleteAggregators from a project passing a list of the IDs to be deleted.
+func (c *Client) DeleteAggregators(ctx context.Context, projectID string, aggregatorIDs ...string) error {
+	q := url.Values{}
+	for _, id := range aggregatorIDs {
+		q.Add("aggregator_id", id)
+	}
+	return c.do(ctx, http.MethodDelete, "/v1/projects/"+url.PathEscape(projectID)+"/aggregators?"+q.Encode(), nil, nil)
+}

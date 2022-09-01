@@ -58,3 +58,12 @@ func (c *Client) UpdateAgent(ctx context.Context, agentID string, payload types.
 func (c *Client) DeleteAgent(ctx context.Context, agentID string) error {
 	return c.do(ctx, http.MethodDelete, "/v1/agents/"+url.PathEscape(agentID), nil, nil)
 }
+
+// DeleteAgents from a project passing a list of the IDs to be deleted.
+func (c *Client) DeleteAgents(ctx context.Context, projectID string, agentIDs ...string) error {
+	q := url.Values{}
+	for _, id := range agentIDs {
+		q.Add("agent_id", id)
+	}
+	return c.do(ctx, http.MethodDelete, "/v1/projects/"+url.PathEscape(projectID)+"/agents?"+q.Encode(), nil, nil)
+}

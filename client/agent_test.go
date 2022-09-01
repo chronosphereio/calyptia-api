@@ -351,3 +351,43 @@ func TestClient_DeleteAgent(t *testing.T) {
 	err = asUser.DeleteAgent(ctx, registered.ID)
 	wantEqual(t, err, nil)
 }
+
+func TestClient_DeleteAgents(t *testing.T) {
+	ctx := context.Background()
+
+	asUser := userClient(t)
+	project := defaultProject(t, asUser)
+	withToken := withToken(t, asUser)
+
+	agent1, err := withToken.RegisterAgent(ctx, types.RegisterAgent{
+		Name:      "test-agent-1",
+		MachineID: "test-machine-id-1",
+		Type:      types.AgentTypeFluentBit,
+		Version:   "1.8.6",
+		Edition:   types.AgentEditionCommunity,
+	})
+	wantEqual(t, err, nil)
+
+	agent2, err := withToken.RegisterAgent(ctx, types.RegisterAgent{
+		Name:      "test-agent-2",
+		MachineID: "test-machine-id-2",
+		Type:      types.AgentTypeFluentBit,
+		Version:   "1.8.6",
+		Edition:   types.AgentEditionCommunity,
+	})
+	wantEqual(t, err, nil)
+
+	defer func() {
+		err := asUser.DeleteAgent(ctx, agent2.ID)
+		wantEqual(t, err, nil)
+	}()
+
+	err = asUser.DeleteAgents(ctx, project.ID, agent1.ID)
+	wantEqual(t, err, nil)
+
+	_, err = asUser.Agent(ctx, agent1.ID)
+	wantErrMsg(t, err, "agent not found")
+
+	_, err = asUser.Agent(ctx, agent2.ID)
+	wantEqual(t, err, nil)
+}

@@ -672,7 +672,6 @@ func defaultToken(t *testing.T, asUser *client.Client) types.Token {
 func randStr(t *testing.T) string {
 	t.Helper()
 	math_rand.Seed(time.Now().UnixNano())
-	//nolint // math_rand uses math/rand import
 	return fmt.Sprintf("%x", math_rand.Int63())
 }
 
