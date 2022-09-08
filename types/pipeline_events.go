@@ -16,7 +16,7 @@ type PipelineEvent struct {
 	Status     PipelineStatusKind  `json:"kind" yaml:"kind"`
 	Reason     string              `json:"reason" yaml:"reason"`
 	Message    string              `json:"message" yaml:"message"`
-	CreatedAt  time.Time           `json:"createdAt" yaml:"createdAt"`
+	LoggedAt   time.Time           `json:"loggedAt" yaml:"loggedAt"`
 }
 
 // CreatePipelineEvents is the format we submit the events in.
@@ -24,7 +24,7 @@ type CreatePipelineEvents []PipelineEvent
 
 // CreatePipelineEventsResponse is the response we get when creating new pipeline
 // events.
-type CreatePipelineEventsResponse struct {
+type CreatedPipelineEvents struct {
 	Status  string `json:"status" yaml:"status"`
 	Message string `json:"message" yaml:"message"`
 }
