@@ -14,5 +14,5 @@ import (
 // Use them to easily deploy configured agents to the aggregator.
 func (c *Client) CreatePipelineEvents(ctx context.Context, aggregagotID string, payload types.CreatePipelineEvents) (types.CreatePipelineEventsResponse, error) {
 	var out types.CreatePipelineEventsResponse
-	return out, c.do(ctx, http.MethodPost, "/v1/aggregators/"+url.PathEscape(aggregagotID)+"/pipeline/events", payload, &out)
+	return out, c.do(ctx, http.MethodPost, "/v1/aggregators/"+url.PathEscape(aggregagotID)+"/pipeline_events", payload, &out)
 }
