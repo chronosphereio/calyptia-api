@@ -26,6 +26,5 @@ type CreatePipelineEvent struct {
 // CreatedPipelineEvent is the response we get when creating new pipeline
 // events.
 type CreatedPipelineEvent struct {
-	CreatePipelineEvent
 	StatusID  string    `json:"id" yaml:"id"`
 }
