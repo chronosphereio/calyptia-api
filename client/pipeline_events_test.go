@@ -48,8 +48,7 @@ func TestClient_CreatePipelineEvent(t *testing.T) {
 
 	wantEqual(t, err, nil)
 
-	resp, err := asUser.CreatePipelineEvent(ctx, aggregator.ID, types.CreatePipelineEvent{
-		PipelineID: got.ID,
+	resp, err := asUser.CreatePipelineEvent(ctx, pipeline.ID, types.CreatePipelineEvent{
 		System:     types.PipelineEventSystemDeployment,
 		Status:     types.PipelineStatusFailed,
 		Reason:     "CrashLoopBackOff",

@@ -11,7 +11,6 @@ const (
 
 // PipelineEvent model.
 type PipelineEvent struct {
-	PipelineID string              `json:"pipelineID" yaml:"pipelineID"`
 	System     PipelineEventSystem `json:"system" yaml:"system"`
 	Status     PipelineStatusKind  `json:"kind" yaml:"kind"`
 	Reason     string              `json:"reason" yaml:"reason"`
