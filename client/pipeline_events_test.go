@@ -49,13 +49,14 @@ func TestClient_CreatePipelineEvent(t *testing.T) {
 	wantEqual(t, err, nil)
 
 	_, err = asUser.CreatePipelineEvent(ctx, got.ID, types.CreatePipelineEvent{
-		types.PipelineEvent{
+		PipelineEvent: types.PipelineEvent{
 			System:   types.PipelineEventSystemDeployment,
 			Status:   types.PipelineStatusFailed,
 			Reason:   "CrashLoopBackOff",
 			Message:  "Utter complete reactor meltdown in the core",
 			LoggedAt: time.Now(),
-		}})
+		},
+	})
 
 	wantEqual(t, err, nil)
 }
