@@ -28,6 +28,5 @@ type CreatePipelineEvent struct {
 // events.
 type CreatedPipelineEvent struct {
 	CreatePipelineEvent
-	ID        string    `json:"id" yaml:"id"`
-	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
+	StatusID  string    `json:"id" yaml:"id"`
 }
