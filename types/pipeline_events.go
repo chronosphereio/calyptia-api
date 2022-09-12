@@ -20,11 +20,14 @@ type PipelineEvent struct {
 }
 
 // CreatePipelineEvents is the format we submit the events in.
-type CreatePipelineEvents []PipelineEvent
+type CreatePipelineEvent struct {
+	PipelineEvent
+}
 
-// CreatePipelineEventsResponse is the response we get when creating new pipeline
+// CreatedPipelineEvent is the response we get when creating new pipeline
 // events.
-type CreatedPipelineEvents struct {
-	Status  string `json:"status" yaml:"status"`
-	Message string `json:"message" yaml:"message"`
+type CreatedPipelineEvent struct {
+	CreatePipelineEvent
+	ID        string    `json:"id" yaml:"id"`
+	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
 }

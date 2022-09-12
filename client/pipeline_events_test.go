@@ -9,7 +9,7 @@ import (
 	"github.com/calyptia/api/types"
 )
 
-func TestClient_CreatePipelineEvents(t *testing.T) {
+func TestClient_CreatePipelineEvent(t *testing.T) {
 	t.SkipNow()
 
 	ctx := context.Background()
@@ -48,16 +48,14 @@ func TestClient_CreatePipelineEvents(t *testing.T) {
 
 	wantEqual(t, err, nil)
 
-	resp, err := asUser.CreatePipelineEvents(ctx, aggregator.ID, types.CreatePipelineEvents{{
+	resp, err := asUser.CreatePipelineEvent(ctx, aggregator.ID, types.CreatePipelineEvent{
 		PipelineID: got.ID,
 		System:     types.PipelineEventSystemDeployment,
 		Status:     types.PipelineStatusFailed,
 		Reason:     "CrashLoopBackOff",
 		Message:    "Utter complete reactor meltdown in the core",
 		LoggedAt:  time.Now(),
-	}})
+	})
 
 	wantEqual(t, err, nil)
-	wantEqual(t, resp.Status, "OK")
-	wantEqual(t, resp.Message, "Events Created")
 }
