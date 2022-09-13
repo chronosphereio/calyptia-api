@@ -1278,7 +1278,7 @@ components:
             - STARTED
             - SCALING
         events:
-          type: object
+          type: array
           nullable: true
           items:
             $ref: "#/components/schemas/PipelineEvent"
