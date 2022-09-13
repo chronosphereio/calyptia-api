@@ -21,7 +21,7 @@ func TestClient_PipelineStatusHistory(t *testing.T) {
 			Status: (*types.PipelineStatusKind)(ptrStr(string(types.PipelineStatusStarting))),
 			Events: []types.PipelineEvent{
 				{
-					System:   types.PipelineEventSystemDeployment,
+					Source:   types.PipelineEventSourceDeployment,
 					Reason:   "Testing",
 					Message:  "",
 					LoggedAt: time.Now(),
