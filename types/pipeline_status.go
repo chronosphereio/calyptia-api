@@ -22,7 +22,7 @@ type PipelineStatus struct {
 	ID        string             `json:"id" yaml:"id"`
 	Config    PipelineConfig     `json:"config" yaml:"config"`
 	Status    PipelineStatusKind `json:"status" yaml:"status"`
-	Events    []PipelineEvent    `json:"events,omitempty" yaml:"events,omitempty"`
+	Events    []PipelineEvent    `json:"events" yaml:"events"`
 	CreatedAt time.Time          `json:"createdAt" yaml:"createdAt"`
 }
 
