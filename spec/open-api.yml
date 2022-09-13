@@ -513,8 +513,11 @@ components:
       type: object
       description: Pipeline Status event.
       properties:
-        system:
+        source:
           type: string
+          enum:
+            - k8s:deployment
+            - k8s:pod
         reason:
           type: string
         message:
@@ -523,7 +526,7 @@ components:
           type: string
           format: date-time
       required:
-        - system
+        - source
         - reason
         - loggedAt
     PipelineFile:
@@ -1265,6 +1268,20 @@ components:
         autoCreatePortsFromConfig:
           type: boolean
           nullable: true
+        status:
+          type: string
+          nullable: true
+          enum:
+            - NEW
+            - FAILED
+            - STARTING
+            - STARTED
+            - SCALING
+        events:
+          type: object
+          nullable: true
+          items:
+            $ref: "#/components/schemas/PipelineEvent"
         metadata:
           type: object
           nullable: true
