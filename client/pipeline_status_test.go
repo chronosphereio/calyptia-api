@@ -3,7 +3,6 @@ package client_test
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/calyptia/api/types"
 )
@@ -19,14 +18,15 @@ func TestClient_PipelineStatusHistory(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
 		_, err := withToken.UpdatePipeline(ctx, pipeline.ID, types.UpdatePipeline{
 			Status: (*types.PipelineStatusKind)(ptrStr(string(types.PipelineStatusStarting))),
-			Events: []types.PipelineEvent{
-				{
-					Source:   types.PipelineEventSourceDeployment,
-					Reason:   "Testing",
-					Message:  "",
-					LoggedAt: time.Now(),
-				},
-			},
+			// Pending acceptance in cloud
+			//Events: []types.PipelineEvent{
+			//	{
+			//		Source:   types.PipelineEventSourceDeployment,
+			//		Reason:   "Testing",
+			//		Message:  "",
+			//		LoggedAt: time.Now(),
+			//	},
+			//},
 		})
 		wantEqual(t, err, nil)
 
