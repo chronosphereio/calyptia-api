@@ -497,6 +497,10 @@ components:
             - STARTING
             - STARTED
             - SCALING
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/PipelineEvent'
         createdAt:
           type: string
           format: date-time
@@ -505,6 +509,23 @@ components:
         - config
         - status
         - createdAt
+    PipelineEvent:
+      type: object
+      description: Pipeline Status event.
+      properties:
+        system:
+          type: string
+        reason:
+          type: string
+        message:
+          type: string
+        loggedAt:
+          type: string
+          format: date-time
+      required:
+        - system
+        - reason
+        - loggedAt
     PipelineFile:
       type: object
       description: Pipeline file model.
