@@ -19,14 +19,14 @@ func TestClient_PipelineStatusHistory(t *testing.T) {
 		_, err := withToken.UpdatePipeline(ctx, pipeline.ID, types.UpdatePipeline{
 			Status: (*types.PipelineStatusKind)(ptrStr(string(types.PipelineStatusStarting))),
 			// Pending acceptance in cloud
-			//Events: []types.PipelineEvent{
+			// Events: []types.PipelineEvent{
 			//	{
 			//		Source:   types.PipelineEventSourceDeployment,
 			//		Reason:   "Testing",
 			//		Message:  "",
 			//		LoggedAt: time.Now(),
 			//	},
-			//},
+			// },
 		})
 		wantEqual(t, err, nil)
 
