@@ -490,7 +490,16 @@ func TestClient_UpdatePipeline(t *testing.T) {
 				Encrypted: ptrBool(true),
 			},
 		},
-		Status:                    (*types.PipelineStatusKind)(ptrStr(string(types.PipelineStatusStarted))),
+		Status: (*types.PipelineStatusKind)(ptrStr(string(types.PipelineStatusStarted))),
+		// Pending acceptance in cloud
+		// Events: []types.PipelineEvent{
+		//	{
+		//		Source:   types.PipelineEventSourceDeployment,
+		//		Reason:   "Testing",
+		//		Message:  "",
+		//		LoggedAt: time.Now(),
+		//	},
+		// },
 		ResourceProfile:           ptrStr(string(types.ResourceProfileHighPerformanceOptimalThroughput)),
 		AutoCreatePortsFromConfig: ptrBool(true),
 	})

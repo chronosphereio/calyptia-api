@@ -2,11 +2,27 @@ package types
 
 import "time"
 
+type PipelineEventSource string
+
+const (
+	PipelineEventSourceDeployment PipelineEventSource = "k8s:deployment"
+	PipelineEventSourcePod        PipelineEventSource = "k8s:pod"
+)
+
+// PipelineEvent model.
+type PipelineEvent struct {
+	Source   PipelineEventSource `json:"source" yaml:"source"`
+	Reason   string              `json:"reason" yaml:"reason"`
+	Message  string              `json:"message" yaml:"message"`
+	LoggedAt time.Time           `json:"loggedAt" yaml:"loggedAt"`
+}
+
 // PipelineStatus model.
 type PipelineStatus struct {
 	ID        string             `json:"id" yaml:"id"`
 	Config    PipelineConfig     `json:"config" yaml:"config"`
 	Status    PipelineStatusKind `json:"status" yaml:"status"`
+	Events    []PipelineEvent    `json:"events" yaml:"events"`
 	CreatedAt time.Time          `json:"createdAt" yaml:"createdAt"`
 }
 
