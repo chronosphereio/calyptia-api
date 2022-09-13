@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"sort"
 	"testing"
+	"time"
 
 	"github.com/calyptia/api/client"
 	"github.com/calyptia/api/types"
@@ -490,7 +491,15 @@ func TestClient_UpdatePipeline(t *testing.T) {
 				Encrypted: ptrBool(true),
 			},
 		},
-		Status:                    (*types.PipelineStatusKind)(ptrStr(string(types.PipelineStatusStarted))),
+		Status: (*types.PipelineStatusKind)(ptrStr(string(types.PipelineStatusStarted))),
+		Events: []types.PipelineEvent{
+			{
+				System:   types.PipelineEventSystemDeployment,
+				Reason:   "Testing",
+				Message:  "",
+				LoggedAt: time.Now(),
+			},
+		},
 		ResourceProfile:           ptrStr(string(types.ResourceProfileHighPerformanceOptimalThroughput)),
 		AutoCreatePortsFromConfig: ptrBool(true),
 	})

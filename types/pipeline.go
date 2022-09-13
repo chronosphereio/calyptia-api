@@ -62,6 +62,7 @@ type UpdatePipeline struct {
 	Secrets                   []UpdatePipelineSecret `json:"secrets"`
 	Files                     []UpdatePipelineFile   `json:"files"`
 	Status                    *PipelineStatusKind    `json:"status"`
+	Events                    []PipelineEvent        `json:"events"`
 	ResourceProfile           *string                `json:"resourceProfile"`
 	AutoCreatePortsFromConfig *bool                  `json:"autoCreatePortsFromConfig"`
 	Metadata                  *json.RawMessage       `json:"metadata"`
