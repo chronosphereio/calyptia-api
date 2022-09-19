@@ -9,11 +9,11 @@ linters-settings:
     # Default: 40
     statements: -1
   dupl:
-    threshold: 300
+    threshold: 1000
   goimports:
     local-prefixes: github.com/calyptia/api
   gocyclo:
-    min-complexity: 15
+    min-complexity: 20
   govet:
     check-shadowing: true
   misspell:
