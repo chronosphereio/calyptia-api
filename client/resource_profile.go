@@ -1,4 +1,6 @@
-//nolint:dupl // Certain level of code duplication is a good trade off to avoid complexity.
+// Package client provides a client over the REST HTTP API of Calyptia Cloud.
+//
+//nolint:dupl // no need to remove duplication here.
 package client
 
 import (

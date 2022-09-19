@@ -15,21 +15,23 @@ func TestClient_CreateAggregator(t *testing.T) {
 	asUser := userClient(t)
 	withToken := withToken(t, asUser)
 
-	got, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
-		Name:                   "test-aggregator",
-		Version:                types.DefaultAggregatorVersion,
-		AddHealthCheckPipeline: true,
-	})
+	t.Run("ok", func(t *testing.T) {
+		got, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+			Name:                   "test-aggregator",
+			Version:                types.DefaultAggregatorVersion,
+			AddHealthCheckPipeline: true,
+		})
 
-	wantEqual(t, err, nil)
-	wantEqual(t, got.Version, types.DefaultAggregatorVersion)
-	wantEqual(t, got.Name, "test-aggregator")
-	wantNoEqual(t, got.Token, "")
-	wantNoEqual(t, got.PrivateRSAKey, "")
-	wantNoEqual(t, got.PublicRSAKey, "")
-	wantNoTimeZero(t, got.CreatedAt)
-	wantNoEqual(t, got.HealthCheckPipeline, nil)
-	wantEqual(t, len(got.ResourceProfiles), 3)
+		wantEqual(t, err, nil)
+		wantEqual(t, got.Version, types.DefaultAggregatorVersion)
+		wantEqual(t, got.Name, "test-aggregator")
+		wantNoEqual(t, got.Token, "")
+		wantNoEqual(t, got.PrivateRSAKey, "")
+		wantNoEqual(t, got.PublicRSAKey, "")
+		wantNoTimeZero(t, got.CreatedAt)
+		wantNoEqual(t, got.HealthCheckPipeline, nil)
+		wantEqual(t, len(got.ResourceProfiles), 3)
+	})
 
 	t.Run("name exists", func(t *testing.T) {
 		_, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
@@ -43,6 +45,68 @@ func TestClient_CreateAggregator(t *testing.T) {
 		})
 
 		wantErrMsg(t, err, "aggregator name already exists")
+	})
+
+	t.Run("enable cluster logging", func(t *testing.T) {
+		got, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+			Name:           "test-aggregator-01",
+			Version:        types.DefaultAggregatorVersion,
+			ClusterLogging: true,
+		})
+
+		wantEqual(t, err, nil)
+		wantNoEqual(t, got.ClusterLoggingPipeline, nil)
+
+		agg, err := withToken.Aggregator(ctx, got.ID)
+		wantEqual(t, err, nil)
+		wantEqual(t, agg.ClusterLoggingEnabled, true)
+	})
+
+	t.Run("enable cluster logging after creation", func(t *testing.T) {
+		got, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+			Name:           "test-aggregator-02",
+			Version:        types.DefaultAggregatorVersion,
+			ClusterLogging: false,
+		})
+
+		wantEqual(t, err, nil)
+
+		err = withToken.UpdateAggregator(ctx, got.ID, types.UpdateAggregator{
+			ClusterLogging: ptrBool(true),
+		})
+
+		wantEqual(t, err, nil)
+		wantNoEqual(t, got.ClusterLoggingPipeline, nil)
+
+		agg, err := withToken.Aggregator(ctx, got.ID)
+		wantEqual(t, err, nil)
+		wantEqual(t, agg.ClusterLoggingEnabled, true)
+	})
+
+	t.Run("disable cluster logging after creation", func(t *testing.T) {
+		got, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+			Name:                   "test-aggregator-03",
+			Version:                types.DefaultAggregatorVersion,
+			ClusterLogging:         true,
+			AddHealthCheckPipeline: false,
+		})
+
+		wantEqual(t, err, nil)
+		wantNoEqual(t, got.ClusterLoggingPipeline, nil)
+
+		err = withToken.UpdateAggregator(ctx, got.ID, types.UpdateAggregator{
+			ClusterLogging: ptrBool(false),
+		})
+
+		wantEqual(t, err, nil)
+
+		pips, err := withToken.Pipelines(ctx, got.ID, types.PipelinesParams{})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(pips.Items), 0)
+
+		agg, err := withToken.Aggregator(ctx, got.ID)
+		wantEqual(t, err, nil)
+		wantEqual(t, agg.ClusterLoggingEnabled, false)
 	})
 }
 
@@ -364,8 +428,9 @@ func setupAggregator(t *testing.T, withToken *client.Client) types.CreatedAggreg
 	ctx := context.Background()
 
 	aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
-		Name:    "test-aggregator",
-		Version: types.DefaultAggregatorVersion,
+		Name:                   "test-aggregator",
+		Version:                types.DefaultAggregatorVersion,
+		AddHealthCheckPipeline: true,
 	})
 	wantEqual(t, err, nil)
 

@@ -1,3 +1,5 @@
+// Package token provides a decoder for Calyptia Cloud projects tokens.
+// Tokens contain a signed payload with the project identifier.
 package token
 
 import (
