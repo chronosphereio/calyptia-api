@@ -419,6 +419,13 @@ components:
           type: string
           description: DNS label format as of defined on RFC1123
           example: my-pipeline
+        kind:
+          type: string
+          description: Kind of deployment used when deploying this pipeline
+          default: deployment
+          enum:
+            - daemonSet
+            - deployment
         config:
           $ref: "#/components/schemas/PipelineConfig"
         status:
@@ -1045,6 +1052,9 @@ components:
           example: v0.1.12
         addHealthCheckPipeline:
           type: boolean
+        clusterLogging:
+          type: boolean
+          description: Enable cluster-logging functionality on this aggregator instance.
         healthCheckPipelinePort:
           type: integer
           format: int32
@@ -1069,6 +1079,10 @@ components:
           type: string
           format: hostname
           example: new-aggregator
+          nullable: true
+        clusterLogging:
+          type: boolean
+          description: enable or disable cluster-logging functionality.
           nullable: true
         version:
           type: string
@@ -1187,6 +1201,13 @@ components:
           type: string
           description: DNS label format as of defined on RFC1123
           example: new-pipeline
+        kind:
+          type: string
+          description: Kind of deployment used when deploying this pipeline
+          default: deployment
+          enum:
+            - daemonSet
+            - deployment
         replicasCount:
           type: integer
           minimum: 0
@@ -1237,6 +1258,13 @@ components:
           description: DNS label format as of defined on RFC1123
           example: new-pipeline
           nullable: true
+        kind:
+          type: string
+          description: Kind of deployment used when deploying this pipeline
+          default: deployment
+          enum:
+            - daemonSet
+            - deployment
         replicasCount:
           type: integer
           minimum: 0
@@ -1484,6 +1512,8 @@ components:
           format: date-time
         healthCheckPipeline:
           $ref: "#/components/schemas/Pipeline"
+        clusterLoggingPipeline:
+          $ref: "#/components/schemas/Pipeline"
         resourceProfiles:
           type: array
           items:
@@ -1523,6 +1553,13 @@ components:
         name:
           type: string
           example: my-pipeline
+        kind:
+          type: string
+          description: Kind of deployment used when deploying this pipeline
+          default: deployment
+          enum:
+            - daemonSet
+            - deployment
         config:
           $ref: "#/components/schemas/PipelineConfig"
         secrets:

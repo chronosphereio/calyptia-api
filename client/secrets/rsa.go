@@ -1,3 +1,4 @@
+// Package secrets provides RSA codec to work with Calyptia Cloud pipeline secrets.
 package secrets
 
 import (

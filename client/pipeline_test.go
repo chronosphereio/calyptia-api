@@ -33,82 +33,130 @@ const testFbitConfigWithAddr3 = `[INPUT]
 
 func TestClient_CreatePipeline(t *testing.T) {
 	ctx := context.Background()
-
 	asUser := userClient(t)
 	aggregator := setupAggregator(t, withToken(t, asUser))
 
-	jsonMetadata, err := json.Marshal(map[string]interface{}{
-		"test-key": "test-value",
-	})
-	wantEqual(t, err, nil)
+	t.Run("ok", func(t *testing.T) {
+		jsonMetadata, err := json.Marshal(map[string]interface{}{
+			"test-key": "test-value",
+		})
+		wantEqual(t, err, nil)
 
-	rawMetadata := json.RawMessage(jsonMetadata)
+		rawMetadata := json.RawMessage(jsonMetadata)
 
-	got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
-		Name:          "test-pipeline",
-		ReplicasCount: 3,
-		RawConfig:     testFbitConfigWithAddr,
-		Secrets: []types.CreatePipelineSecret{
-			{
-				Key:   "testkey",
-				Value: []byte("test-value"),
+		got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:          "test-pipeline",
+			ReplicasCount: 3,
+			RawConfig:     testFbitConfigWithAddr,
+			Secrets: []types.CreatePipelineSecret{
+				{
+					Key:   "testkey",
+					Value: []byte("test-value"),
+				},
 			},
-		},
-		Files: []types.CreatePipelineFile{
-			{
-				Name:      "testfile",
-				Contents:  []byte("test-contents"),
-				Encrypted: true,
+			Files: []types.CreatePipelineFile{
+				{
+					Name:      "testfile",
+					Contents:  []byte("test-contents"),
+					Encrypted: true,
+				},
 			},
-		},
-		ResourceProfileName:       types.DefaultResourceProfileName,
-		AutoCreatePortsFromConfig: true,
-		Metadata:                  &rawMetadata,
+			ResourceProfileName:       types.DefaultResourceProfileName,
+			AutoCreatePortsFromConfig: true,
+			Metadata:                  &rawMetadata,
+		})
+		wantEqual(t, err, nil)
+		wantNoEqual(t, got.ID, "")
+		wantEqual(t, got.Name, "test-pipeline")
+
+		wantNoEqual(t, got.Config.ID, "")
+		wantEqual(t, got.Config.RawConfig, testFbitConfigWithAddr)
+		wantNoTimeZero(t, got.Config.CreatedAt)
+
+		wantEqual(t, len(got.Secrets), 1)
+		wantNoEqual(t, got.Secrets[0].ID, "")
+		wantEqual(t, got.Secrets[0].Key, "testkey")
+		wantNoEqual(t, got.Secrets[0].Value, []byte("test-value")) // should be encrypted now.
+		wantNoTimeZero(t, got.Secrets[0].CreatedAt)
+		wantNoTimeZero(t, got.Secrets[0].UpdatedAt)
+
+		wantEqual(t, len(got.Files), 2) // Aditional "parsers" file should be created by default.
+
+		// Sort files by name
+		// since they are created at the same time
+		// and the order may switch.
+		sort.Slice(got.Files, func(i, j int) bool {
+			return got.Files[i].Name < got.Files[j].Name
+		})
+
+		wantEqual(t, got.Files[0].Name, "parsers")
+
+		wantNoEqual(t, got.Files[1].ID, "")
+		wantEqual(t, got.Files[1].Name, "testfile")
+		wantNoEqual(t, got.Files[1].Contents, []byte("test-contents")) // should be encrypted now.
+		wantNoTimeZero(t, got.Files[1].CreatedAt)
+		wantNoTimeZero(t, got.Files[1].UpdatedAt)
+
+		wantNoEqual(t, got.Status.ID, "")
+		wantEqual(t, got.Status.Config, got.Config)
+		wantEqual(t, got.Status.Status, types.PipelineStatusNew)
+		wantNoTimeZero(t, got.Status.CreatedAt)
+
+		wantNoEqual(t, got.ResourceProfile.ID, "")
+		wantEqual(t, got.ResourceProfile.Name, types.DefaultResourceProfileName)
+		wantNoTimeZero(t, got.ResourceProfile.CreatedAt)
+		wantNoTimeZero(t, got.ResourceProfile.UpdatedAt)
+
+		wantEqual(t, got.ReplicasCount, uint(3))
+		wantNoTimeZero(t, got.CreatedAt)
 	})
-	wantEqual(t, err, nil)
-	wantNoEqual(t, got.ID, "")
-	wantEqual(t, got.Name, "test-pipeline")
 
-	wantNoEqual(t, got.Config.ID, "")
-	wantEqual(t, got.Config.RawConfig, testFbitConfigWithAddr)
-	wantNoTimeZero(t, got.Config.CreatedAt)
+	t.Run("ok valid pipeline kind", func(t *testing.T) {
+		got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:                      "test-pipeline-01",
+			Kind:                      types.PipelineKindDeployment,
+			ReplicasCount:             1,
+			RawConfig:                 testFbitConfigWithAddr,
+			AutoCreatePortsFromConfig: true,
+		})
 
-	wantEqual(t, len(got.Secrets), 1)
-	wantNoEqual(t, got.Secrets[0].ID, "")
-	wantEqual(t, got.Secrets[0].Key, "testkey")
-	wantNoEqual(t, got.Secrets[0].Value, []byte("test-value")) // should be encrypted now.
-	wantNoTimeZero(t, got.Secrets[0].CreatedAt)
-	wantNoTimeZero(t, got.Secrets[0].UpdatedAt)
-
-	wantEqual(t, len(got.Files), 2) // Aditional "parsers" file should be created by default.
-
-	// Sort files by name
-	// since they are created at the same time
-	// and the order may switch.
-	sort.Slice(got.Files, func(i, j int) bool {
-		return got.Files[i].Name < got.Files[j].Name
+		wantEqual(t, err, nil)
+		wantEqual(t, got.Kind, types.PipelineKindDeployment)
 	})
 
-	wantEqual(t, got.Files[0].Name, "parsers")
+	t.Run("ok valid pipeline kind", func(t *testing.T) {
+		got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:                      "test-pipeline-02",
+			ReplicasCount:             1,
+			RawConfig:                 testFbitConfigWithAddr,
+			AutoCreatePortsFromConfig: true,
+		})
 
-	wantNoEqual(t, got.Files[1].ID, "")
-	wantEqual(t, got.Files[1].Name, "testfile")
-	wantNoEqual(t, got.Files[1].Contents, []byte("test-contents")) // should be encrypted now.
-	wantNoTimeZero(t, got.Files[1].CreatedAt)
-	wantNoTimeZero(t, got.Files[1].UpdatedAt)
+		wantEqual(t, err, nil)
+		wantEqual(t, got.Kind, types.PipelineKindDeployment)
+	})
 
-	wantNoEqual(t, got.Status.ID, "")
-	wantEqual(t, got.Status.Config, got.Config)
-	wantEqual(t, got.Status.Status, types.PipelineStatusNew)
-	wantNoTimeZero(t, got.Status.CreatedAt)
+	t.Run("ok valid pipeline kind daemonSet", func(t *testing.T) {
+		got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:      "test-pipeline-03",
+			Kind:      types.PipelineKindDaemonSet,
+			RawConfig: testFbitConfigWithAddr,
+		})
 
-	wantNoEqual(t, got.ResourceProfile.ID, "")
-	wantEqual(t, got.ResourceProfile.Name, types.DefaultResourceProfileName)
-	wantNoTimeZero(t, got.ResourceProfile.CreatedAt)
-	wantNoTimeZero(t, got.ResourceProfile.UpdatedAt)
+		wantEqual(t, err, nil)
+		wantEqual(t, got.Kind, types.PipelineKindDaemonSet)
+	})
 
-	wantEqual(t, got.ReplicasCount, uint(3))
-	wantNoTimeZero(t, got.CreatedAt)
+	t.Run("not ok pipeline kind", func(t *testing.T) {
+		_, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:          "test-pipeline-04",
+			Kind:          "invalid",
+			ReplicasCount: 1,
+			RawConfig:     testFbitConfigWithAddr,
+		})
+
+		wantNoEqual(t, err, nil)
+	})
 }
 
 func TestClient_Pipelines(t *testing.T) {
@@ -207,7 +255,6 @@ func TestClient_Pipelines(t *testing.T) {
 		wantEqual(t, page1.Items[2].CreatedAt.After(page2.Items[0].CreatedAt), true)
 	})
 
-	//nolint:dupl // this is a test and could be duplicated
 	t.Run("tags", func(t *testing.T) {
 		aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
 			Name: "test-aggregator-three",
@@ -337,7 +384,6 @@ func TestClient_ProjectPipelines(t *testing.T) {
 		wantEqual(t, page1.Items[2].CreatedAt.After(page2.Items[0].CreatedAt), true)
 	})
 
-	//nolint:dupl // this is a test and could be duplicated
 	t.Run("tags", func(t *testing.T) {
 		aggregator, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
 			Name: "test-aggregator-one",
@@ -443,99 +489,137 @@ func TestClient_UpdatePipeline(t *testing.T) {
 	asUser := userClient(t)
 	aggregator := setupAggregator(t, withToken(t, asUser))
 
-	jsonMetadata, err := json.Marshal(map[string]interface{}{
-		"test-key": "test-value",
-	})
-	wantEqual(t, err, nil)
+	t.Run("ok", func(t *testing.T) {
+		jsonMetadata, err := json.Marshal(map[string]interface{}{
+			"test-key": "test-value",
+		})
+		wantEqual(t, err, nil)
 
-	rawMetadata := json.RawMessage(jsonMetadata)
+		rawMetadata := json.RawMessage(jsonMetadata)
 
-	pipeline, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
-		Name:          "test-pipeline",
-		ReplicasCount: 3,
-		RawConfig:     testFbitConfigWithAddr,
-		Secrets: []types.CreatePipelineSecret{
-			{
-				Key:   "testkey",
-				Value: []byte("test-value"),
+		pipeline, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:          "test-pipeline",
+			ReplicasCount: 3,
+			RawConfig:     testFbitConfigWithAddr,
+			Secrets: []types.CreatePipelineSecret{
+				{
+					Key:   "testkey",
+					Value: []byte("test-value"),
+				},
 			},
-		},
-		Files: []types.CreatePipelineFile{
-			{
-				Name:      "testfile",
-				Contents:  []byte("test-contents"),
-				Encrypted: true,
+			Files: []types.CreatePipelineFile{
+				{
+					Name:      "testfile",
+					Contents:  []byte("test-contents"),
+					Encrypted: true,
+				},
 			},
-		},
-		ResourceProfileName:       types.DefaultResourceProfileName,
-		AutoCreatePortsFromConfig: true,
-		Metadata:                  &rawMetadata,
-	})
-	wantEqual(t, err, nil)
+			ResourceProfileName:       types.DefaultResourceProfileName,
+			AutoCreatePortsFromConfig: true,
+			Metadata:                  &rawMetadata,
+		})
+		wantEqual(t, err, nil)
 
-	got, err := asUser.UpdatePipeline(ctx, pipeline.ID, types.UpdatePipeline{
-		Name:          ptrStr("test-pipeline-updated"),
-		ReplicasCount: ptrUint(4),
-		RawConfig:     ptrStr(testFbitConfigWithAddr3),
-		Secrets: []types.UpdatePipelineSecret{
-			{
-				Key:   ptrStr("testkeyupdated"),
-				Value: ptrBytes([]byte("test-value-updated")),
+		got, err := asUser.UpdatePipeline(ctx, pipeline.ID, types.UpdatePipeline{
+			Name:          ptrStr("test-pipeline-updated"),
+			ReplicasCount: ptrUint(4),
+			RawConfig:     ptrStr(testFbitConfigWithAddr3),
+			Secrets: []types.UpdatePipelineSecret{
+				{
+					Key:   ptrStr("testkeyupdated"),
+					Value: ptrBytes([]byte("test-value-updated")),
+				},
 			},
-		},
-		Files: []types.UpdatePipelineFile{
-			{
-				Name:      ptrStr("testfileupdated"),
-				Contents:  ptrBytes([]byte("test-contents-updated")),
-				Encrypted: ptrBool(true),
+			Files: []types.UpdatePipelineFile{
+				{
+					Name:      ptrStr("testfileupdated"),
+					Contents:  ptrBytes([]byte("test-contents-updated")),
+					Encrypted: ptrBool(true),
+				},
 			},
-		},
-		Status: (*types.PipelineStatusKind)(ptrStr(string(types.PipelineStatusStarted))),
-		// Pending acceptance in cloud
-		// Events: []types.PipelineEvent{
-		//	{
-		//		Source:   types.PipelineEventSourceDeployment,
-		//		Reason:   "Testing",
-		//		Message:  "",
-		//		LoggedAt: time.Now(),
-		//	},
-		// },
-		ResourceProfile:           ptrStr(string(types.ResourceProfileHighPerformanceOptimalThroughput)),
-		AutoCreatePortsFromConfig: ptrBool(true),
-	})
-	wantEqual(t, err, nil)
+			Status: (*types.PipelineStatusKind)(ptrStr(string(types.PipelineStatusStarted))),
+			// Pending acceptance in cloud
+			// Events: []types.PipelineEvent{
+			//	{
+			//		Source:   types.PipelineEventSourceDeployment,
+			//		Reason:   "Testing",
+			//		Message:  "",
+			//		LoggedAt: time.Now(),
+			//	},
+			// },
+			ResourceProfile:           ptrStr(string(types.ResourceProfileHighPerformanceOptimalThroughput)),
+			AutoCreatePortsFromConfig: ptrBool(true),
+		})
+		wantEqual(t, err, nil)
 
-	wantEqual(t, len(got.AddedPorts), 2) // new config has 2 additional ports tcp/5140 and udp/5141.
-	wantEqual(t, len(got.RemovedPorts), 0)
+		wantEqual(t, len(got.AddedPorts), 2) // new config has 2 additional ports tcp/5140 and udp/5141.
+		wantEqual(t, len(got.RemovedPorts), 0)
 
-	// Sort added ports by protocold and port number
-	// since they are created at the same time
-	// and the order may switch.
-	sort.Slice(got.AddedPorts, func(i, j int) bool {
-		if got.AddedPorts[i].Protocol == got.AddedPorts[j].Protocol {
-			if got.AddedPorts[i].FrontendPort == got.AddedPorts[j].FrontendPort {
-				return got.AddedPorts[i].BackendPort < got.AddedPorts[j].BackendPort
+		// Sort added ports by protocold and port number
+		// since they are created at the same time
+		// and the order may switch.
+		sort.Slice(got.AddedPorts, func(i, j int) bool {
+			if got.AddedPorts[i].Protocol == got.AddedPorts[j].Protocol {
+				if got.AddedPorts[i].FrontendPort == got.AddedPorts[j].FrontendPort {
+					return got.AddedPorts[i].BackendPort < got.AddedPorts[j].BackendPort
+				}
+				return got.AddedPorts[i].FrontendPort < got.AddedPorts[j].FrontendPort
 			}
-			return got.AddedPorts[i].FrontendPort < got.AddedPorts[j].FrontendPort
-		}
-		return got.AddedPorts[i].Protocol < got.AddedPorts[j].Protocol
+			return got.AddedPorts[i].Protocol < got.AddedPorts[j].Protocol
+		})
+
+		wantNoEqual(t, got.AddedPorts[0].ID, "")
+		wantEqual(t, got.AddedPorts[0].Protocol, "tcp")
+		wantEqual(t, got.AddedPorts[0].FrontendPort, uint(5140))
+		wantEqual(t, got.AddedPorts[0].BackendPort, uint(5140))
+		wantEqual(t, got.AddedPorts[0].Endpoint, "")
+		wantNoTimeZero(t, got.AddedPorts[0].CreatedAt)
+		wantNoTimeZero(t, got.AddedPorts[0].UpdatedAt)
+
+		wantNoEqual(t, got.AddedPorts[1].ID, "")
+		wantEqual(t, got.AddedPorts[1].Protocol, "udp")
+		wantEqual(t, got.AddedPorts[1].FrontendPort, uint(5140))
+		wantEqual(t, got.AddedPorts[1].BackendPort, uint(5140))
+		wantEqual(t, got.AddedPorts[1].Endpoint, "")
+		wantNoTimeZero(t, got.AddedPorts[1].CreatedAt)
+		wantNoTimeZero(t, got.AddedPorts[1].UpdatedAt)
 	})
 
-	wantNoEqual(t, got.AddedPorts[0].ID, "")
-	wantEqual(t, got.AddedPorts[0].Protocol, "tcp")
-	wantEqual(t, got.AddedPorts[0].FrontendPort, uint(5140))
-	wantEqual(t, got.AddedPorts[0].BackendPort, uint(5140))
-	wantEqual(t, got.AddedPorts[0].Endpoint, "")
-	wantNoTimeZero(t, got.AddedPorts[0].CreatedAt)
-	wantNoTimeZero(t, got.AddedPorts[0].UpdatedAt)
+	t.Run("not ok pipeline kind", func(t *testing.T) {
+		got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:      "test-pipeline-03",
+			Kind:      types.PipelineKindDaemonSet,
+			RawConfig: testFbitConfigWithAddr,
+		})
 
-	wantNoEqual(t, got.AddedPorts[1].ID, "")
-	wantEqual(t, got.AddedPorts[1].Protocol, "udp")
-	wantEqual(t, got.AddedPorts[1].FrontendPort, uint(5140))
-	wantEqual(t, got.AddedPorts[1].BackendPort, uint(5140))
-	wantEqual(t, got.AddedPorts[1].Endpoint, "")
-	wantNoTimeZero(t, got.AddedPorts[1].CreatedAt)
-	wantNoTimeZero(t, got.AddedPorts[1].UpdatedAt)
+		wantEqual(t, err, nil)
+		wantEqual(t, got.Kind, types.PipelineKindDaemonSet)
+
+		pipelineKind := types.PipelineKindDeployment
+		_, err = asUser.UpdatePipeline(ctx, got.ID, types.UpdatePipeline{
+			Kind: &pipelineKind,
+		})
+		wantNoEqual(t, err, nil)
+		wantErrMsg(t, err, "pipeline kind cannot be updated")
+	})
+
+	t.Run("not ok pipeline replicaSet for daemonSet", func(t *testing.T) {
+		got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:      "test-pipeline-04",
+			Kind:      types.PipelineKindDaemonSet,
+			RawConfig: testFbitConfigWithAddr,
+		})
+
+		wantEqual(t, err, nil)
+		wantEqual(t, got.Kind, types.PipelineKindDaemonSet)
+
+		var replicaSet uint = 3
+		_, err = asUser.UpdatePipeline(ctx, got.ID, types.UpdatePipeline{
+			ReplicasCount: &replicaSet,
+		})
+		wantNoEqual(t, err, nil)
+		wantErrMsg(t, err, "pipeline replicas can only be set for pipelines of kind deployment")
+	})
 }
 
 func TestClient_DeletePipeline(t *testing.T) {
@@ -544,38 +628,40 @@ func TestClient_DeletePipeline(t *testing.T) {
 	asUser := userClient(t)
 	aggregator := setupAggregator(t, withToken(t, asUser))
 
-	jsonMetadata, err := json.Marshal(map[string]interface{}{
-		"test-key": "test-value",
-	})
-	wantEqual(t, err, nil)
+	t.Run("ok", func(t *testing.T) {
+		jsonMetadata, err := json.Marshal(map[string]interface{}{
+			"test-key": "test-value",
+		})
+		wantEqual(t, err, nil)
 
-	rawMetadata := json.RawMessage(jsonMetadata)
+		rawMetadata := json.RawMessage(jsonMetadata)
 
-	pipeline, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
-		Name:          "test-pipeline",
-		ReplicasCount: 3,
-		RawConfig:     testFbitConfigWithAddr,
-		Secrets: []types.CreatePipelineSecret{
-			{
-				Key:   "testkey",
-				Value: []byte("test-value"),
+		pipeline, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:          "test-pipeline",
+			ReplicasCount: 3,
+			RawConfig:     testFbitConfigWithAddr,
+			Secrets: []types.CreatePipelineSecret{
+				{
+					Key:   "testkey",
+					Value: []byte("test-value"),
+				},
 			},
-		},
-		Files: []types.CreatePipelineFile{
-			{
-				Name:      "testfile",
-				Contents:  []byte("test-contents"),
-				Encrypted: true,
+			Files: []types.CreatePipelineFile{
+				{
+					Name:      "testfile",
+					Contents:  []byte("test-contents"),
+					Encrypted: true,
+				},
 			},
-		},
-		ResourceProfileName:       types.DefaultResourceProfileName,
-		AutoCreatePortsFromConfig: true,
-		Metadata:                  &rawMetadata,
-	})
-	wantEqual(t, err, nil)
+			ResourceProfileName:       types.DefaultResourceProfileName,
+			AutoCreatePortsFromConfig: true,
+			Metadata:                  &rawMetadata,
+		})
+		wantEqual(t, err, nil)
 
-	err = asUser.DeletePipeline(ctx, pipeline.ID)
-	wantEqual(t, err, nil)
+		err = asUser.DeletePipeline(ctx, pipeline.ID)
+		wantEqual(t, err, nil)
+	})
 }
 
 func TestClient_DeletePipelines(t *testing.T) {

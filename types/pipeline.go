@@ -5,10 +5,18 @@ import (
 	"time"
 )
 
+type PipelineKind string
+
+const (
+	PipelineKindDaemonSet  PipelineKind = "daemonSet"
+	PipelineKindDeployment PipelineKind = "deployment"
+)
+
 // Pipeline model.
 type Pipeline struct {
 	ID              string           `json:"id" yaml:"id"`
 	Name            string           `json:"name" yaml:"name"`
+	Kind            PipelineKind     `json:"kind" yaml:"kind"`
 	Config          PipelineConfig   `json:"config" yaml:"config"`
 	Status          PipelineStatus   `json:"status" yaml:"status"`
 	ResourceProfile ResourceProfile  `json:"resourceProfile" yaml:"resourceProfile"`
@@ -29,6 +37,7 @@ type Pipelines struct {
 // CreatePipeline request payload for creating a new pipeline.
 type CreatePipeline struct {
 	Name                      string                 `json:"name"`
+	Kind                      PipelineKind           `json:"kind"`
 	ReplicasCount             uint                   `json:"replicasCount"`
 	RawConfig                 string                 `json:"rawConfig"`
 	ConfigFormat              ConfigFormat           `json:"configFormat"`
@@ -44,6 +53,7 @@ type CreatePipeline struct {
 type CreatedPipeline struct {
 	ID              string           `json:"id"`
 	Name            string           `json:"name"`
+	Kind            PipelineKind     `json:"kind"`
 	Config          PipelineConfig   `json:"config"`
 	Secrets         []PipelineSecret `json:"secrets"`
 	Files           []PipelineFile   `json:"files"`
@@ -56,6 +66,7 @@ type CreatedPipeline struct {
 // UpdatePipeline request payload for updating a pipeline.
 type UpdatePipeline struct {
 	Name                      *string                `json:"name"`
+	Kind                      *PipelineKind          `json:"kind"`
 	ReplicasCount             *uint                  `json:"replicasCount"`
 	RawConfig                 *string                `json:"rawConfig"`
 	ConfigFormat              *ConfigFormat          `json:"configFormat"`

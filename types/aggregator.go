@@ -11,17 +11,18 @@ const (
 
 // Aggregator model.
 type Aggregator struct {
-	ID              string           `json:"id" yaml:"id"`
-	Token           string           `json:"token" yaml:"token"`
-	Name            string           `json:"name" yaml:"name"`
-	EnvironmentName string           `json:"environmentName" yaml:"environmentName"`
-	Version         string           `json:"version" yaml:"version"`
-	PipelinesCount  uint             `json:"pipelinesCount" yaml:"pipelinesCount"`
-	Tags            []string         `json:"tags" yaml:"tags"`
-	Metadata        *json.RawMessage `json:"metadata" yaml:"metadata"`
-	Status          AggregatorStatus `json:"status" yaml:"status"`
-	CreatedAt       time.Time        `json:"createdAt" yaml:"createdAt"`
-	UpdatedAt       time.Time        `json:"updatedAt" yaml:"updatedAt"`
+	ID                    string           `json:"id" yaml:"id"`
+	Token                 string           `json:"token" yaml:"token"`
+	Name                  string           `json:"name" yaml:"name"`
+	ClusterLoggingEnabled bool             `json:"clusterLoggingEnabled" yaml:"clusterLoggingEnabled"`
+	EnvironmentName       string           `json:"environmentName" yaml:"environmentName"`
+	Version               string           `json:"version" yaml:"version"`
+	PipelinesCount        uint             `json:"pipelinesCount" yaml:"pipelinesCount"`
+	Tags                  []string         `json:"tags" yaml:"tags"`
+	Metadata              *json.RawMessage `json:"metadata" yaml:"metadata"`
+	Status                AggregatorStatus `json:"status" yaml:"status"`
+	CreatedAt             time.Time        `json:"createdAt" yaml:"createdAt"`
+	UpdatedAt             time.Time        `json:"updatedAt" yaml:"updatedAt"`
 }
 
 type AggregatorStatus string
@@ -106,6 +107,7 @@ type CreateAggregator struct {
 	Version                 string           `json:"version"`
 	AddHealthCheckPipeline  bool             `json:"addHealthCheckPipeline"`
 	HealthCheckPipelinePort uint             `json:"healthCheckPipelinePort"`
+	ClusterLogging          bool             `json:"clusterLogging"`
 	Tags                    []string         `json:"tags"`
 	Metadata                *json.RawMessage `json:"metadata"`
 	EnvironmentID           string           `json:"environmentID"`
@@ -113,17 +115,18 @@ type CreateAggregator struct {
 
 // CreatedAggregator response payload after creating an aggregator successfully.
 type CreatedAggregator struct {
-	ID                  string            `json:"id"`
-	Token               string            `json:"token"`
-	PrivateRSAKey       []byte            `json:"privateRSAKey"`
-	PublicRSAKey        []byte            `json:"publicRSAKey"`
-	Name                string            `json:"name"`
-	Version             string            `json:"version"`
-	CreatedAt           time.Time         `json:"createdAt"`
-	Tags                []string          `json:"tags"`
-	HealthCheckPipeline *Pipeline         `json:"healthCheckPipeline"`
-	ResourceProfiles    []ResourceProfile `json:"resourceProfiles"`
-	EnvironmentName     string            `json:"environmentName"`
+	ID                     string            `json:"id"`
+	Token                  string            `json:"token"`
+	PrivateRSAKey          []byte            `json:"privateRSAKey"`
+	PublicRSAKey           []byte            `json:"publicRSAKey"`
+	Name                   string            `json:"name"`
+	Version                string            `json:"version"`
+	CreatedAt              time.Time         `json:"createdAt"`
+	Tags                   []string          `json:"tags"`
+	HealthCheckPipeline    *Pipeline         `json:"healthCheckPipeline"`
+	ClusterLoggingPipeline *Pipeline         `json:"clusterLoggingPipeline"`
+	ResourceProfiles       []ResourceProfile `json:"resourceProfiles"`
+	EnvironmentName        string            `json:"environmentName"`
 }
 
 // AggregatorsParams request payload for querying aggregators.
@@ -137,11 +140,12 @@ type AggregatorsParams struct {
 
 // UpdateAggregator request payload for updating an aggregator.
 type UpdateAggregator struct {
-	Name          *string          `json:"name"`
-	Version       *string          `json:"version"`
-	EnvironmentID *string          `json:"environmentID"`
-	Tags          *[]string        `json:"tags"`
-	Metadata      *json.RawMessage `json:"metadata"`
+	Name           *string          `json:"name"`
+	Version        *string          `json:"version"`
+	EnvironmentID  *string          `json:"environmentID"`
+	ClusterLogging *bool            `json:"clusterLogging"`
+	Tags           *[]string        `json:"tags"`
+	Metadata       *json.RawMessage `json:"metadata"`
 }
 
 // PipelinesMetricsParams request payload for bulk querying pipeline metrics for a given aggregator.

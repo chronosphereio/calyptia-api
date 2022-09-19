@@ -1,11 +1,9 @@
 package client_test
 
-//nolint:gci // using goimports
 import (
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -26,7 +24,6 @@ import (
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/google/uuid"
-	influxdb "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/lestrrat-go/jwx/jws"
@@ -53,8 +50,8 @@ var (
 
 var (
 	hostIP                             = env("HOST_IP", dockerHostGateway)
-	testCloudImage                     = env("TEST_CLOUD_IMAGE", "ghcr.io/calyptia/cloud:main")
-	testCloudPort                      = env("TEST_CLOUD_PORT", "5000")
+	testCloudImage                     = env("TEST_CLOUD_IMAGE", "ghcr.io/calyptia/cloud/all-in-one:main")
+	testCloudPort                      = env("TEST_CLOUD_PORT", "5001")
 	testFluentbitConfigValidatorAPIKey = os.Getenv("TEST_FLUENTBIT_CONFIG_VALIDATOR_API_KEY")
 	testFluentdConfigValidatorAPIKey   = os.Getenv("TEST_FLUENTD_CONFIG_VALIDATOR_API_KEY")
 	testSMTPHost                       = env("TEST_SMTP_HOST", "smtp.mailtrap.io")
@@ -78,7 +75,6 @@ func setupDockerPool() (*dockertest.Pool, error) {
 	return pool, pool.Client.Ping()
 }
 
-//nolint:gocyclo // this function setups all the components required by tests.
 func testMain(m *testing.M) int {
 	jwksServer, privateKey, err := setupJWKSServer()
 	if err != nil {
@@ -96,58 +92,6 @@ func testMain(m *testing.M) int {
 		return 1
 	}
 
-	postgres, err := setupPostgres(dockerPool)
-	if err != nil {
-		fmt.Printf("could not setup postgres: %v\n", err)
-		return 1
-	}
-
-	defer func(postgres *dockertest.Resource) {
-		err := postgres.Close()
-		if err != nil {
-			return
-		}
-	}(postgres)
-
-	defer func(pool *dockertest.Pool, r *dockertest.Resource) {
-		err := pool.Purge(r)
-		if err != nil {
-			return
-		}
-	}(dockerPool, postgres)
-
-	influx, err := setupInflux(dockerPool)
-	if err != nil {
-		fmt.Printf("could not setup influx: %v\n", err)
-		return 1
-	}
-
-	defer func(influx *dockertest.Resource) {
-		err := influx.Close()
-		if err != nil {
-			return
-		}
-	}(influx)
-
-	defer func(pool *dockertest.Pool, r *dockertest.Resource) {
-		err := pool.Purge(r)
-		if err != nil {
-			return
-		}
-	}(dockerPool, influx)
-
-	err = pingPostgres(postgres)
-	if err != nil {
-		fmt.Printf("could not ping postgres: %v\n", err)
-		return 1
-	}
-
-	err = pingInflux(influx)
-	if err != nil {
-		fmt.Printf("could not ping influx: %v\n", err)
-		return 1
-	}
-
 	jwksURL, err := url.Parse(jwksServer.URL)
 	if err != nil {
 		fmt.Printf("could not parse jwks url: %v\n", err)
@@ -162,8 +106,8 @@ func testMain(m *testing.M) int {
 		jwksURL:                        jwksURL.String(),
 		accessTokenAudience:            "http://cloud-api-testing.localhost",
 		accessTokenIssuer:              "http://cloud-api-testing.localhost",
-		postgresDSN:                    "postgresql://postgres@host.docker.internal:" + postgres.GetPort("5432/tcp") + "?sslmode=disable",
-		influxServer:                   "http://host.docker.internal:" + influx.GetPort("8086/tcp"),
+		postgresDSN:                    "postgresql://postgres@localhost?sslmode=disable",
+		influxServer:                   "http://localhost:8086",
 		fluentBitConfigValidatorAPIKey: testFluentbitConfigValidatorAPIKey,
 		fluentdConfigValidatorAPIKey:   testFluentdConfigValidatorAPIKey,
 		smtpHost:                       testSMTPHost,
@@ -320,85 +264,6 @@ func issueBearerToken(key jwk.RSAPrivateKey, claims bearerTokenClaims) (*oauth2.
 		RefreshToken: "",
 		Expiry:       exp,
 	}, nil
-}
-
-func setupPostgres(pool *dockertest.Pool) (*dockertest.Resource, error) {
-	return pool.RunWithOptions(&dockertest.RunOptions{
-		Repository:   "postgres",
-		Env:          []string{"POSTGRES_HOST_AUTH_METHOD=trust"},
-		ExposedPorts: []string{"5432"},
-	}, func(hc *docker.HostConfig) {
-		hc.AutoRemove = true
-		hc.RestartPolicy = docker.RestartPolicy{Name: "no"}
-	})
-}
-
-func pingPostgres(postgres *dockertest.Resource) error {
-	return retry(func() error {
-		hostPort := postgres.GetHostPort("5432/tcp")
-		if hostPort == "" {
-			return errors.New("postgres host-port not ready")
-		}
-
-		db, err := sql.Open("postgres", "postgresql://postgres@"+hostPort+"?sslmode=disable")
-		if err != nil {
-			return fmt.Errorf("could not open postgres db: %w", err)
-		}
-
-		defer func(db *sql.DB) {
-			err := db.Close()
-			if err != nil {
-				return
-			}
-		}(db)
-
-		if err := db.Ping(); err != nil {
-			return fmt.Errorf("could not ping postgres db: %w", err)
-		}
-
-		return nil
-	})
-}
-
-func setupInflux(pool *dockertest.Pool) (*dockertest.Resource, error) {
-	return pool.RunWithOptions(&dockertest.RunOptions{
-		Repository: "influxdb",
-		Env: []string{
-			"DOCKER_INFLUXDB_INIT_MODE=setup",
-			"DOCKER_INFLUXDB_INIT_USERNAME=my-user",
-			"DOCKER_INFLUXDB_INIT_PASSWORD=my-password",
-			"DOCKER_INFLUXDB_INIT_ORG=cloud-api",
-			"DOCKER_INFLUXDB_INIT_BUCKET=cloud-api",
-			"DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=cloud-api",
-		},
-		ExposedPorts: []string{"8086"},
-	}, func(hc *docker.HostConfig) {
-		hc.AutoRemove = true
-		hc.RestartPolicy = docker.RestartPolicy{Name: "no"}
-	})
-}
-
-func pingInflux(influx *dockertest.Resource) error {
-	return retry(func() error {
-		hostPort := influx.GetHostPort("8086/tcp")
-		if hostPort == "" {
-			return errors.New("influx host-port not ready")
-		}
-
-		client := influxdb.NewClient("http://"+hostPort, "cloud-api")
-		defer client.Close()
-
-		ok, err := client.Ping(context.Background())
-		if err != nil {
-			return err
-		}
-
-		if !ok {
-			return errors.New("influx is not ready")
-		}
-
-		return nil
-	})
 }
 
 type setupCloudConfig struct {
