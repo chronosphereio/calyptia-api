@@ -108,7 +108,7 @@ func TestClient_UpdateEnvironment(t *testing.T) {
 		wantEqual(t, err, nil)
 
 		err = asUser.UpdateEnvironment(ctx, created.ID, types.UpdateEnvironment{
-			Name: ptrStr("test-environment-updated"),
+			Name: ptr("test-environment-updated"),
 		})
 		wantEqual(t, err, nil)
 	})
@@ -129,7 +129,7 @@ func TestClient_UpdateEnvironment(t *testing.T) {
 		wantEqual(t, err, nil)
 
 		err = asUser.UpdateEnvironment(ctx, created.ID, types.UpdateEnvironment{
-			Name: ptrStr("existent-name"),
+			Name: ptr("existent-name"),
 		})
 		wantEqual(t, err.Error(), "environment name taken")
 	})

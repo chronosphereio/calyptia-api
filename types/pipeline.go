@@ -18,6 +18,7 @@ type Pipeline struct {
 	Name            string           `json:"name" yaml:"name"`
 	Kind            PipelineKind     `json:"kind" yaml:"kind"`
 	Config          PipelineConfig   `json:"config" yaml:"config"`
+	ConfigSections  []ConfigSection  `json:"configSections" yaml:"configSections"`
 	Status          PipelineStatus   `json:"status" yaml:"status"`
 	ResourceProfile ResourceProfile  `json:"resourceProfile" yaml:"resourceProfile"`
 	TracingEnabled  bool             `json:"tracingEnabled" yaml:"tracingEnabled"`
@@ -81,16 +82,18 @@ type UpdatePipeline struct {
 
 // PipelinesParams request payload for querying pipelines.
 type PipelinesParams struct {
-	Last         *uint
-	Before       *string
-	Name         *string
-	Tags         *string
-	ConfigFormat *ConfigFormat
+	Last                     *uint
+	Before                   *string
+	Name                     *string
+	Tags                     *string
+	ConfigFormat             *ConfigFormat
+	RenderWithConfigSections bool
 }
 
 // PipelineParams request payload for querying a single pipeline.
 type PipelineParams struct {
-	ConfigFormat *ConfigFormat
+	ConfigFormat             *ConfigFormat
+	RenderWithConfigSections bool
 }
 
 // UpdatedPipeline response payload after updating a pipeline successfully.
