@@ -17,7 +17,7 @@ func TestClient_PipelineStatusHistory(t *testing.T) {
 
 	t.Run("ok", func(t *testing.T) {
 		_, err := withToken.UpdatePipeline(ctx, pipeline.ID, types.UpdatePipeline{
-			Status: (*types.PipelineStatusKind)(ptrStr(string(types.PipelineStatusStarting))),
+			Status: (*types.PipelineStatusKind)(ptr(string(types.PipelineStatusStarting))),
 			// Pending acceptance in cloud
 			// Events: []types.PipelineEvent{
 			//	{
@@ -51,12 +51,12 @@ func TestClient_PipelineStatusHistory(t *testing.T) {
 	t.Run("pagination", func(t *testing.T) {
 		for i := 0; i < 9; i++ {
 			_, err := withToken.UpdatePipeline(ctx, pipeline.ID, types.UpdatePipeline{
-				Status: (*types.PipelineStatusKind)(ptrStr(string(types.PipelineStatusStarting))),
+				Status: (*types.PipelineStatusKind)(ptr(string(types.PipelineStatusStarting))),
 			})
 			wantEqual(t, err, nil)
 			if i%2 == 0 {
 				_, err := withToken.UpdatePipeline(ctx, pipeline.ID, types.UpdatePipeline{
-					Status: (*types.PipelineStatusKind)(ptrStr(string(types.PipelineStatusFailed))),
+					Status: (*types.PipelineStatusKind)(ptr(string(types.PipelineStatusFailed))),
 				})
 				wantEqual(t, err, nil)
 			}
@@ -83,7 +83,7 @@ func TestClient_PipelineStatusHistory(t *testing.T) {
 
 		for _, status := range statuses {
 			_, err := withToken.UpdatePipeline(ctx, pipeline.ID, types.UpdatePipeline{
-				Status: (*types.PipelineStatusKind)(ptrStr(string(status))),
+				Status: (*types.PipelineStatusKind)(ptr(string(status))),
 			})
 			wantEqual(t, err, nil)
 		}

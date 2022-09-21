@@ -29,6 +29,7 @@ import (
 	"github.com/lestrrat-go/jwx/jws"
 	"github.com/lestrrat-go/jwx/jwt"
 	_ "github.com/lib/pq"
+	"github.com/muesli/reflow/dedent"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	"golang.org/x/oauth2"
@@ -575,28 +576,12 @@ func wantErrMsg(t *testing.T, err error, msg string) {
 	}
 }
 
-func ptrStr(s string) *string {
-	return &s
-}
-
-func ptrSliceStr(ss []string) *[]string {
-	return &ss
-}
-
-func ptrBool(b bool) *bool {
-	return &b
+func ptr[T any](v T) *T {
+	return &v
 }
 
 func ptrUint(u uint) *uint {
 	return &u
-}
-
-func ptrBytes(b []byte) *[]byte {
-	return &b
-}
-
-func ptrJSON(b json.RawMessage) *json.RawMessage {
-	return &b
 }
 
 func randUUID(t *testing.T) string {
@@ -623,4 +608,8 @@ func env(key, fallback string) string {
 		return fallback
 	}
 	return v
+}
+
+func newClassicConf(s string) string {
+	return strings.TrimSpace(dedent.String(s)) + "\n"
 }

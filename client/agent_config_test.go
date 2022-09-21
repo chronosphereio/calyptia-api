@@ -30,7 +30,7 @@ func TestClient_AgentConfigHistory(t *testing.T) {
 	withToken.SetAgentToken(registered.Token)
 	t.Run("ok", func(t *testing.T) {
 		err = withToken.UpdateAgent(ctx, registered.ID, types.UpdateAgent{
-			RawConfig: ptrStr("test-raw-config-updated"),
+			RawConfig: ptr("test-raw-config-updated"),
 		})
 		wantEqual(t, err, nil)
 
@@ -49,7 +49,7 @@ func TestClient_AgentConfigHistory(t *testing.T) {
 	t.Run("pagination", func(t *testing.T) {
 		for i := 0; i < 9; i++ {
 			err = withToken.UpdateAgent(ctx, registered.ID, types.UpdateAgent{
-				RawConfig: ptrStr(fmt.Sprintf("test-raw-config-updated-%d", i)),
+				RawConfig: ptr(fmt.Sprintf("test-raw-config-updated-%d", i)),
 			})
 			wantEqual(t, err, nil)
 		}

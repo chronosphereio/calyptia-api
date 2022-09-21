@@ -72,7 +72,7 @@ func TestClient_CreateAggregator(t *testing.T) {
 		wantEqual(t, err, nil)
 
 		err = withToken.UpdateAggregator(ctx, got.ID, types.UpdateAggregator{
-			ClusterLogging: ptrBool(true),
+			ClusterLogging: ptr(true),
 		})
 
 		wantEqual(t, err, nil)
@@ -95,7 +95,7 @@ func TestClient_CreateAggregator(t *testing.T) {
 		wantNoEqual(t, got.ClusterLoggingPipeline, nil)
 
 		err = withToken.UpdateAggregator(ctx, got.ID, types.UpdateAggregator{
-			ClusterLogging: ptrBool(false),
+			ClusterLogging: ptr(false),
 		})
 
 		wantEqual(t, err, nil)
@@ -237,14 +237,14 @@ func TestClient_Aggregators(t *testing.T) {
 		wantNoEqual(t, aggregatorTwo, nil)
 
 		envOneAggregators, err := asUser.Aggregators(ctx, project.ID, types.AggregatorsParams{
-			EnvironmentID: ptrStr(envOne.ID),
+			EnvironmentID: ptr(envOne.ID),
 			Last:          ptrUint(0),
 		})
 		wantEqual(t, err, nil)
 		wantEqual(t, len(envOneAggregators.Items), 1)
 
 		envTwoAggregators, err := asUser.Aggregators(ctx, project.ID, types.AggregatorsParams{
-			EnvironmentID: ptrStr(envTwo.ID),
+			EnvironmentID: ptr(envTwo.ID),
 			Last:          ptrUint(0),
 		})
 		wantEqual(t, err, nil)
@@ -294,10 +294,10 @@ func TestClient_UpdateAggregator(t *testing.T) {
 	wantEqual(t, err, nil)
 
 	err = withToken.UpdateAggregator(ctx, created.ID, types.UpdateAggregator{
-		Name:     ptrStr("updated-core-instance"),
-		Version:  ptrStr("v1.0.0"),
-		Tags:     ptrSliceStr([]string{"updatedtag"}),
-		Metadata: ptrJSON(json.RawMessage(`{"k8s.cluster_name":"test"}`)),
+		Name:     ptr("updated-core-instance"),
+		Version:  ptr("v1.0.0"),
+		Tags:     ptr([]string{"updatedtag"}),
+		Metadata: ptr(json.RawMessage(`{"k8s.cluster_name":"test"}`)),
 	})
 	wantEqual(t, err, nil)
 

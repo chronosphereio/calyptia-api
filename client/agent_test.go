@@ -245,14 +245,14 @@ func TestClient_Agents(t *testing.T) {
 		wantNoEqual(t, aggregatorTwo, nil)
 
 		envOneAggregators, err := asUser.Agents(ctx, project.ID, types.AgentsParams{
-			EnvironmentID: ptrStr(envOne.ID),
+			EnvironmentID: ptr(envOne.ID),
 			Last:          ptrUint(0),
 		})
 		wantEqual(t, err, nil)
 		wantEqual(t, len(envOneAggregators.Items), 1)
 
 		envTwoAggregators, err := asUser.Agents(ctx, project.ID, types.AgentsParams{
-			EnvironmentID: ptrStr(envTwo.ID),
+			EnvironmentID: ptr(envTwo.ID),
 			Last:          ptrUint(0),
 		})
 		wantEqual(t, err, nil)
@@ -328,7 +328,7 @@ func TestClient_UpdateAgent(t *testing.T) {
 
 	err = asUser.UpdateAgent(ctx, registered.ID, types.UpdateAgent{
 		// Only name is allowed to be updated by users.
-		Name: ptrStr("test-agent-updated"),
+		Name: ptr("test-agent-updated"),
 	})
 	wantEqual(t, err, nil)
 }

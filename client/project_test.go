@@ -82,6 +82,6 @@ func TestClient_UpdateProject(t *testing.T) {
 	asUser := userClient(t)
 	project := defaultProject(t, asUser)
 
-	err := asUser.UpdateProject(ctx, project.ID, types.UpdateProject{Name: ptrStr("test-project-updated")})
+	err := asUser.UpdateProject(ctx, project.ID, types.UpdateProject{Name: ptr("test-project-updated")})
 	wantEqual(t, err, nil)
 }

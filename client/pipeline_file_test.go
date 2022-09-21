@@ -114,9 +114,9 @@ func TestClient_UpdatePipelineFile(t *testing.T) {
 	wantEqual(t, err, nil)
 
 	err = asUser.UpdatePipelineFile(ctx, file.ID, types.UpdatePipelineFile{
-		Name:      ptrStr("testfileupdated"),
-		Contents:  ptrBytes([]byte("test-contents-updated")),
-		Encrypted: ptrBool(true),
+		Name:      ptr("testfileupdated"),
+		Contents:  ptr([]byte("test-contents-updated")),
+		Encrypted: ptr(true),
 	})
 	wantEqual(t, err, nil)
 }

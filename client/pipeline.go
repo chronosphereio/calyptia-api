@@ -36,6 +36,9 @@ func (c *Client) Pipelines(ctx context.Context, aggregatorID string, params type
 	if params.ConfigFormat != nil {
 		q.Set("config_format", string(*params.ConfigFormat))
 	}
+	if params.RenderWithConfigSections {
+		q.Set("render_with_config_sections", "true")
+	}
 
 	var out types.Pipelines
 	path := "/v1/aggregators/" + url.PathEscape(aggregatorID) + "/pipelines?" + q.Encode()
@@ -60,6 +63,9 @@ func (c *Client) ProjectPipelines(ctx context.Context, projectID string, params 
 	if params.ConfigFormat != nil {
 		q.Set("config_format", string(*params.ConfigFormat))
 	}
+	if params.RenderWithConfigSections {
+		q.Set("render_with_config_sections", "true")
+	}
 
 	var out types.Pipelines
 	path := "/v1/projects/" + url.PathEscape(projectID) + "/aggregator_pipelines?" + q.Encode()
@@ -71,6 +77,9 @@ func (c *Client) Pipeline(ctx context.Context, pipelineID string, params types.P
 	q := url.Values{}
 	if params.ConfigFormat != nil {
 		q.Set("config_format", string(*params.ConfigFormat))
+	}
+	if params.RenderWithConfigSections {
+		q.Set("render_with_config_sections", "true")
 	}
 
 	var out types.Pipeline

@@ -7,6 +7,8 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/alecthomas/assert/v2"
+
 	"github.com/calyptia/api/client"
 	"github.com/calyptia/api/types"
 )
@@ -302,6 +304,64 @@ func TestClient_Pipelines(t *testing.T) {
 		wantEqual(t, err, nil)
 		wantEqual(t, len(tag4.Items), 0)
 	})
+
+	t.Run("render_config_sections", func(t *testing.T) {
+		agg, err := withToken.CreateAggregator(ctx, types.CreateAggregator{})
+		assert.NoError(t, err)
+
+		createdPip, err := asUser.CreatePipeline(ctx, agg.ID, types.CreatePipeline{
+			RawConfig: newClassicConf(`
+				[INPUT]
+					Name dummy
+			`),
+		})
+		assert.NoError(t, err)
+
+		defaultProj := defaultProject(t, asUser)
+
+		csInput := types.CreateConfigSection{
+			Kind: types.SectionKindOutput,
+			Properties: types.Pairs{
+				{Key: "Name", Value: "http"},
+				{Key: "Match", Value: "*"},
+				{Key: "host", Value: "localhost"},
+				{Key: "port", Value: "80"},
+			},
+		}
+		cs, err := asUser.CreateConfigSection(ctx, defaultProj.ID, csInput)
+		assert.NoError(t, err)
+
+		err = asUser.UpdateConfigSectionSet(ctx, createdPip.ID, cs.ID)
+		assert.NoError(t, err)
+
+		pp, err := asUser.Pipelines(ctx, agg.ID, types.PipelinesParams{
+			RenderWithConfigSections: true,
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(pp.Items))
+
+		pip := pp.Items[0]
+
+		assert.Equal(t, 1, len(pip.ConfigSections))
+		assert.Equal(t, types.ConfigSection{
+			ID:         cs.ID,
+			Kind:       csInput.Kind,
+			ProjectID:  defaultProj.ID,
+			Properties: csInput.Properties,
+			CreatedAt:  cs.CreatedAt,
+			UpdatedAt:  cs.CreatedAt,
+		}, pip.ConfigSections[0])
+
+		assert.Equal(t, newClassicConf(`
+			[INPUT]
+			    Name dummy
+			[OUTPUT]
+			    Name http
+			    Match *
+			    host localhost
+			    port 80
+		`), pip.Config.RawConfig)
+	})
 }
 
 func TestClient_ProjectPipelines(t *testing.T) {
@@ -446,10 +506,13 @@ func TestClient_Pipeline(t *testing.T) {
 
 	rawMetadata := json.RawMessage(jsonMetadata)
 
-	pipeline, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+	createdPip, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
 		Name:          "test-pipeline",
 		ReplicasCount: 3,
-		RawConfig:     testFbitConfigWithAddr,
+		RawConfig: newClassicConf(`
+			[INPUT]
+				Name dummy
+		`),
 		Secrets: []types.CreatePipelineSecret{
 			{
 				Key:   "testkey",
@@ -469,18 +532,61 @@ func TestClient_Pipeline(t *testing.T) {
 	})
 	wantEqual(t, err, nil)
 
-	got, err := asUser.Pipeline(ctx, pipeline.ID, types.PipelineParams{})
+	pip, err := asUser.Pipeline(ctx, createdPip.ID, types.PipelineParams{})
 	wantEqual(t, err, nil)
 
-	wantEqual(t, got.ID, pipeline.ID)
-	wantEqual(t, got.Name, pipeline.Name)
-	wantEqual(t, got.Config, pipeline.Config)
-	wantEqual(t, got.Status, pipeline.Status)
-	wantEqual(t, got.ResourceProfile, pipeline.ResourceProfile)
-	wantEqual(t, got.ReplicasCount, pipeline.ReplicasCount)
-	wantNoEqual(t, got.Metadata, nil)
-	wantEqual(t, *got.Metadata, rawMetadata)
-	wantEqual(t, got.Config.CreatedAt, pipeline.Config.CreatedAt)
+	wantEqual(t, pip.ID, createdPip.ID)
+	wantEqual(t, pip.Name, createdPip.Name)
+	wantEqual(t, pip.Config, createdPip.Config)
+	wantEqual(t, pip.Status, createdPip.Status)
+	wantEqual(t, pip.ResourceProfile, createdPip.ResourceProfile)
+	wantEqual(t, pip.ReplicasCount, createdPip.ReplicasCount)
+	wantNoEqual(t, pip.Metadata, nil)
+	wantEqual(t, *pip.Metadata, rawMetadata)
+	wantEqual(t, pip.Config.CreatedAt, createdPip.Config.CreatedAt)
+
+	t.Run("render_config_sections", func(t *testing.T) {
+		defaultProj := defaultProject(t, asUser)
+
+		csInput := types.CreateConfigSection{
+			Kind: types.SectionKindOutput,
+			Properties: types.Pairs{
+				{Key: "Name", Value: "http"},
+				{Key: "Match", Value: "*"},
+				{Key: "host", Value: "localhost"},
+				{Key: "port", Value: "80"},
+			},
+		}
+		cs, err := asUser.CreateConfigSection(ctx, defaultProj.ID, csInput)
+		assert.NoError(t, err)
+
+		err = asUser.UpdateConfigSectionSet(ctx, createdPip.ID, cs.ID)
+		assert.NoError(t, err)
+
+		pip, err := asUser.Pipeline(ctx, createdPip.ID, types.PipelineParams{
+			RenderWithConfigSections: true,
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(pip.ConfigSections))
+		assert.Equal(t, types.ConfigSection{
+			ID:         cs.ID,
+			Kind:       csInput.Kind,
+			ProjectID:  defaultProj.ID,
+			Properties: csInput.Properties,
+			CreatedAt:  cs.CreatedAt,
+			UpdatedAt:  cs.CreatedAt,
+		}, pip.ConfigSections[0])
+
+		assert.Equal(t, newClassicConf(`
+			[INPUT]
+			    Name dummy
+			[OUTPUT]
+			    Name http
+			    Match *
+			    host localhost
+			    port 80
+		`), pip.Config.RawConfig)
+	})
 }
 
 func TestClient_UpdatePipeline(t *testing.T) {
@@ -521,23 +627,23 @@ func TestClient_UpdatePipeline(t *testing.T) {
 		wantEqual(t, err, nil)
 
 		got, err := asUser.UpdatePipeline(ctx, pipeline.ID, types.UpdatePipeline{
-			Name:          ptrStr("test-pipeline-updated"),
+			Name:          ptr("test-pipeline-updated"),
 			ReplicasCount: ptrUint(4),
-			RawConfig:     ptrStr(testFbitConfigWithAddr3),
+			RawConfig:     ptr(testFbitConfigWithAddr3),
 			Secrets: []types.UpdatePipelineSecret{
 				{
-					Key:   ptrStr("testkeyupdated"),
-					Value: ptrBytes([]byte("test-value-updated")),
+					Key:   ptr("testkeyupdated"),
+					Value: ptr([]byte("test-value-updated")),
 				},
 			},
 			Files: []types.UpdatePipelineFile{
 				{
-					Name:      ptrStr("testfileupdated"),
-					Contents:  ptrBytes([]byte("test-contents-updated")),
-					Encrypted: ptrBool(true),
+					Name:      ptr("testfileupdated"),
+					Contents:  ptr([]byte("test-contents-updated")),
+					Encrypted: ptr(true),
 				},
 			},
-			Status: (*types.PipelineStatusKind)(ptrStr(string(types.PipelineStatusStarted))),
+			Status: (*types.PipelineStatusKind)(ptr(string(types.PipelineStatusStarted))),
 			// Pending acceptance in cloud
 			// Events: []types.PipelineEvent{
 			//	{
@@ -547,8 +653,8 @@ func TestClient_UpdatePipeline(t *testing.T) {
 			//		LoggedAt: time.Now(),
 			//	},
 			// },
-			ResourceProfile:           ptrStr(string(types.ResourceProfileHighPerformanceOptimalThroughput)),
-			AutoCreatePortsFromConfig: ptrBool(true),
+			ResourceProfile:           ptr(string(types.ResourceProfileHighPerformanceOptimalThroughput)),
+			AutoCreatePortsFromConfig: ptr(true),
 		})
 		wantEqual(t, err, nil)
 

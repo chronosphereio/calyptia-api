@@ -158,17 +158,17 @@ func TestClient_UpdateResourceProfile(t *testing.T) {
 	wantEqual(t, err, nil)
 
 	err = asUser.UpdateResourceProfile(ctx, resourceProfile.ID, types.UpdateResourceProfile{
-		Name:                   ptrStr("test-resource-profile-updated"),
+		Name:                   ptr("test-resource-profile-updated"),
 		StorageMaxChunksUp:     ptrUint(4),
-		StorageSyncFull:        ptrBool(false),
-		StorageMaxChunksPause:  ptrBool(false),
-		StorageBacklogMemLimit: ptrStr("51Mi"),
-		StorageVolumeSize:      ptrStr("41Mi"),
+		StorageSyncFull:        ptr(false),
+		StorageMaxChunksPause:  ptr(false),
+		StorageBacklogMemLimit: ptr("51Mi"),
+		StorageVolumeSize:      ptr("41Mi"),
 		CPUBufferWorkers:       ptrUint(3),
-		CPULimit:               ptrStr("41Mi"),
-		CPURequest:             ptrStr("31Mi"),
-		MemoryLimit:            ptrStr("46Mi"),
-		MemoryRequest:          ptrStr("36Mi"),
+		CPULimit:               ptr("41Mi"),
+		CPURequest:             ptr("31Mi"),
+		MemoryLimit:            ptr("46Mi"),
+		MemoryRequest:          ptr("36Mi"),
 	})
 	wantEqual(t, err, nil)
 }

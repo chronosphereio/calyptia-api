@@ -92,7 +92,7 @@ func TestClient_UpdateToken(t *testing.T) {
 	wantEqual(t, err, nil)
 
 	err = asUser.UpdateToken(ctx, token.ID, types.UpdateToken{
-		Name: ptrStr("test-token-updated"),
+		Name: ptr("test-token-updated"),
 	})
 	wantEqual(t, err, nil)
 }

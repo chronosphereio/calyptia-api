@@ -18,7 +18,7 @@ func TestClient_PipelineConfigHistory(t *testing.T) {
 
 	t.Run("ok", func(t *testing.T) {
 		_, err := asUser.UpdatePipeline(ctx, pipeline.ID, types.UpdatePipeline{
-			RawConfig: ptrStr(testFbitConfigWithAddr3),
+			RawConfig: ptr(testFbitConfigWithAddr3),
 		})
 		wantEqual(t, err, nil)
 
@@ -39,7 +39,7 @@ func TestClient_PipelineConfigHistory(t *testing.T) {
 	t.Run("pagination", func(t *testing.T) {
 		for i := 0; i < 9; i++ {
 			_, err := asUser.UpdatePipeline(ctx, pipeline.ID, types.UpdatePipeline{
-				RawConfig: ptrStr(strings.ReplaceAll(testFbitConfigWithAddr, "24224", strconv.Itoa(24224+i))),
+				RawConfig: ptr(strings.ReplaceAll(testFbitConfigWithAddr, "24224", strconv.Itoa(24224+i))),
 			})
 			wantEqual(t, err, nil)
 		}

@@ -110,8 +110,8 @@ func TestClient_UpdatePipelineSecret(t *testing.T) {
 	wantEqual(t, err, nil)
 
 	err = asUser.UpdatePipelineSecret(ctx, secret.ID, types.UpdatePipelineSecret{
-		Key:   ptrStr("testsecretupdated"),
-		Value: ptrBytes([]byte("test-value-updated")),
+		Key:   ptr("testsecretupdated"),
+		Value: ptr([]byte("test-value-updated")),
 	})
 	wantEqual(t, err, nil)
 }

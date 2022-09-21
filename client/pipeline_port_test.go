@@ -134,10 +134,10 @@ func TestClient_UpdatePipelinePort(t *testing.T) {
 	wantEqual(t, err, nil)
 
 	err = withToken.UpdatePipelinePort(ctx, port.ID, types.UpdatePipelinePort{
-		Protocol:     ptrStr("udp"),
+		Protocol:     ptr("udp"),
 		FrontendPort: ptrUint(4001),
 		BackendPort:  ptrUint(4001),
-		Endpoint:     ptrStr("10.10.10.10"),
+		Endpoint:     ptr("10.10.10.10"),
 	})
 	wantEqual(t, err, nil)
 }

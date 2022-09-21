@@ -428,6 +428,10 @@ components:
             - deployment
         config:
           $ref: "#/components/schemas/PipelineConfig"
+        configSections:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConfigSection"
         status:
           $ref: "#/components/schemas/PipelineStatus"
         resourceProfile:
@@ -458,6 +462,7 @@ components:
         - id
         - name
         - config
+        - configSections
         - status
         - resourceProfile
         - replicasCount
@@ -2039,6 +2044,90 @@ components:
         - lifespan
         - updatedAt
 
+    ConfigSection:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        projectID:
+          type: string
+          format: uuid
+        kind:
+          $ref: "#/components/schemas/ConfigSectionKind"
+        properties:
+          $ref: "#/components/schemas/Pairs"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - projectID
+        - kind
+        - properties
+        - createdAt
+        - updatedAt
+    ConfigSectionKind:
+      type: string
+      enum:
+        - input
+        - filter
+        - output
+    Pairs:
+      type: array
+      items:
+        $ref: "#/components/schemas/Pair"
+    Pair:
+      type: object
+      properties:
+        key:
+          type: string
+          example: name
+        value:
+          anyOf:
+            - type: integer
+            - type: number
+            - type: boolean
+            - type: string
+            - type: array
+              items:
+                type: string
+          example: dummy
+      required: [key, value]
+    CreateConfigSection:
+      type: object
+      properties:
+        kind:
+          $ref: "#/components/schemas/ConfigSectionKind"
+        properties:
+          $ref: "#/components/schemas/Pairs"
+      required: [kind, properties]
+    CreatedConfigSection:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, createdAt]
+    UpdateConfigSection:
+      type: object
+      properties:
+        properties:
+          $ref: "#/components/schemas/Pairs"
+          nullable: true
+    UpdatedConfigSection:
+      type: object
+      properties:
+        updatedAt:
+          type: string
+          format: date-time
+      required: [updatedAt]
 paths:
   /v1/verification_email:
     post:
@@ -4126,3 +4215,155 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/TraceRecord"
+
+  "/v1/projects/{projectID}/config_sections":
+    parameters:
+      - name: projectID
+        in: path
+        schema:
+          type: string
+          format: uuid
+        required: true
+    post:
+      tags: [config_section]
+      security:
+        - user: []
+        - project: []
+      summary: Create config section
+      operationId: createConfigSection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateConfigSection"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedConfigSection"
+    get:
+      tags: [config_section]
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - name: last
+          schema:
+            type: integer
+            minimum: 0
+          in: query
+          description: Last config sections.
+        - name: before
+          schema:
+            type: string
+          in: query
+          description: Config sections before the given cursor.
+      summary: Config sections
+      operationId: configSections
+      responses:
+        "200":
+          description: OK
+          headers:
+            Link:
+              schema:
+                type: string
+                example: </v1/projects/foo/config_sections?before=bar>; rel="next"
+              description: RFC5988 with `rel="next"`.
+          links:
+            NextTraceRecordsPage:
+              operationId: configSections
+              parameters:
+                before: "$response.header.Link#rel=next"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ConfigSection"
+
+  "/v1/config_sections/{configSectionID}":
+    parameters:
+      - name: configSectionID
+        in: path
+        schema:
+          type: string
+          format: uuid
+        required: true
+    get:
+      tags: [config_section]
+      security:
+        - user: []
+        - project: []
+      summary: Config section
+      operationId: configSection
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfigSection"
+          links:
+            Project:
+              operationId: project
+              parameters:
+                projectID: "$response.body.projectID"
+    patch:
+      tags: [config_section]
+      summary: Update config section
+      operationId: updateConfigSection
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateConfigSection"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatedConfigSection"
+    delete:
+      tags: [config_section]
+      summary: Delete config section
+      operationId: deleteConfigSection
+      security:
+        - user: []
+        - project: []
+      responses:
+        "204":
+          description: Deleted
+
+  "/v1/pipelines/{pipelineID}/config_section_set":
+    parameters:
+      - name: pipelineID
+        in: path
+        schema:
+          type: string
+          format: uuid
+        required: true
+    patch:
+      tags: [config_section]
+      summary: Update config section set
+      operationId: updateConfigSectionSet
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+              description: Config section IDs.
+      responses:
+        "204":
+          description: Updated
