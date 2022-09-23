@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"sort"
 	"testing"
+	"time"
 
 	"github.com/alecthomas/assert/v2"
 
@@ -725,6 +726,138 @@ func TestClient_UpdatePipeline(t *testing.T) {
 		})
 		wantNoEqual(t, err, nil)
 		wantErrMsg(t, err, "pipeline replicas can only be set for pipelines of kind deployment")
+	})
+
+	t.Run("null status events", func(t *testing.T) {
+		got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:      "test-pipeline-05",
+			Kind:      types.PipelineKindDeployment,
+			RawConfig: testFbitConfigWithAddr,
+		})
+		wantEqual(t, err, nil)
+
+		_, err = asUser.UpdatePipeline(ctx, got.ID, types.UpdatePipeline{
+			Events: nil,
+		})
+		wantEqual(t, err, nil)
+
+		pip, err := asUser.Pipeline(ctx, got.ID, types.PipelineParams{})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(pip.Status.Events), 0)
+	})
+
+	t.Run("empty status events", func(t *testing.T) {
+		got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:      "test-pipeline-06",
+			Kind:      types.PipelineKindDeployment,
+			RawConfig: testFbitConfigWithAddr,
+		})
+		wantEqual(t, err, nil)
+
+		_, err = asUser.UpdatePipeline(ctx, got.ID, types.UpdatePipeline{
+			Events: []types.PipelineEvent{},
+		})
+		wantEqual(t, err, nil)
+
+		pip, err := asUser.Pipeline(ctx, got.ID, types.PipelineParams{})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(pip.Status.Events), 0)
+	})
+
+	t.Run("single status event", func(t *testing.T) {
+		got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:      "test-pipeline-07",
+			Kind:      types.PipelineKindDeployment,
+			RawConfig: testFbitConfigWithAddr,
+		})
+		wantEqual(t, err, nil)
+
+		_, err = asUser.UpdatePipeline(ctx, got.ID, types.UpdatePipeline{
+			Events: []types.PipelineEvent{
+				{
+					Source:   "k8s:pod",
+					Reason:   "event",
+					Message:  "message",
+					LoggedAt: time.Now(),
+				},
+			},
+		})
+
+		wantEqual(t, err, nil)
+		pip, err := asUser.Pipeline(ctx, got.ID, types.PipelineParams{})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(pip.Status.Events), 1)
+
+		_, err = asUser.UpdatePipeline(ctx, got.ID, types.UpdatePipeline{
+			ReplicasCount: ptrUint(2),
+		})
+
+		wantEqual(t, err, nil)
+
+		pip, err = asUser.Pipeline(ctx, got.ID, types.PipelineParams{})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(pip.Status.Events), 1)
+	})
+	t.Run("multi status event", func(t *testing.T) {
+		got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:      "test-pipeline-08",
+			Kind:      types.PipelineKindDeployment,
+			RawConfig: testFbitConfigWithAddr,
+		})
+		wantEqual(t, err, nil)
+
+		events := []types.PipelineEvent{
+			{
+				Source:   types.PipelineEventSourcePod,
+				Reason:   "event",
+				Message:  "message",
+				LoggedAt: time.Now(),
+			},
+			{
+				Source:   types.PipelineEventSourcePod,
+				Reason:   "event",
+				Message:  "message",
+				LoggedAt: time.Now(),
+			},
+			{
+				Source:   types.PipelineEventSourcePod,
+				Reason:   "event",
+				Message:  "message",
+				LoggedAt: time.Now(),
+			},
+			{
+				Source:   types.PipelineEventSourcePod,
+				Reason:   "event",
+				Message:  "message",
+				LoggedAt: time.Now(),
+			},
+		}
+
+		_, err = asUser.UpdatePipeline(ctx, got.ID, types.UpdatePipeline{
+			Events: events,
+		})
+
+		wantEqual(t, err, nil)
+		pip, err := asUser.Pipeline(ctx, got.ID, types.PipelineParams{})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(pip.Status.Events), 4)
+
+		_, err = asUser.UpdatePipeline(ctx, got.ID, types.UpdatePipeline{
+			ReplicasCount: ptrUint(2),
+		})
+
+		wantEqual(t, err, nil)
+
+		pip, err = asUser.Pipeline(ctx, got.ID, types.PipelineParams{})
+		wantEqual(t, err, nil)
+		wantEqual(t, len(pip.Status.Events), 4)
+		wantEqual(t, pip.Status.Events[0].Source, events[0].Source)
+		wantEqual(t, pip.Status.Events[0].Reason, events[0].Reason)
+		wantEqual(t, pip.Status.Events[0].Message, events[0].Message)
+
+		// safety check for sequential loads
+		_, err = asUser.Pipelines(ctx, aggregator.ID, types.PipelinesParams{})
+		wantEqual(t, err, nil)
 	})
 }
 
