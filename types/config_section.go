@@ -14,19 +14,21 @@ const (
 // ConfigSection model represents a fluent-bit config section that can be reused
 // across pipelines on a project.
 type ConfigSection struct {
-	ID         string            `json:"id" yaml:"id"`
-	ProjectID  string            `json:"projectID" yaml:"projectID"`
-	Kind       ConfigSectionKind `json:"kind" yaml:"kind"`
-	Properties Pairs             `json:"properties" yaml:"properties"`
-	CreatedAt  time.Time         `json:"createdAt" yaml:"createdAt"`
-	UpdatedAt  time.Time         `json:"updatedAt" yaml:"updatedAt"`
+	ID               string            `json:"id" yaml:"id"`
+	ProjectID        string            `json:"projectID" yaml:"projectID"`
+	Kind             ConfigSectionKind `json:"kind" yaml:"kind"`
+	Properties       Pairs             `json:"properties" yaml:"properties"`
+	ProcessingRuleID *string           `json:"processingRuleID" yaml:"processingRuleID"`
+	CreatedAt        time.Time         `json:"createdAt" yaml:"createdAt"`
+	UpdatedAt        time.Time         `json:"updatedAt" yaml:"updatedAt"`
 }
 
 // CreateConfigSection request payload for creating a new
 // fluent-bit config section on a project.
 type CreateConfigSection struct {
-	Kind       ConfigSectionKind `json:"kind"`
-	Properties Pairs             `json:"properties"`
+	Kind             ConfigSectionKind `json:"kind"`
+	Properties       Pairs             `json:"properties"`
+	ProcessingRuleID *string           `json:"-"`
 }
 
 // CreatedConfigSection response payload after creating
@@ -39,8 +41,9 @@ type CreatedConfigSection struct {
 // ConfigSectionsParams request payload for querying
 // the fluent-bit config sections.
 type ConfigSectionsParams struct {
-	Last   *uint
-	Before *string
+	Last                   *uint
+	Before                 *string
+	IncludeProcessingRules bool
 }
 
 // ConfigSections paginated list.

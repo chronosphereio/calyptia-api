@@ -28,12 +28,14 @@ tags:
   - name: agent_config
   - name: aggregator
   - name: resource_profile
+  - name: core_instance_check
   - name: pipeline
   - name: pipeline_config
   - name: pipeline_status
   - name: pipeline_file
   - name: pipeline_secret
   - name: pipeline_port
+  - name: pipeline_check
   - name: config_validator
   - name: config_validator_v2
   - name: metric
@@ -109,6 +111,21 @@ components:
         - avatarURL
         - createdAt
         - updatedAt
+    CheckStatus:
+      type: string
+      description: The status of a check.
+      default: new
+      enum:
+        - new
+        - failed
+        - running
+        - ok
+    PipelinePortProtocol:
+      type: string
+      description: Valid protocol types defined for a pipelines.
+      enum:
+        - tcp
+        - udp
     Project:
       type: object
       description: Project model.
@@ -439,6 +456,18 @@ components:
         replicasCount:
           type: integer
           minimum: 0
+        checksTotal:
+          type: integer
+          minimum: 0
+          description: total number of checks associated with the pipeline.
+        checksOK:
+          type: integer
+          minimum: 0
+          description: total number of checks with ok status.
+        checksRunning:
+          type: integer
+          minimum: 0
+          description: total number of checks with running status.
         tags:
           type: array
           nullable: true
@@ -509,6 +538,8 @@ components:
             - STARTING
             - STARTED
             - SCALING
+            - CHECKS_OK
+            - CHECKS_FAILED
         events:
           type: array
           items:
@@ -541,6 +572,84 @@ components:
         - source
         - reason
         - loggedAt
+    PipelineCheck:
+      type: object
+      description: Pipeline check model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        protocol:
+          $ref: "#/components/schemas/PipelinePortProtocol"
+        status:
+          $ref: "#/components/schemas/CheckStatus"
+        retries:
+          type: number
+          default: 3
+          description: number of retries for the check before marking it as failed
+        port:
+          type: number
+          minimum: 0
+          maximum: 65535
+          description: valid 0-65535 port number
+        host:
+          type: string
+          description: DNS label format as of defined on RFC1123 or an IPv4 address.
+          example: localhost
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - protocol
+        - status
+        - retries
+        - port
+        - host
+        - createdAt
+        - updatedAt
+    CoreInstanceCheck:
+      type: object
+      description: Core instance(aggregator) check model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        protocol:
+          $ref: "#/components/schemas/PipelinePortProtocol"
+        status:
+          $ref: "#/components/schemas/CheckStatus"
+        retries:
+          type: number
+          default: 0
+          description: number of retries for the check before marking it as failed
+        host:
+          type: string
+          description: DNS label format as of defined on RFC1123 or an IPv4 address.
+          example: localhost
+        port:
+          type: number
+          minimum: 0
+          maximum: 65535
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - protocol
+        - status
+        - retries
+        - host
+        - port
+        - createdAt
+        - updatedAt
+
     PipelineFile:
       type: object
       description: Pipeline file model.
@@ -1237,6 +1346,33 @@ components:
         resourceProfile:
           type: string
           example: my-resource-profile
+        autoCreateChecksFromConfig:
+          type: boolean
+          default: false
+          description: |
+            If true, this will automatically create a set of Pipeline checks
+            to validate that the configured output services are reachable.
+        waitForChecksBeforeDeploying:
+          type: boolean
+          default: false
+          description: |
+            If set to true:
+
+            If all checks associated with the pipeline run successfully, the status of
+            the pipeline will be switched to CHECKS_OK and the deployment will be executed.
+
+            If any of the checks associated with the pipeline fails, the status of
+            the pipeline will be switched to CHECKS_FAILED and the deployment of the pipeline
+            will be blocked.
+
+            If set to false (default):
+
+            If all checks associated with the pipeline run successfully, the status of
+            the pipeline will be switched to CHECKS_OK and the deployment will be executed.
+
+            If any of the checks associated with the pipeline fails, the status of
+            the pipeline will be switched to CHECKS_FAILED and the deployment of the pipeline
+            will be executed.
         autoCreatePortsFromConfig:
           type: boolean
         metadata:
@@ -1254,6 +1390,7 @@ components:
         - files
         - resourceProfile
         - autoCreatePortsFromConfig
+        - autoCreateChecksFromConfig
     UpdatePipeline:
       description: Update pipeline request body.
       type: object
@@ -1301,6 +1438,29 @@ components:
         autoCreatePortsFromConfig:
           type: boolean
           nullable: true
+        autoCreateChecksFromConfig:
+          type: boolean
+          nullable: true
+        checksBeforeDeploying:
+          type: boolean
+          nullable: true
+          description: |
+            If set to true:
+
+            If all checks associated with the pipeline run successfully, the status of
+            the pipeline will be switched to CHECKS_OK and the deployment will be executed.
+
+            If any of the checks associated with the pipeline fails, the status of
+            the pipeline will be switched to CHECKS_FAILED and the deployment of the pipeline
+            will be blocked.
+
+            If set to false (default):
+
+            If all checks associated with the pipeline run successfully, the status of
+            the pipeline will be switched to CHECKS_OK and the deployment will be executed.
+
+            If any of the checks associated with the pipeline fails, the status of
+            the pipeline will be switched to CHECKS_FAILED and the deployment of the pipeline
         status:
           type: string
           nullable: true
@@ -1310,6 +1470,8 @@ components:
             - STARTING
             - STARTED
             - SCALING
+            - CHECKS_OK
+            - CHECKS_FAILED
         events:
           type: array
           nullable: true
@@ -1322,6 +1484,54 @@ components:
             nodeSelector:
               type: object
               nullable: true
+    CreatePipelineCheck:
+      description: Create pipeline check request body.
+      type: object
+      properties:
+        protocol:
+          $ref: "#/components/schemas/PipelinePortProtocol"
+        status:
+          $ref: "#/components/schemas/CheckStatus"
+        retries:
+          type: number
+          default: 3
+          description: number of retries for the check before marking it as failed
+        host:
+          type: string
+          description: DNS label format as of defined on RFC1123 or an IPv4 address.
+          example: localhost
+        port:
+          type: number
+          minimum: 0
+          maximum: 65535
+          description: valid 0-65535 port number
+      required:
+        - protocol
+        - host
+        - port
+    CreateCoreInstanceCheck:
+      description: Create core instance (aggregator) check request body.
+      type: object
+      properties:
+        protocol:
+          $ref: "#/components/schemas/PipelinePortProtocol"
+        status:
+          $ref: "#/components/schemas/CheckStatus"
+        retries:
+          type: number
+          default: 3
+          description: number of retries for the check before marking it as failed
+        host:
+          type: string
+          description: DNS label format as of defined on RFC1123 or an IPv4 address.
+          example: localhost
+        port:
+          type: number
+          description: valid 0-65535 port number
+      required:
+        - protocol
+        - host
+        - port
     CreatePipelineFile:
       description: Create pipeline file request body.
       type: object
@@ -1353,6 +1563,59 @@ components:
         encrypted:
           type: boolean
           nullable: true
+    UpdatePipelineCheck:
+      description: Update pipeline check request body.
+      type: object
+      properties:
+        protocol:
+          $ref: "#/components/schemas/PipelinePortProtocol"
+          nullable: true
+        status:
+          $ref: "#/components/schemas/CheckStatus"
+          nullable: true
+        retries:
+          type: number
+          nullable: true
+          default: 3
+          description: number of retries for the check before marking it as unreachable.
+        host:
+          type: string
+          nullable: true
+          description: DNS label format as of defined on RFC1123 or an IPv4 address.
+          example: localhost
+        port:
+          type: number
+          minimum: 0
+          maximum: 65535
+          nullable: true
+          description: valid 0-65535 port number
+
+    UpdateCoreInstanceCheck:
+      description: Update a core instance check request body.
+      type: object
+      properties:
+        protocol:
+          $ref: "#/components/schemas/PipelinePortProtocol"
+          nullable: true
+        status:
+          $ref: "#/components/schemas/CheckStatus"
+          nullable: true
+        host:
+          type: string
+          nullable: true
+          description: DNS label format as of defined on RFC1123 or an IPv4 address.
+          example: localhost
+        port:
+          type: number
+          minimum: 0
+          maximum: 65535
+          nullable: true
+          description: valid 0-65535 port number
+        retries:
+          type: number
+          nullable: true
+          default: 3
+          description: number of retries for the check before marking it as unreachable.
     CreatePipelineSecret:
       description: Create pipeline secret request body.
       type: object
@@ -1579,6 +1842,10 @@ components:
           $ref: "#/components/schemas/PipelineStatus"
         resourceProfile:
           $ref: "#/components/schemas/ResourceProfile"
+        checks:
+          type: array
+          items:
+            $ref: "#/components/schemas/PipelineCheck"
         replicasCount:
           type: integer
           minimum: 0
@@ -1593,6 +1860,18 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PipelinePort"
+        removedPorts:
+          type: array
+          items:
+            $ref: "#/components/schemas/PipelinePort"
+        addedChecks:
+          type: array
+          items:
+            $ref: "#/components/schemas/PipelineCheck"
+        removedChecks:
+          type: array
+          items:
+            $ref: "#/components/schemas/PipelineCheck"
     CreatedPipelineFile:
       type: object
       description: Created pipeline file response body.
@@ -1606,6 +1885,34 @@ components:
       required:
         - id
         - createdAt
+    CreatedPipelineCheck:
+      type: object
+      description: Created pipeline check response body.
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - createdAt
+
+    CreatedCoreInstanceCheck:
+      type: object
+      description: Created core instance (aggregator) check response body.
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - createdAt
+
     CreatedPipelineSecret:
       type: object
       description: Created pipeline secret response body.
@@ -2053,6 +2360,10 @@ components:
         projectID:
           type: string
           format: uuid
+        processingRuleID:
+          type: string
+          format: uuid
+          nullable: true
         kind:
           $ref: "#/components/schemas/ConfigSectionKind"
         properties:
@@ -2066,6 +2377,7 @@ components:
       required:
         - id
         - projectID
+        - processingRuleID
         - kind
         - properties
         - createdAt
@@ -2128,6 +2440,174 @@ components:
           type: string
           format: date-time
       required: [updatedAt]
+
+    ProcessingRule:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        pipelineID:
+          type: string
+          format: uuid
+        language:
+          $ref: "#/components/schemas/ProcessingRuleLanguage"
+        actions:
+          type: array
+          items:
+            $ref: "#/components/schemas/RuleAction"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - pipelineID
+        - language
+        - actions
+        - createdAt
+        - updatedAt
+
+    ProcessingRuleLanguage:
+      type: string
+      enum: [lua]
+
+    RuleAction:
+      type: object
+      properties:
+        kind:
+          $ref: "#/components/schemas/RuleActionKind"
+        description:
+          type: string
+          example: Sample action
+        enabled:
+          type: boolean
+          default: false
+          example: true
+        selectors:
+          type: array
+          items:
+            $ref: "#/components/schemas/LogSelector"
+        add:
+          $ref: "#/components/schemas/LogKeyVal"
+          nullable: true
+          description: Only required when kind is "add".
+        renameTo:
+          type: string
+          nullable: true
+          example: renamed
+          description: Only required when kind is "rename".
+        copyAs:
+          type: string
+          nullable: true
+          example: copied
+          description: Only required when kind is "copy".
+        maskWith:
+          type: string
+          nullable: true
+          example: masked
+          description: Only required when kind is "mask".
+      required:
+        - kind
+        - description
+        - enabled
+        - selectors
+
+
+    RuleActionKind:
+      type: string
+      enum:
+        - add
+        - rename
+        - copy
+        - mask
+        - remove
+        - skip
+
+    LogSelector:
+      type: object
+      properties:
+        kind:
+          $ref: "#/components/schemas/LogSelectorKind"
+        op:
+          $ref: "#/components/schemas/LogSelectorOpKind"
+        expr:
+          type: string
+          example: some_key
+      required:
+        - kind
+        - op
+        - expr
+
+    LogSelectorKind:
+      type: string
+      enum: [key]
+
+    LogSelectorOpKind:
+      type: string
+      enum: [equal]
+
+    LogKeyVal:
+      type: object
+      properties:
+        key:
+          type: string
+          example: some_key
+        value:
+          type: string
+          example: some_value
+      required:
+        - key
+        - value
+
+    CreateProcessingRule:
+      type: object
+      properties:
+        language:
+          $ref: "#/components/schemas/ProcessingRuleLanguage"
+        actions:
+          type: array
+          items:
+            $ref: "#/components/schemas/RuleAction"
+      required:
+        - language
+        - actions
+
+    CreatedProcessingRule:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: uuid
+      required:
+        - id
+        - createdAt
+
+    UpdateProcessingRule:
+      type: object
+      properties:
+        language:
+          $ref: "#/components/schemas/ProcessingRuleLanguage"
+          nullable: true
+        actions:
+          type: array
+          items:
+            $ref: "#/components/schemas/RuleAction"
+          nullable: true
+
+    UpdatedProcessingRule:
+      type: object
+      properties:
+        updatedAt:
+          type: string
+          format: date-time
+      required: [updatedAt]
+
 paths:
   /v1/verification_email:
     post:
@@ -3371,6 +3851,260 @@ paths:
       responses:
         "204":
           description: No Content
+  "/v1/pipelines/{pipelineID}/checks":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: pipelineID
+        in: path
+        required: true
+    post:
+      tags:
+        - pipeline_check
+      summary: Create pipeline check
+      operationId: createPipelineCheck
+      description: |-
+        Create check within a pipeline.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePipelineCheck"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedPipelineCheck"
+    get:
+      tags:
+        - pipeline_check
+      summary: Pipeline checks
+      operationId: pipelineChecks
+      description: Checks associated to a pipeline.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            minimum: 0
+          in: query
+          name: last
+          description: Last files.
+        - schema:
+            type: string
+          in: query
+          name: before
+          description: End cursor.
+      responses:
+        "200":
+          description: OK
+          headers:
+            Link:
+              schema:
+                type: string
+                example: </v1/pipelines/foo/checks?before=bar>; rel="next"
+              description: RFC5988 with `rel="next"`.
+          links:
+            NextChecksPage:
+              operationId: pipelineChecks
+              parameters:
+                before: "$response.header.Link#rel=next"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PipelineCheck"
+  "/v1/pipeline_checks/{checkID}":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: checkID
+        in: path
+        required: true
+    get:
+      tags:
+        - pipeline_check
+      summary: Pipeline check
+      operationId: pipelineCheck
+      description: Check by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PipelineCheck"
+    patch:
+      tags:
+        - pipeline_check
+      summary: Update pipeline check
+      operationId: updatePipelineCheck
+      description: Update check by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePipelineCheck"
+      responses:
+        "204":
+          description: No Content
+    delete:
+      tags:
+        - pipeline_check
+      summary: Delete pipeline check
+      operationId: deletePipelineCheck
+      description: |-
+        Delete pipeline check by its ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "204":
+          description: No Content
+
+
+  "/v1/core_instances/{coreInstanceID}/checks":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: coreInstanceID
+        in: path
+        required: true
+    post:
+      tags:
+        - core_instance_check
+      summary: Create core instance check
+      operationId: createCoreInstanceCheck
+      description: |-
+        Create check within a core instance.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCoreInstanceCheck"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedCoreInstanceCheck"
+    get:
+      tags:
+        - core_instance_check
+      summary: Core Instance checks
+      operationId: coreInstanceChecks
+      description: Checks associated to a core instance.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            minimum: 0
+          in: query
+          name: last
+          description: Last checks.
+        - schema:
+            type: string
+          in: query
+          name: before
+          description: End cursor.
+      responses:
+        "200":
+          description: OK
+          headers:
+            Link:
+              schema:
+                type: string
+                example: </v1/core_instances/foo/checks?before=bar>; rel="next"
+              description: RFC5988 with `rel="next"`.
+          links:
+            NextChecksPage:
+              operationId: coreInstanceChecks
+              parameters:
+                before: "$response.header.Link#rel=next"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CoreInstanceCheck"
+
+  "/v1/core_instance_checks/{checkID}":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: checkID
+        in: path
+        required: true
+    get:
+      tags:
+        - core_instance_check
+      summary: Core Instance check
+      operationId: coreInstanceCheck
+      description: Check by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreInstanceCheck"
+    patch:
+      tags:
+        - core_instance_check
+      summary: Update core instance check
+      operationId: updateCoreInstanceCheck
+      description: Update check by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCoreInstanceCheck"
+      responses:
+        "204":
+          description: No Content
+    delete:
+      tags:
+        - core_instance_check
+      summary: Delete core instance check
+      operationId: deleteCoreInstanceCheck
+      description: |-
+        Delete core instance check by its ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "204":
+          description: No Content
+
   "/v1/aggregator_pipelines/{pipelineID}/secrets":
     parameters:
       - schema:
@@ -4260,6 +4994,13 @@ paths:
             type: string
           in: query
           description: Config sections before the given cursor.
+        - name: include_processing_rules
+          schema:
+            type: boolean
+          in: query
+          description: |
+            Include config sections
+            that were created through a processing rule.
       summary: Config sections
       operationId: configSections
       responses:
@@ -4367,3 +5108,90 @@ paths:
       responses:
         "204":
           description: Updated
+
+  "/v1/pipelines/{pipelineID}/processing_rules":
+    parameters:
+      - name: pipelineID
+        in: path
+        schema:
+          type: string
+          format: uuid
+        required: true
+    post:
+      tags: [processing_rule]
+      security:
+        - user: []
+        - project: []
+      summary: Create a processing rule
+      description: |
+        Create a processing rule in the given pipeline.
+        Only one processing rule is allowed per pipeline.
+      operationId: createProcessingRule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProcessingRule"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedProcessingRule"
+
+  "/v1/pipelines/{pipelineID}/processing_rule":
+    parameters:
+      - name: pipelineID
+        in: path
+        schema:
+          type: string
+          format: uuid
+        required: true
+    get:
+      tags: [processing_rule]
+      security:
+        - user: []
+        - project: []
+      summary: Processing rule from pipeline
+      operationId: processingRuleFromPipeline
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcessingRule"
+          links:
+            Pipeline:
+              operationId: pipeline
+              parameters:
+                projectID: "$response.body.pipelineID"
+
+  "/v1/processing_rules/{processingRuleID}":
+    parameters:
+      - name: processingRuleID
+        in: path
+        schema:
+          type: string
+          format: uuid
+        required: true
+    patch:
+      tags: [processing_rule]
+      summary: Update processing rule
+      operationId: updateProcessingRule
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProcessingRule"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatedProcessingRule"

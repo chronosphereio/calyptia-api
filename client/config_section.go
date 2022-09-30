@@ -24,6 +24,9 @@ func (c *Client) ConfigSections(ctx context.Context, projectID string, params ty
 	if params.Before != nil {
 		q.Set("before", *params.Before)
 	}
+	if params.IncludeProcessingRules {
+		q.Set("include_processing_rules", "true")
+	}
 
 	err := c.do(ctx, http.MethodGet, "/v1/projects/"+url.PathEscape(projectID)+"/config_sections?"+q.Encode(), nil, &out.Items, withCursor(&out.EndCursor))
 	if err != nil {

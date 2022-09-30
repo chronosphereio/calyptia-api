@@ -46,6 +46,12 @@ const (
 	PipelineStatusStarted PipelineStatusKind = "STARTED"
 	// PipelineStatusScaling is the status of a pipeline while scaling up/down.
 	PipelineStatusScaling PipelineStatusKind = "SCALING"
+	// PipelineStatusChecksOK is the status marked when all the checks associated
+	// with a pipeline are OK. Must be a temporary status before deployment.
+	PipelineStatusChecksOK PipelineStatusKind = "CHECKS_OK"
+	// PipelineStatusChecksFailed PipelineStatusCheckFailed is the status marked when any of the checks associated
+	// with a pipeline FAIL. Must be a temporary status before deployment.
+	PipelineStatusChecksFailed PipelineStatusKind = "CHECKS_FAILED"
 )
 
 // PipelineStatusHistoryParams request payload for querying the pipeline status history.

@@ -35,29 +35,27 @@ func (pp Pairs) Has(key string) bool {
 }
 
 // Set a value, overriding any axisting key (case-insensitively).
-func (pp Pairs) Set(key string, value any) {
-	for _, p := range pp {
+func (pp *Pairs) Set(key string, value any) {
+	for i, p := range *pp {
 		if strings.EqualFold(p.Key, key) {
-			p.Value = value
+			(*pp)[i].Value = value
 			return
 		}
 	}
-	pp = append(pp, Pair{Key: key, Value: value})
-	_ = pp
+	*pp = append(*pp, Pair{Key: key, Value: value})
 }
 
 // Remove a value using the given key (case-insensitively).
-func (pp Pairs) Remove(key string) {
+func (pp *Pairs) Remove(key string) {
 	deleteIndex := -1
-	for i, p := range pp {
+	for i, p := range *pp {
 		if strings.EqualFold(p.Key, key) {
 			deleteIndex = i
 			break
 		}
 	}
 
-	pp = append(pp[:deleteIndex], pp[deleteIndex+1:]...)
-	_ = pp
+	*pp = append((*pp)[:deleteIndex], (*pp)[deleteIndex+1:]...)
 }
 
 func (pp Pairs) AsMap() map[string]any {
