@@ -12,21 +12,31 @@ const (
 	PipelineKindDeployment PipelineKind = "deployment"
 )
 
+// AllPipelineKindTypes all valid pipeline kinds.
+var AllPipelineKindTypes = [...]PipelineKind{
+	PipelineKindDaemonSet,
+	PipelineKindDeployment,
+}
+
 // Pipeline model.
 type Pipeline struct {
-	ID              string           `json:"id" yaml:"id"`
-	Name            string           `json:"name" yaml:"name"`
-	Kind            PipelineKind     `json:"kind" yaml:"kind"`
-	Config          PipelineConfig   `json:"config" yaml:"config"`
-	ConfigSections  []ConfigSection  `json:"configSections" yaml:"configSections"`
-	Status          PipelineStatus   `json:"status" yaml:"status"`
-	ResourceProfile ResourceProfile  `json:"resourceProfile" yaml:"resourceProfile"`
-	TracingEnabled  bool             `json:"tracingEnabled" yaml:"tracingEnabled"`
-	ReplicasCount   uint             `json:"replicasCount" yaml:"replicasCount"`
-	Tags            []string         `json:"tags" yaml:"tags"`
-	Metadata        *json.RawMessage `json:"metadata" yaml:"metadata"`
-	CreatedAt       time.Time        `json:"createdAt" yaml:"createdAt"`
-	UpdatedAt       time.Time        `json:"updatedAt" yaml:"updatedAt"`
+	ID                           string           `json:"id" yaml:"id"`
+	Name                         string           `json:"name" yaml:"name"`
+	Kind                         PipelineKind     `json:"kind" yaml:"kind"`
+	Config                       PipelineConfig   `json:"config" yaml:"config"`
+	ConfigSections               []ConfigSection  `json:"configSections" yaml:"configSections"`
+	Status                       PipelineStatus   `json:"status" yaml:"status"`
+	ResourceProfile              ResourceProfile  `json:"resourceProfile" yaml:"resourceProfile"`
+	TracingEnabled               bool             `json:"tracingEnabled" yaml:"tracingEnabled"`
+	WaitForChecksBeforeDeploying bool             `json:"waitForChecksBeforeDeploying" yaml:"waitForChecksBeforeDeploying"`
+	ReplicasCount                uint             `json:"replicasCount" yaml:"replicasCount"`
+	Tags                         []string         `json:"tags" yaml:"tags"`
+	Metadata                     *json.RawMessage `json:"metadata" yaml:"metadata"`
+	ChecksTotal                  uint             `json:"checksTotal" yaml:"checksTotal"`
+	ChecksOK                     uint             `json:"checksOK" yaml:"checksOK"`
+	ChecksRunning                uint             `json:"checksRunning" yaml:"checksRunning"`
+	CreatedAt                    time.Time        `json:"createdAt" yaml:"createdAt"`
+	UpdatedAt                    time.Time        `json:"updatedAt" yaml:"updatedAt"`
 }
 
 // Pipelines paginated list.
@@ -48,36 +58,67 @@ type CreatePipeline struct {
 	AutoCreatePortsFromConfig bool                   `json:"autoCreatePortsFromConfig"`
 	Metadata                  *json.RawMessage       `json:"metadata"`
 	Tags                      []string               `json:"tags"`
+
+	// automatically create checks based on the output configuration.
+	AutoCreateChecksFromConfig bool `json:"autoCreateChecksFromConfig"`
+
+	// WaitForChecksBeforeDeploying is a conditional variable that defines behavior on the
+	// pipeline deployment
+	//
+	// If set to true:
+	//
+	// If all checks associated with the pipeline run successfully, the status of
+	// the pipeline will be switched to CHECKS_OK and the deployment will be executed.
+	//
+	// If any of the checks associated with the pipeline fails, the status of
+	// the pipeline will be switched to CHECKS_FAILED and the deployment of the pipeline
+	// will be blocked.
+	//
+	// If set to false (default):
+	//
+	// If all checks associated with the pipeline run successfully, the status of
+	// the pipeline will be switched to CHECKS_OK and the deployment will be executed.
+	//
+	// If any of the checks associated with the pipeline fails, the status of
+	// the pipeline will be switched to CHECKS_FAILED and the deployment of the pipeline
+	// will be executed.
+	WaitForChecksBeforeDeploying bool `json:"waitForChecksBeforeDeploying"`
 }
 
 // CreatedPipeline response payload after creating a pipeline successfully.
 type CreatedPipeline struct {
-	ID              string           `json:"id"`
-	Name            string           `json:"name"`
-	Kind            PipelineKind     `json:"kind"`
-	Config          PipelineConfig   `json:"config"`
-	Secrets         []PipelineSecret `json:"secrets"`
-	Files           []PipelineFile   `json:"files"`
-	Status          PipelineStatus   `json:"status"`
-	ResourceProfile ResourceProfile  `json:"resourceProfile"`
-	ReplicasCount   uint             `json:"replicasCount"`
-	CreatedAt       time.Time        `json:"createdAt"`
+	ID                           string           `json:"id"`
+	Name                         string           `json:"name"`
+	Kind                         PipelineKind     `json:"kind"`
+	Config                       PipelineConfig   `json:"config"`
+	Secrets                      []PipelineSecret `json:"secrets"`
+	Files                        []PipelineFile   `json:"files"`
+	Status                       PipelineStatus   `json:"status"`
+	ResourceProfile              ResourceProfile  `json:"resourceProfile"`
+	Checks                       []PipelineCheck  `json:"checks"`
+	ReplicasCount                uint             `json:"replicasCount"`
+	WaitForChecksBeforeDeploying bool             `json:"waitForChecksBeforeDeploying"`
+	CreatedAt                    time.Time        `json:"createdAt"`
 }
 
 // UpdatePipeline request payload for updating a pipeline.
 type UpdatePipeline struct {
-	Name                      *string                `json:"name"`
-	Kind                      *PipelineKind          `json:"kind"`
-	ReplicasCount             *uint                  `json:"replicasCount"`
-	RawConfig                 *string                `json:"rawConfig"`
-	ConfigFormat              *ConfigFormat          `json:"configFormat"`
-	Secrets                   []UpdatePipelineSecret `json:"secrets"`
-	Files                     []UpdatePipelineFile   `json:"files"`
-	Status                    *PipelineStatusKind    `json:"status"`
-	Events                    []PipelineEvent        `json:"events"`
-	ResourceProfile           *string                `json:"resourceProfile"`
-	AutoCreatePortsFromConfig *bool                  `json:"autoCreatePortsFromConfig"`
-	Metadata                  *json.RawMessage       `json:"metadata"`
+	Name                      *string             `json:"name"`
+	Kind                      *PipelineKind       `json:"kind"`
+	Status                    *PipelineStatusKind `json:"status"`
+	ConfigFormat              *ConfigFormat       `json:"configFormat"`
+	ReplicasCount             *uint               `json:"replicasCount"`
+	RawConfig                 *string             `json:"rawConfig"`
+	ResourceProfile           *string             `json:"resourceProfile"`
+	AutoCreatePortsFromConfig *bool               `json:"autoCreatePortsFromConfig"`
+	// automatically create checks based on the output configuration.
+	AutoCreateChecksFromConfig *bool `json:"autoCreateChecksFromConfig"`
+	// this defines behavior; await for checks to complete before reporting the status back.
+	WaitForChecksBeforeDeploying *bool                  `json:"waitForChecksBeforeDeploying"`
+	Metadata                     *json.RawMessage       `json:"metadata"`
+	Secrets                      []UpdatePipelineSecret `json:"secrets"`
+	Files                        []UpdatePipelineFile   `json:"files"`
+	Events                       []PipelineEvent        `json:"events"`
 }
 
 // PipelinesParams request payload for querying pipelines.
@@ -100,4 +141,8 @@ type PipelineParams struct {
 type UpdatedPipeline struct {
 	AddedPorts   []PipelinePort `json:"addedPorts"`
 	RemovedPorts []PipelinePort `json:"removedPorts"`
+
+	// Pipeline checks that have been created/updated based on AutoCreatePreChecksFromConfig changes.
+	AddedChecks   []PipelineCheck `json:"addedChecks"`
+	RemovedChecks []PipelineCheck `json:"removedChecks"`
 }

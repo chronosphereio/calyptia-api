@@ -2,6 +2,20 @@ package types
 
 import "time"
 
+// PipelinePortProtocol valid protocol types defined for a pipeline.
+type PipelinePortProtocol string
+
+const (
+	PipelineProtocolTCP PipelinePortProtocol = "tcp"
+	PipelineProtocolUDP PipelinePortProtocol = "udp"
+)
+
+// AllPipelinePortProtocols all valid protocol types for a pipeline.
+var AllPipelinePortProtocols = [...]PipelinePortProtocol{
+	PipelineProtocolTCP,
+	PipelineProtocolUDP,
+}
+
 // PipelinePort model.
 type PipelinePort struct {
 	ID           string    `json:"id" yaml:"id"`

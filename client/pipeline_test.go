@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	math_rand "math/rand"
 	"sort"
 	"testing"
 	"time"
@@ -13,6 +14,43 @@ import (
 	"github.com/calyptia/api/client"
 	"github.com/calyptia/api/types"
 )
+
+const testFluentBitConfigWithInvalidOutput = `[OUTPUT]
+	Name tcp
+	Port 5556`
+
+const testFbitConfigWithMultipleOutputs = `[INPUT]
+	Name 			  forward
+	Host              0.0.0.0
+	Port              24224
+[OUTPUT]
+	Name tcp
+	Host 127.0.0.1
+	Port 5556
+[OUTPUT]
+	Name opensearch
+	Host api.elasticsearch.com
+[OUTPUT]
+	Name syslog
+	Host 192.168.0.1
+	Mode udp
+[OUTPUT]
+	Name syslog
+	Host 192.168.0.1
+	Mode tcp
+[OUTPUT]
+	Name gelf
+	Host 127.0.0.1
+	Port 3333`
+
+const testFbitConfigWithSingleOutput = `[INPUT]
+	Name 			  forward
+	Host              0.0.0.0
+	Port              24224
+[OUTPUT]
+	Name syslog
+	Host 192.168.0.1
+	Mode udp`
 
 const testFbitConfigWithAddr = `[INPUT]
 	Name 			  forward
@@ -159,6 +197,30 @@ func TestClient_CreatePipeline(t *testing.T) {
 		})
 
 		wantNoEqual(t, err, nil)
+	})
+
+	t.Run("create with auto create checks with invalid config", func(t *testing.T) {
+		_, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:                       "test-pipeline-09",
+			Kind:                       types.PipelineKindDeployment,
+			RawConfig:                  testFluentBitConfigWithInvalidOutput,
+			AutoCreateChecksFromConfig: true,
+		})
+
+		wantNoEqual(t, err, nil)
+		wantErrMsg(t, err, "invalid pipeline config: host property not defined in section \"tcp.0\"")
+	})
+
+	t.Run("create with auto create checks enabled and multi output configuration", func(t *testing.T) {
+		got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:                       "test-pipeline-10",
+			Kind:                       types.PipelineKindDeployment,
+			RawConfig:                  testFbitConfigWithMultipleOutputs,
+			AutoCreateChecksFromConfig: true,
+		})
+
+		wantEqual(t, err, nil)
+		wantEqual(t, len(got.Checks), 5)
 	})
 }
 
@@ -362,6 +424,60 @@ func TestClient_Pipelines(t *testing.T) {
 			    host localhost
 			    port 80
 		`), pip.Config.RawConfig)
+	})
+	t.Run("auto create checks from config", func(t *testing.T) {
+		agg, err := withToken.CreateAggregator(ctx, types.CreateAggregator{})
+		assert.NoError(t, err)
+
+		createdPip, err := asUser.CreatePipeline(ctx, agg.ID, types.CreatePipeline{
+			RawConfig:                  testFbitConfigWithMultipleOutputs,
+			AutoCreateChecksFromConfig: true,
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, len(createdPip.Checks), 5)
+
+		pp, err := asUser.Pipelines(ctx, agg.ID, types.PipelinesParams{})
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(pp.Items))
+		assert.Equal(t, pp.Items[0].ChecksOK, 0)
+		assert.Equal(t, pp.Items[0].ChecksTotal, 5)
+	})
+
+	t.Run("update await_for_checks property", func(t *testing.T) {
+		agg, err := withToken.CreateAggregator(ctx, types.CreateAggregator{})
+		assert.NoError(t, err)
+		createdPip, err := asUser.CreatePipeline(ctx, agg.ID, types.CreatePipeline{
+			RawConfig: testFbitConfigWithAddr,
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, createdPip.WaitForChecksBeforeDeploying, false)
+
+		_, err = asUser.UpdatePipeline(ctx, createdPip.ID, types.UpdatePipeline{
+			WaitForChecksBeforeDeploying: ptr(true),
+		})
+
+		assert.NoError(t, err)
+
+		updatedPip, err := asUser.Pipeline(ctx, createdPip.ID, types.PipelineParams{})
+		assert.NoError(t, err)
+		assert.Equal(t, updatedPip.WaitForChecksBeforeDeploying, true)
+
+		createdPip, err = asUser.CreatePipeline(ctx, agg.ID, types.CreatePipeline{
+			RawConfig:                    testFbitConfigWithAddr,
+			WaitForChecksBeforeDeploying: true,
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, createdPip.WaitForChecksBeforeDeploying, true)
+
+		_, err = asUser.UpdatePipeline(ctx, createdPip.ID, types.UpdatePipeline{
+			WaitForChecksBeforeDeploying: ptr(false),
+		})
+
+		assert.NoError(t, err)
+
+		updatedPip, err = asUser.Pipeline(ctx, createdPip.ID, types.PipelineParams{})
+		assert.NoError(t, err)
+		assert.Equal(t, updatedPip.WaitForChecksBeforeDeploying, false)
 	})
 }
 
@@ -644,25 +760,15 @@ func TestClient_UpdatePipeline(t *testing.T) {
 					Encrypted: ptr(true),
 				},
 			},
-			Status: (*types.PipelineStatusKind)(ptr(string(types.PipelineStatusStarted))),
-			// Pending acceptance in cloud
-			// Events: []types.PipelineEvent{
-			//	{
-			//		Source:   types.PipelineEventSourceDeployment,
-			//		Reason:   "Testing",
-			//		Message:  "",
-			//		LoggedAt: time.Now(),
-			//	},
-			// },
-			ResourceProfile:           ptr(string(types.ResourceProfileHighPerformanceOptimalThroughput)),
+			Status:                    (*types.PipelineStatusKind)(ptr(string(types.PipelineStatusStarted))),
+			ResourceProfile:           ptr(types.ResourceProfileHighPerformanceOptimalThroughput),
 			AutoCreatePortsFromConfig: ptr(true),
 		})
 		wantEqual(t, err, nil)
-
 		wantEqual(t, len(got.AddedPorts), 2) // new config has 2 additional ports tcp/5140 and udp/5141.
 		wantEqual(t, len(got.RemovedPorts), 0)
 
-		// Sort added ports by protocold and port number
+		// Sort added ports by protocol and port number
 		// since they are created at the same time
 		// and the order may switch.
 		sort.Slice(got.AddedPorts, func(i, j int) bool {
@@ -691,7 +797,6 @@ func TestClient_UpdatePipeline(t *testing.T) {
 		wantNoTimeZero(t, got.AddedPorts[1].CreatedAt)
 		wantNoTimeZero(t, got.AddedPorts[1].UpdatedAt)
 	})
-
 	t.Run("not ok pipeline kind", func(t *testing.T) {
 		got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
 			Name:      "test-pipeline-03",
@@ -709,7 +814,6 @@ func TestClient_UpdatePipeline(t *testing.T) {
 		wantNoEqual(t, err, nil)
 		wantErrMsg(t, err, "pipeline kind cannot be updated")
 	})
-
 	t.Run("not ok pipeline replicaSet for daemonSet", func(t *testing.T) {
 		got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
 			Name:      "test-pipeline-04",
@@ -727,7 +831,6 @@ func TestClient_UpdatePipeline(t *testing.T) {
 		wantNoEqual(t, err, nil)
 		wantErrMsg(t, err, "pipeline replicas can only be set for pipelines of kind deployment")
 	})
-
 	t.Run("null status events", func(t *testing.T) {
 		got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
 			Name:      "test-pipeline-05",
@@ -745,7 +848,6 @@ func TestClient_UpdatePipeline(t *testing.T) {
 		wantEqual(t, err, nil)
 		wantEqual(t, len(pip.Status.Events), 0)
 	})
-
 	t.Run("empty status events", func(t *testing.T) {
 		got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
 			Name:      "test-pipeline-06",
@@ -763,7 +865,6 @@ func TestClient_UpdatePipeline(t *testing.T) {
 		wantEqual(t, err, nil)
 		wantEqual(t, len(pip.Status.Events), 0)
 	})
-
 	t.Run("single status event", func(t *testing.T) {
 		got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
 			Name:      "test-pipeline-07",
@@ -859,6 +960,59 @@ func TestClient_UpdatePipeline(t *testing.T) {
 		_, err = asUser.Pipelines(ctx, aggregator.ID, types.PipelinesParams{})
 		wantEqual(t, err, nil)
 	})
+	t.Run("update with auto create checks with invalid config", func(t *testing.T) {
+		_, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:                       "test-pipeline-09",
+			Kind:                       types.PipelineKindDeployment,
+			RawConfig:                  testFluentBitConfigWithInvalidOutput,
+			AutoCreateChecksFromConfig: true,
+		})
+
+		wantNoEqual(t, err, nil)
+		wantErrMsg(t, err, "invalid pipeline config: host property not defined in section \"tcp.0\"")
+	})
+
+	t.Run("update with auto create checks enabled and multi output configuration", func(t *testing.T) {
+		got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:                       "test-pipeline-10",
+			Kind:                       types.PipelineKindDeployment,
+			RawConfig:                  testFbitConfigWithSingleOutput,
+			AutoCreateChecksFromConfig: true,
+		})
+
+		wantEqual(t, err, nil)
+		wantEqual(t, len(got.Checks), 1)
+
+		updated, err := asUser.UpdatePipeline(ctx, got.ID, types.UpdatePipeline{
+			RawConfig:                  ptr(testFbitConfigWithMultipleOutputs),
+			AutoCreateChecksFromConfig: ptr(true),
+		})
+
+		wantEqual(t, err, nil)
+		wantEqual(t, len(updated.AddedChecks), 5)
+		wantEqual(t, len(updated.RemovedChecks), 1)
+	})
+
+	t.Run("update with auto create checks enabled from disabled", func(t *testing.T) {
+		got, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name:                       "test-pipeline-11",
+			Kind:                       types.PipelineKindDeployment,
+			RawConfig:                  testFbitConfigWithSingleOutput,
+			AutoCreateChecksFromConfig: false,
+		})
+
+		wantEqual(t, err, nil)
+		wantEqual(t, len(got.Checks), 0)
+
+		updated, err := asUser.UpdatePipeline(ctx, got.ID, types.UpdatePipeline{
+			RawConfig:                  ptr(testFbitConfigWithMultipleOutputs),
+			AutoCreateChecksFromConfig: ptr(true),
+		})
+
+		wantEqual(t, err, nil)
+		wantEqual(t, len(updated.AddedChecks), 5)
+		wantEqual(t, len(updated.RemovedChecks), 0)
+	})
 }
 
 func TestClient_DeletePipeline(t *testing.T) {
@@ -950,4 +1104,13 @@ func setupPipeline(t *testing.T, asUser *client.Client, aggregatorID string) typ
 	wantEqual(t, err, nil)
 
 	return pipeline
+}
+
+func randPort() uint {
+	return uint(randInt(1, 65535))
+}
+
+func randInt(min, max int) int {
+	math_rand.Seed(time.Now().UnixNano())
+	return min + math_rand.Intn(max-min+1)
 }
