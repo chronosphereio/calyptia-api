@@ -16,21 +16,21 @@ import (
 
 const testFbitConfigWithAddr = `[INPUT]
 	Name 			  forward
-	Listen            0.0.0.0
+	Host              0.0.0.0
 	Port              24224`
 
 const testFbitConfigWithAddr3 = `[INPUT]
 	Name              forward
-	Listen            0.0.0.0
+	Host              0.0.0.0
 	Port              24224
 [INPUT]
 	Name     syslog
-	Listen   0.0.0.0
+	Host     0.0.0.0
 	Port     5140
 	Mode     tcp
 [INPUT]
 	Name     syslog
-	Listen   0.0.0.0
+	Host     0.0.0.0
 	Port     5140
 	Mode     udp`
 
