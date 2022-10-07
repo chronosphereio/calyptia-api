@@ -2,9 +2,10 @@ package client_test
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"testing"
+
+	"code.cloudfoundry.org/bytefmt"
 
 	"github.com/calyptia/api/client"
 	"github.com/calyptia/api/types"
@@ -293,11 +294,16 @@ func TestClient_UpdateAggregator(t *testing.T) {
 	})
 	wantEqual(t, err, nil)
 
+	metadata := types.AggregatorMetadata{
+		MetadataK8S: types.MetadataK8S{
+			ClusterName: "test",
+		},
+	}
 	err = withToken.UpdateAggregator(ctx, created.ID, types.UpdateAggregator{
 		Name:     ptr("updated-core-instance"),
 		Version:  ptr("v1.0.0"),
 		Tags:     ptr([]string{"updatedtag"}),
-		Metadata: ptr(json.RawMessage(`{"k8s.cluster_name":"test"}`)),
+		Metadata: &metadata,
 	})
 	wantEqual(t, err, nil)
 
@@ -306,7 +312,7 @@ func TestClient_UpdateAggregator(t *testing.T) {
 	wantEqual(t, found.Name, "updated-core-instance")
 	wantEqual(t, found.Version, "v1.0.0")
 	wantEqual(t, found.Tags, []string{"updatedtag"})
-	wantEqual(t, *found.Metadata, json.RawMessage(`{"k8s.cluster_name":"test"}`))
+	wantEqual(t, found.Metadata, metadata)
 }
 
 func TestClient_DeleteAggregator(t *testing.T) {
@@ -386,41 +392,71 @@ func TestClient_CoreInstanceMetadata(t *testing.T) {
 	asUser := userClient(t)
 	withToken := withToken(t, asUser)
 
-	created, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
-		Name:                   "test-core-instance",
-		AddHealthCheckPipeline: false,
+	t.Run("invalid metadata", func(t *testing.T) {
+		_, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+			Name:                   "test-core-instance",
+			AddHealthCheckPipeline: false,
+			Metadata: types.AggregatorMetadata{
+				MetadataK8S: types.MetadataK8S{
+					ClusterName: "dev",
+				},
+			},
+		})
+
+		wantEqual(t, err, nil)
 	})
 
-	wantEqual(t, err, nil)
-	wantNoEqual(t, created, nil)
+	t.Run("ok", func(t *testing.T) {
+		created, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+			Name:                   "test-core-instance-01",
+			AddHealthCheckPipeline: false,
+		})
 
-	metadata := types.AggregatorMetadata{
-		MetadataAWS: types.MetadataAWS{
-			PrivateIPv4: "192.168.0.1",
-			PublicIPv4:  "1.1.1.1",
-		},
-		MetadataK8S: types.MetadataK8S{},
-		MetadataGCP: types.MetadataGCP{},
-	}
+		wantEqual(t, err, nil)
+		wantNoEqual(t, created, nil)
 
-	m, err := json.Marshal(metadata)
-	wantEqual(t, err, nil)
-	wantNoEqual(t, m, nil)
+		metadata := types.AggregatorMetadata{
+			MetadataAWS: types.MetadataAWS{
+				PrivateIPv4: "192.168.0.1",
+				PublicIPv4:  "1.1.1.1",
+			},
+			MetadataK8S: types.MetadataK8S{},
+			MetadataGCP: types.MetadataGCP{},
+		}
 
-	err = withToken.UpdateAggregator(ctx, created.ID, types.UpdateAggregator{
-		Metadata: (*json.RawMessage)(&m),
+		err = withToken.UpdateAggregator(ctx, created.ID, types.UpdateAggregator{
+			Metadata: ptr(metadata),
+		})
+		wantEqual(t, err, nil)
+
+		got, err := asUser.Aggregator(ctx, created.ID)
+		wantEqual(t, err, nil)
+		wantNoEqual(t, got, nil)
+
+		wantEqual(t, err, nil)
+		wantEqual(t, metadata, got.Metadata)
 	})
-	wantEqual(t, err, nil)
 
-	got, err := asUser.Aggregator(ctx, created.ID)
-	wantEqual(t, err, nil)
-	wantNoEqual(t, got, nil)
+	t.Run("invalid metadata value > 8KB", func(t *testing.T) {
+		metadata := types.AggregatorMetadata{
+			MetadataAWS: types.MetadataAWS{
+				PrivateIPv4: "192.168.0.1",
+				// set it to 10K
+				PublicIPv4: randStrSize(10 * bytefmt.KILOBYTE),
+			},
+			MetadataK8S: types.MetadataK8S{},
+			MetadataGCP: types.MetadataGCP{},
+		}
 
-	var gotMetadata types.AggregatorMetadata
+		_, err := withToken.CreateAggregator(ctx, types.CreateAggregator{
+			Name:                   "test-core-instance-02",
+			AddHealthCheckPipeline: false,
+			Metadata:               metadata,
+		})
 
-	err = json.Unmarshal(*got.Metadata, &gotMetadata)
-	wantEqual(t, err, nil)
-	wantEqual(t, metadata, gotMetadata)
+		wantNoEqual(t, err, nil)
+		wantErrMsg(t, err, "invalid aggregator metadata")
+	})
 }
 
 func setupAggregator(t *testing.T, withToken *client.Client) types.CreatedAggregator {
