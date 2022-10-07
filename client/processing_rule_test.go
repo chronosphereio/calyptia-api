@@ -2,6 +2,7 @@ package client_test
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"github.com/alecthomas/assert/v2"
 
 	"github.com/calyptia/api/client"
+	"github.com/calyptia/api/processingrule"
 	"github.com/calyptia/api/types"
 )
 
@@ -16,7 +18,7 @@ var sampleProcessingRuleActions = []types.RuleAction{{
 	Kind:        types.RuleActionKindAdd,
 	Enabled:     true,
 	Description: "Add foobar key-value pair",
-	Add:         &types.LogKeyVal{Key: "foo", Value: "bar"},
+	Add:         &types.LogAttr{Key: "foo", Value: "bar"},
 }, {
 	Kind:        types.RuleActionKindRename,
 	Enabled:     true,
@@ -86,9 +88,17 @@ func TestClient_CreateProcessingRule(t *testing.T) {
 	agg := setupAggregator(t, withToken(t, asUser))
 	pip := setupPipeline(t, asUser, agg.ID)
 
+	t.Run("invalid_match", func(t *testing.T) {
+		_, err := asUser.CreateProcessingRule(ctx, types.CreateProcessingRule{
+			PipelineID: pip.ID,
+		})
+		assert.EqualError(t, err, "invalid processing rule match")
+	})
+
 	t.Run("invalid_lang", func(t *testing.T) {
 		_, err := asUser.CreateProcessingRule(ctx, types.CreateProcessingRule{
 			PipelineID: pip.ID,
+			Match:      "*",
 		})
 		assert.EqualError(t, err, "invalid processing rule language")
 	})
@@ -96,6 +106,7 @@ func TestClient_CreateProcessingRule(t *testing.T) {
 	t.Run("invalid_action_desc", func(t *testing.T) {
 		_, err := asUser.CreateProcessingRule(ctx, types.CreateProcessingRule{
 			PipelineID: pip.ID,
+			Match:      "*",
 			Language:   types.ProcessingRuleLanguageLua,
 			Actions: []types.RuleAction{{
 				Description: strings.Repeat("x", 101),
@@ -107,6 +118,7 @@ func TestClient_CreateProcessingRule(t *testing.T) {
 	t.Run("invalid_action_kind", func(t *testing.T) {
 		_, err := asUser.CreateProcessingRule(ctx, types.CreateProcessingRule{
 			PipelineID: pip.ID,
+			Match:      "*",
 			Language:   types.ProcessingRuleLanguageLua,
 			Actions:    []types.RuleAction{{}},
 		})
@@ -116,6 +128,7 @@ func TestClient_CreateProcessingRule(t *testing.T) {
 	t.Run("invalid_action_selector_kind", func(t *testing.T) {
 		_, err := asUser.CreateProcessingRule(ctx, types.CreateProcessingRule{
 			PipelineID: pip.ID,
+			Match:      "*",
 			Language:   types.ProcessingRuleLanguageLua,
 			Actions: []types.RuleAction{{
 				Kind:      types.RuleActionKindAdd,
@@ -128,6 +141,7 @@ func TestClient_CreateProcessingRule(t *testing.T) {
 	t.Run("invalid_action_selector_op", func(t *testing.T) {
 		_, err := asUser.CreateProcessingRule(ctx, types.CreateProcessingRule{
 			PipelineID: pip.ID,
+			Match:      "*",
 			Language:   types.ProcessingRuleLanguageLua,
 			Actions: []types.RuleAction{{
 				Kind: types.RuleActionKindAdd,
@@ -142,6 +156,7 @@ func TestClient_CreateProcessingRule(t *testing.T) {
 	t.Run("invalid_action_args_add", func(t *testing.T) {
 		_, err := asUser.CreateProcessingRule(ctx, types.CreateProcessingRule{
 			PipelineID: pip.ID,
+			Match:      "*",
 			Language:   types.ProcessingRuleLanguageLua,
 			Actions: []types.RuleAction{{
 				Kind: types.RuleActionKindAdd,
@@ -153,6 +168,7 @@ func TestClient_CreateProcessingRule(t *testing.T) {
 	t.Run("invalid_action_args_rename", func(t *testing.T) {
 		_, err := asUser.CreateProcessingRule(ctx, types.CreateProcessingRule{
 			PipelineID: pip.ID,
+			Match:      "*",
 			Language:   types.ProcessingRuleLanguageLua,
 			Actions: []types.RuleAction{{
 				Kind: types.RuleActionKindRename,
@@ -164,6 +180,7 @@ func TestClient_CreateProcessingRule(t *testing.T) {
 	t.Run("invalid_action_args_copy", func(t *testing.T) {
 		_, err := asUser.CreateProcessingRule(ctx, types.CreateProcessingRule{
 			PipelineID: pip.ID,
+			Match:      "*",
 			Language:   types.ProcessingRuleLanguageLua,
 			Actions: []types.RuleAction{{
 				Kind: types.RuleActionKindCopy,
@@ -175,6 +192,7 @@ func TestClient_CreateProcessingRule(t *testing.T) {
 	t.Run("invalid_action_args_mask", func(t *testing.T) {
 		_, err := asUser.CreateProcessingRule(ctx, types.CreateProcessingRule{
 			PipelineID: pip.ID,
+			Match:      "*",
 			Language:   types.ProcessingRuleLanguageLua,
 			Actions: []types.RuleAction{{
 				Kind: types.RuleActionKindMask,
@@ -186,6 +204,7 @@ func TestClient_CreateProcessingRule(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
 		in := types.CreateProcessingRule{
 			PipelineID: pip.ID,
+			Match:      "*",
 			Language:   types.ProcessingRuleLanguageLua,
 			Actions:    sampleProcessingRuleActions,
 		}
@@ -193,10 +212,12 @@ func TestClient_CreateProcessingRule(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotZero(t, got)
 
-		pr, err := asUser.ProcessingRuleFromPipeline(ctx, pip.ID)
+		pr, err := asUser.ProcessingRule(ctx, got.ID)
 		assert.NoError(t, err)
 
 		assert.Equal(t, got.ID, pr.ID)
+		assert.Equal(t, in.Match, pr.Match)
+		assert.Equal(t, in.IsMatchRegexp, pr.IsMatchRegexp)
 		assert.Equal(t, in.Language, pr.Language)
 
 		// revert transport layer
@@ -210,38 +231,83 @@ func TestClient_CreateProcessingRule(t *testing.T) {
 		assert.Equal(t, in.Actions, pr.Actions)
 		assert.Equal(t, got.CreatedAt, pr.CreatedAt)
 
-		testProcessingRuleConfigSection(t, asUser, pr, pr.CreatedAt)
-	})
+		t.Run("file", func(t *testing.T) {
+			file, err := asUser.PipelineFile(ctx, got.FileID)
+			assert.NoError(t, err)
 
-	t.Run("exists", func(t *testing.T) {
-		_, err := asUser.CreateProcessingRule(ctx, types.CreateProcessingRule{
-			PipelineID: pip.ID,
-			Language:   types.ProcessingRuleLanguageLua,
+			code, err := processingrule.ToLua(in.Actions)
+			assert.NoError(t, err)
+			assert.Equal(t, string(file.Contents), code)
+
+			cs, err := asUser.ConfigSection(ctx, got.ConfigSectionID)
+			assert.NoError(t, err)
+			scriptPropVal, ok := cs.Properties.Get("script")
+			assert.True(t, ok)
+			scriptProp, ok := scriptPropVal.(string)
+			assert.True(t, ok)
+			assert.Equal(t, scriptProp, fmt.Sprintf("{{files.%s}}", file.Name))
 		})
-		assert.EqualError(t, err, "processing rule exists")
 	})
 }
 
-func TestClient_ProcessingRuleFromPipeline(t *testing.T) {
+func TestClient_ProcessingRules(t *testing.T) {
 	ctx := context.Background()
 	asUser := userClient(t)
 
 	t.Run("invalid_pipeline_id", func(t *testing.T) {
-		_, err := asUser.ProcessingRuleFromPipeline(ctx, "")
+		_, err := asUser.ProcessingRules(ctx, types.ProcessingRulesParams{})
 		assert.EqualError(t, err, "invalid pipeline ID")
 	})
 
 	t.Run("pipeline_not_found", func(t *testing.T) {
-		_, err := asUser.ProcessingRuleFromPipeline(ctx, randUUID(t))
+		_, err := asUser.ProcessingRules(ctx, types.ProcessingRulesParams{
+			PipelineID: randUUID(t),
+		})
 		assert.EqualError(t, err, "pipeline not found")
 	})
 
-	agg := setupAggregator(t, withToken(t, asUser))
-	pip := setupPipeline(t, asUser, agg.ID)
+	pr := setupProcessingRule(t, asUser)
+
+	t.Run("ok", func(t *testing.T) {
+		got, err := asUser.ProcessingRules(ctx, types.ProcessingRulesParams{
+			PipelineID: pr.PipelineID,
+		})
+		assert.NoError(t, err)
+		assert.NotZero(t, got)
+
+		found := got.Items[0]
+
+		// revert transport layer
+		// automatically converting nil slices into empty arrays.
+		for i, a := range found.Actions {
+			if len(a.Selectors) == 0 && a.Selectors != nil {
+				found.Actions[i].Selectors = nil
+			}
+		}
+
+		assert.Equal(t, pr, found)
+	})
+}
+
+func TestClient_ProcessingRule(t *testing.T) {
+	ctx := context.Background()
+	asUser := userClient(t)
+
+	t.Run("invalid_id", func(t *testing.T) {
+		_, err := asUser.ProcessingRule(ctx, "")
+		assert.EqualError(t, err, "invalid processing rule ID")
+	})
 
 	t.Run("not_found", func(t *testing.T) {
-		_, err := asUser.ProcessingRuleFromPipeline(ctx, pip.ID)
+		_, err := asUser.ProcessingRule(ctx, randUUID(t))
 		assert.EqualError(t, err, "processing rule not found")
+	})
+
+	pr := setupProcessingRule(t, asUser)
+
+	t.Run("ok", func(t *testing.T) {
+		_, err := asUser.ProcessingRule(ctx, pr.ID)
+		assert.NoError(t, err)
 	})
 
 	// ok case already tested on create/update
@@ -287,6 +353,8 @@ func TestClient_UpdateProcessingRule(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
 		in := types.UpdateProcessingRule{
 			ProcessingRuleID: pr.ID,
+			Match:            ptr("foo.*"),
+			IsMatchRegexp:    ptr(true),
 			Language:         ptr(types.ProcessingRuleLanguageLua),
 			Actions:          &sampleProcessingRuleActions,
 		}
@@ -294,8 +362,11 @@ func TestClient_UpdateProcessingRule(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotZero(t, got)
 
-		found, err := asUser.ProcessingRuleFromPipeline(ctx, pr.PipelineID)
+		found, err := asUser.ProcessingRule(ctx, pr.ID)
 		assert.NoError(t, err)
+
+		assert.Equal(t, *in.Match, found.Match)
+		assert.Equal(t, *in.IsMatchRegexp, found.IsMatchRegexp)
 
 		// revert transport layer
 		// automatically converting nil slices into empty arrays.
@@ -308,56 +379,107 @@ func TestClient_UpdateProcessingRule(t *testing.T) {
 		assert.Equal(t, *in.Actions, found.Actions)
 		assert.Equal(t, got.UpdatedAt, found.UpdatedAt)
 
-		testProcessingRuleConfigSection(t, asUser, pr, got.UpdatedAt)
+		t.Run("file", func(t *testing.T) {
+			file, err := asUser.PipelineFile(ctx, found.FileID)
+			assert.NoError(t, err)
+
+			code, err := processingrule.ToLua(*in.Actions)
+			assert.NoError(t, err)
+			assert.Equal(t, string(file.Contents), code)
+		})
 	})
 }
 
-func testProcessingRuleConfigSection(t *testing.T, client *client.Client, pr types.ProcessingRule, ts time.Time) {
+func TestClient_PreviewProcessingRule(t *testing.T) {
 	ctx := context.Background()
+	asUser := userClient(t)
 
-	t.Run("pip_config_sections", func(t *testing.T) {
-		pip, err := client.Pipeline(ctx, pr.PipelineID, types.PipelineParams{})
-		assert.NoError(t, err)
-		assert.Equal(t, ts, pip.UpdatedAt)
-		assert.NotZero(t, pip.ConfigSections)
+	now := time.Now().UTC().Truncate(time.Second)
 
-		cs := pip.ConfigSections[len(pip.ConfigSections)-1]
-		assert.Equal(t, types.SectionKindFilter, cs.Kind)
-		assert.Equal(t, pr.ID, *cs.ProcessingRuleID)
-		assert.Equal(t, types.Pair{Key: "name", Value: "lua"}, cs.Properties[0])
-		assert.Equal(t, types.Pair{Key: "match", Value: "*"}, cs.Properties[1])
-		assert.Equal(t, types.Pair{Key: "call", Value: "processing_rule"}, cs.Properties[2])
-		// not asserting lua code since it is too much to test,
-		// and generated lua code is already tested
-		// on the processingrule package.
-		// assert.Equal(t, types.Pair{Key: "code", Value: "TODO"}, cs.Properties[3])
+	logs := []types.FluentBitLog{
+		{
+			Timestamp: types.FluentBitTime(now.Unix()),
+			Attrs: types.FluentBitLogAttrs{
+				"msg":       "a log message",
+				"copy_me":   "copied_value",
+				"rename_me": "renamed_value",
+				"mask_me":   "gone",
+				"remove_me": "gone",
+			},
+		},
+	}
+
+	actions := []types.RuleAction{
+		{
+			Kind:    types.RuleActionKindAdd,
+			Enabled: true,
+			Add:     &types.LogAttr{Key: "added_key", Value: "added_value"},
+		},
+		{
+			Kind:    types.RuleActionKindCopy,
+			Enabled: true,
+			Selectors: []types.LogSelector{
+				{
+					Kind: types.LogSelectorKindKey,
+					Op:   types.LogSelectorOpKindEqual,
+					Expr: "copy_me",
+				},
+			},
+			CopyAs: ptr("copied"),
+		},
+		{
+			Kind:    types.RuleActionKindRename,
+			Enabled: true,
+			Selectors: []types.LogSelector{
+				{
+					Kind: types.LogSelectorKindKey,
+					Op:   types.LogSelectorOpKindEqual,
+					Expr: "rename_me",
+				},
+			},
+			RenameTo: ptr("renamed"),
+		},
+		{
+			Kind:    types.RuleActionKindMask,
+			Enabled: true,
+			Selectors: []types.LogSelector{
+				{
+					Kind: types.LogSelectorKindKey,
+					Op:   types.LogSelectorOpKindEqual,
+					Expr: "mask_me",
+				},
+			},
+			MaskWith: ptr("masked"),
+		},
+		{
+			Kind:    types.RuleActionKindRemove,
+			Enabled: true,
+			Selectors: []types.LogSelector{
+				{
+					Kind: types.LogSelectorKindKey,
+					Op:   types.LogSelectorOpKindEqual,
+					Expr: "remove_me",
+				},
+			},
+		},
+	}
+
+	got, err := asUser.PreviewProcessingRule(ctx, types.PreviewProcessingRule{
+		Language: types.ProcessingRuleLanguageLua,
+		Actions:  actions,
+		Logs:     logs,
 	})
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(got))
 
-	t.Run("proj_config_sections", func(t *testing.T) {
-		proj := defaultProject(t, client)
-		cc, err := client.ConfigSections(ctx, proj.ID, types.ConfigSectionsParams{
-			IncludeProcessingRules: false,
-		})
-		assert.NoError(t, err)
-		assert.Zero(t, cc.Items)
-
-		cc, err = client.ConfigSections(ctx, proj.ID, types.ConfigSectionsParams{
-			IncludeProcessingRules: true,
-		})
-		assert.NoError(t, err)
-		assert.NotZero(t, cc.Items)
-
-		cs := cc.Items[len(cc.Items)-1]
-		assert.Equal(t, types.SectionKindFilter, cs.Kind)
-		assert.Equal(t, pr.ID, *cs.ProcessingRuleID)
-		assert.Equal(t, types.Pair{Key: "name", Value: "lua"}, cs.Properties[0])
-		assert.Equal(t, types.Pair{Key: "match", Value: "*"}, cs.Properties[1])
-		assert.Equal(t, types.Pair{Key: "call", Value: "processing_rule"}, cs.Properties[2])
-		// not asserting lua code since it is too much to test,
-		// and generated lua code is already tested
-		// on the processingrule package.
-		// assert.Equal(t, types.Pair{Key: "code", Value: "TODO"}, cs.Properties[3])
-	})
+	assert.Equal(t, map[string]string{
+		"msg":       "a log message",
+		"added_key": "added_value",
+		"copy_me":   "copied_value",
+		"copied":    "copied_value",
+		"renamed":   "renamed_value",
+		"mask_me":   "masked",
+	}, got[0].Attrs)
 }
 
 func setupProcessingRule(t *testing.T, client *client.Client) types.ProcessingRule {
@@ -367,18 +489,24 @@ func setupProcessingRule(t *testing.T, client *client.Client) types.ProcessingRu
 	agg := setupAggregator(t, withToken(t, client))
 	pip := setupPipeline(t, client, agg.ID)
 	in := types.CreateProcessingRule{
-		PipelineID: pip.ID,
-		Language:   types.ProcessingRuleLanguageLua,
-		Actions:    sampleProcessingRuleActions,
+		PipelineID:    pip.ID,
+		Match:         "*",
+		IsMatchRegexp: false,
+		Language:      types.ProcessingRuleLanguageLua,
+		Actions:       sampleProcessingRuleActions,
 	}
 	created, err := client.CreateProcessingRule(ctx, in)
 	assert.NoError(t, err)
 	return types.ProcessingRule{
-		ID:         created.ID,
-		PipelineID: pip.ID,
-		Language:   in.Language,
-		Actions:    in.Actions,
-		CreatedAt:  created.CreatedAt,
-		UpdatedAt:  created.CreatedAt,
+		ID:              created.ID,
+		PipelineID:      pip.ID,
+		ConfigSectionID: created.ConfigSectionID,
+		FileID:          created.FileID,
+		Match:           in.Match,
+		IsMatchRegexp:   in.IsMatchRegexp,
+		Language:        in.Language,
+		Actions:         in.Actions,
+		CreatedAt:       created.CreatedAt,
+		UpdatedAt:       created.CreatedAt,
 	}
 }

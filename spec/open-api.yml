@@ -657,6 +657,10 @@ components:
         id:
           type: string
           format: uuid
+        processingRuleID:
+          type: string
+          format: uuid
+          nullable: true
         name:
           type: string
           example: myfile
@@ -673,6 +677,7 @@ components:
           format: date-time
       required:
         - id
+        - processingRuleID
         - name
         - contents
         - encrypted
@@ -2450,6 +2455,18 @@ components:
         pipelineID:
           type: string
           format: uuid
+        configSectionID:
+          type: string
+          format: uuid
+        fileID:
+          type: string
+          format: uuid
+        match:
+          type: string
+          example: "*"
+        isMatchRegexp:
+          type: boolean
+          default: false
         language:
           $ref: "#/components/schemas/ProcessingRuleLanguage"
         actions:
@@ -2465,6 +2482,10 @@ components:
       required:
         - id
         - pipelineID
+        - configSectionID
+        - fileID
+        - match
+        - isMatchRegexp
         - language
         - actions
         - createdAt
@@ -2491,7 +2512,7 @@ components:
           items:
             $ref: "#/components/schemas/LogSelector"
         add:
-          $ref: "#/components/schemas/LogKeyVal"
+          $ref: "#/components/schemas/LogAttr"
           nullable: true
           description: Only required when kind is "add".
         renameTo:
@@ -2514,7 +2535,6 @@ components:
         - description
         - enabled
         - selectors
-
 
     RuleActionKind:
       type: string
@@ -2549,7 +2569,7 @@ components:
       type: string
       enum: [equal]
 
-    LogKeyVal:
+    LogAttr:
       type: object
       properties:
         key:
@@ -2565,6 +2585,12 @@ components:
     CreateProcessingRule:
       type: object
       properties:
+        match:
+          type: string
+          example: "*"
+        isMatchRegexp:
+          type: boolean
+          default: false
         language:
           $ref: "#/components/schemas/ProcessingRuleLanguage"
         actions:
@@ -2572,6 +2598,8 @@ components:
           items:
             $ref: "#/components/schemas/RuleAction"
       required:
+        - match
+        - isMatchRegexp
         - language
         - actions
 
@@ -2581,16 +2609,31 @@ components:
         id:
           type: string
           format: uuid
+        configSectionID:
+          type: string
+          format: uuid
+        fileID:
+          type: string
+          format: uuid
         createdAt:
           type: string
           format: uuid
       required:
         - id
+        - configSectionID
+        - fileID
         - createdAt
 
     UpdateProcessingRule:
       type: object
       properties:
+        match:
+          type: string
+          example: "*"
+          nullable: true
+        isMatchRegexp:
+          type: boolean
+          nullable: true
         language:
           $ref: "#/components/schemas/ProcessingRuleLanguage"
           nullable: true
@@ -2607,6 +2650,39 @@ components:
           type: string
           format: date-time
       required: [updatedAt]
+
+    PreviewProcessingRule:
+      type: object
+      properties:
+        language:
+          $ref: "#/components/schemas/ProcessingRuleLanguage"
+        actions:
+          type: array
+          items:
+            $ref: "#/components/schemas/RuleAction"
+        logs:
+          type: array
+          items:
+            $ref: "#/components/schemas/FluentBitLog"
+      required:
+        - language
+        - actions
+        - logs
+
+    FluentBitLog:
+      description: |
+        Represents a fluent-bit log.
+        It's an array with 2 items:
+          - 0 being a unix timestamp with nanoseconds fraction.
+          - 1 being an object of string key-values.
+      type: array
+      items:
+        anyOf:
+          - type: number
+          - type: object
+            additionalProperties:
+              type: string
+        example: '[1234.5, {"key": "value"}]'
 
 paths:
   /v1/verification_email:
@@ -4553,6 +4629,7 @@ paths:
       tags:
         - metric
       summary: Project metrics
+      deprecated: true
       operationId: projectMetrics
       description: |-
         Contains an overview of the aggregated metrics for a project.
@@ -4576,6 +4653,12 @@ paths:
       responses:
         "200":
           description: OK
+          headers:
+            Sunset:
+              schema:
+                type: string
+                example: "Tue, 01 Nov 2022 00:00:00 GMT"
+              description: RFC1123 date when the endpoint will be removed.
           content:
             application/json:
               schema:
@@ -4592,6 +4675,7 @@ paths:
       tags:
         - metric
       summary: Agent metrics
+      deprecated: true
       operationId: agentMetrics
       description: |-
         Contains an overview of the aggregated metrics for an agent.
@@ -4615,6 +4699,12 @@ paths:
       responses:
         "200":
           description: OK
+          headers:
+            Sunset:
+              schema:
+                type: string
+                example: "Tue, 01 Nov 2022 00:00:00 GMT"
+              description: RFC1123 date when the endpoint will be removed.
           content:
             application/json:
               schema:
@@ -4631,6 +4721,7 @@ paths:
       tags:
         - metric
       summary: Pipeline metrics
+      deprecated: true
       operationId: pipelineMetrics
       description: |-
         Contains an overview of the aggregated metrics for a pipeline.
@@ -4654,6 +4745,12 @@ paths:
       responses:
         "200":
           description: OK
+          headers:
+            Sunset:
+              schema:
+                type: string
+                example: "Tue, 01 Nov 2022 00:00:00 GMT"
+              description: RFC1123 date when the endpoint will be removed.
           content:
             application/json:
               schema:
@@ -4690,12 +4787,19 @@ paths:
         - user: []
         - project: []
       summary: Aggregator metrics
+      deprecated: true
       operationId: aggregatorMetrics
       tags:
         - metric
       responses:
         "200":
           description: OK
+          headers:
+            Sunset:
+              schema:
+                type: string
+                example: "Tue, 01 Nov 2022 00:00:00 GMT"
+              description: RFC1123 date when the endpoint will be removed.
           content:
             application/json:
               schema:
@@ -4741,12 +4845,19 @@ paths:
         - user: []
         - project: []
       summary: Aggregator pipelines metrics (bulk)
+      deprecated: true
       operationId: aggregatorPipelinesMetrics
       tags:
         - metric
       responses:
         "200":
           description: OK
+          headers:
+            Sunset:
+              schema:
+                type: string
+                example: "Tue, 01 Nov 2022 00:00:00 GMT"
+              description: RFC1123 date when the endpoint will be removed.
           content:
             application/json:
               schema:
@@ -5139,10 +5250,49 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreatedProcessingRule"
+    get:
+      tags: [processing_rule]
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - name: last
+          schema:
+            type: integer
+            minimum: 0
+          in: query
+          description: Last processing rules.
+        - name: before
+          schema:
+            type: string
+          in: query
+          description: Processing rules before the given cursor.
+      summary: Processing rules
+      operationId: processingRules
+      responses:
+        "200":
+          description: OK
+          headers:
+            Link:
+              schema:
+                type: string
+                example: </v1/pipelines/foo/processing_rules?before=bar>; rel="next"
+              description: RFC5988 with `rel="next"`.
+          links:
+            NextTraceRecordsPage:
+              operationId: processingRules
+              parameters:
+                before: "$response.header.Link#rel=next"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProcessingRule"
 
-  "/v1/pipelines/{pipelineID}/processing_rule":
+  "/v1/processing_rules/{processingRuleID}":
     parameters:
-      - name: pipelineID
+      - name: processingRuleID
         in: path
         schema:
           type: string
@@ -5153,8 +5303,8 @@ paths:
       security:
         - user: []
         - project: []
-      summary: Processing rule from pipeline
-      operationId: processingRuleFromPipeline
+      summary: Processing rule
+      operationId: processingRule
       responses:
         "200":
           description: OK
@@ -5167,15 +5317,14 @@ paths:
               operationId: pipeline
               parameters:
                 projectID: "$response.body.pipelineID"
-
-  "/v1/processing_rules/{processingRuleID}":
-    parameters:
-      - name: processingRuleID
-        in: path
-        schema:
-          type: string
-          format: uuid
-        required: true
+            ConfigSection:
+              operationId: configSection
+              parameters:
+                projectID: "$response.body.configSectionID"
+            File:
+              operationId: pipelineFile
+              parameters:
+                projectID: "$response.body.fileID"
     patch:
       tags: [processing_rule]
       summary: Update processing rule
@@ -5195,3 +5344,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdatedProcessingRule"
+
+  "/v1/preview_processing_rule":
+    post:
+      tags: [processing_rule]
+      summary: Preview processing rule
+      operationId: previewProcessingRule
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PreviewProcessingRule"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref:  "#/components/schemas/FluentBitLog"

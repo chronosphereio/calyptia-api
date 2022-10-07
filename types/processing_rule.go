@@ -6,12 +6,16 @@ import "time"
 // eventually will get translated into a single fluent-bif filter.
 // This filter is stored as a config section associated with a pipeline.
 type ProcessingRule struct {
-	ID         string                 `json:"id" yaml:"id"`
-	PipelineID string                 `json:"pipelineID" yaml:"pipelineID"`
-	Language   ProcessingRuleLanguage `json:"language" yaml:"language"`
-	Actions    []RuleAction           `json:"actions" yaml:"actions"`
-	CreatedAt  time.Time              `json:"createdAt" yaml:"createdAt"`
-	UpdatedAt  time.Time              `json:"updatedAt" yaml:"updatedAt"`
+	ID              string                 `json:"id" yaml:"id"`
+	PipelineID      string                 `json:"pipelineID" yaml:"pipelineID"`
+	ConfigSectionID string                 `json:"configSectionID" yaml:"configSectionID"`
+	FileID          string                 `json:"fileID" yaml:"fileID"`
+	Match           string                 `json:"match" yaml:"match"`
+	IsMatchRegexp   bool                   `json:"matchRegexp" yaml:"matchRegexp"`
+	Language        ProcessingRuleLanguage `json:"language" yaml:"language"`
+	Actions         []RuleAction           `json:"actions" yaml:"actions"`
+	CreatedAt       time.Time              `json:"createdAt" yaml:"createdAt"`
+	UpdatedAt       time.Time              `json:"updatedAt" yaml:"updatedAt"`
 }
 
 // ProcessingRuleLanguage enum of scripting languages
@@ -32,10 +36,10 @@ type RuleAction struct {
 
 	// oneof the following depending on Kind:
 
-	Add      *LogKeyVal `json:"add,omitempty" yaml:"add,omitempty"`
-	RenameTo *string    `json:"renameTo,omitempty" yaml:"renameTo,omitempty"`
-	CopyAs   *string    `json:"copyAs,omitempty" yaml:"copyAs,omitempty"`
-	MaskWith *string    `json:"maskWith,omitempty" yaml:"maskWith,omitempty"`
+	Add      *LogAttr `json:"add,omitempty" yaml:"add,omitempty"`
+	RenameTo *string  `json:"renameTo,omitempty" yaml:"renameTo,omitempty"`
+	CopyAs   *string  `json:"copyAs,omitempty" yaml:"copyAs,omitempty"`
+	MaskWith *string  `json:"maskWith,omitempty" yaml:"maskWith,omitempty"`
 }
 
 // RuleActionKind enum of the different action kinds a processing rule can have.
@@ -89,28 +93,47 @@ const (
 	LogSelectorOpKindEqual LogSelectorOpKind = "equal"
 )
 
-// LogKeyVal its the key-value pair in a log record.
-type LogKeyVal struct {
+// LogAttr its the key-value pair in a log record.
+type LogAttr struct {
 	Key   string `json:"key" yaml:"key"`
 	Value string `json:"value" yaml:"value"`
 }
 
 // CreateProcessingRule request payload.
 type CreateProcessingRule struct {
-	PipelineID string                 `json:"-"`
-	Language   ProcessingRuleLanguage `json:"language"`
-	Actions    []RuleAction           `json:"actions"`
+	PipelineID    string                 `json:"-"`
+	Match         string                 `json:"match"`
+	IsMatchRegexp bool                   `json:"matchRegexp"`
+	Language      ProcessingRuleLanguage `json:"language"`
+	Actions       []RuleAction           `json:"actions"`
 }
 
 // CreatedProcessingRule response payload.
 type CreatedProcessingRule struct {
-	ID        string    `json:"id" yaml:"id"`
-	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
+	ID              string    `json:"id" yaml:"id"`
+	ConfigSectionID string    `json:"configSectionID" yaml:"configSectionID"`
+	FileID          string    `json:"fileID" yaml:"fileID"`
+	CreatedAt       time.Time `json:"createdAt" yaml:"createdAt"`
+}
+
+// ProcessingRulesParams request payload for querying processing rules.
+type ProcessingRulesParams struct {
+	PipelineID string
+	Last       *uint
+	Before     *string
+}
+
+// ProcessingRules paginated list.
+type ProcessingRules struct {
+	Items     []ProcessingRule `json:"items" yaml:"items"`
+	EndCursor *string          `json:"endCursor" yaml:"endCursor"`
 }
 
 // UpdateProcessingRule request payload.
 type UpdateProcessingRule struct {
 	ProcessingRuleID string                  `json:"-"`
+	Match            *string                 `json:"match,omitempty"`
+	IsMatchRegexp    *bool                   `json:"matchRegexp,omitempty"`
 	Language         *ProcessingRuleLanguage `json:"language,omitempty"`
 	Actions          *[]RuleAction           `json:"actions,omitempty"`
 }
@@ -118,4 +141,13 @@ type UpdateProcessingRule struct {
 // UpdatedProcessingRule response payload.
 type UpdatedProcessingRule struct {
 	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
+}
+
+// PreviewProcessingRule request payload to run and preview the input/output of
+// a processing rule.
+// Given some sample logs, and some actions, it shows the output log records.
+type PreviewProcessingRule struct {
+	Language ProcessingRuleLanguage `json:"language"`
+	Actions  []RuleAction           `json:"actions"`
+	Logs     []FluentBitLog         `json:"logs"`
 }
