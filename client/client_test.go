@@ -140,10 +140,12 @@ func testMain(m *testing.M) int {
 			name := name
 			go func() {
 				err := dockerPool.Client.Logs(docker.LogsOptions{
-					Container:   name,
-					ErrorStream: os.Stderr,
-					Stderr:      true,
-					Follow:      true,
+					Container:    name,
+					ErrorStream:  os.Stderr,
+					OutputStream: os.Stdout,
+					Stderr:       true,
+					Stdout:       true,
+					Follow:       true,
 				})
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
