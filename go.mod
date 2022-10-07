@@ -3,6 +3,7 @@ module github.com/calyptia/api
 go 1.19
 
 require (
+	code.cloudfoundry.org/bytefmt v0.0.0-20211005130812-5bb3c17173e5
 	github.com/alecthomas/assert/v2 v2.1.0
 	github.com/cenkalti/backoff/v4 v4.1.3
 	github.com/google/uuid v1.3.0
