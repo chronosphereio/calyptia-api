@@ -2,6 +2,7 @@ package client_test
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"github.com/alecthomas/assert/v2"
 
 	"github.com/calyptia/api/client"
+	"github.com/calyptia/api/processingrule"
 	"github.com/calyptia/api/types"
 )
 
@@ -229,23 +231,22 @@ func TestClient_CreateProcessingRule(t *testing.T) {
 		assert.Equal(t, in.Actions, pr.Actions)
 		assert.Equal(t, got.CreatedAt, pr.CreatedAt)
 
-		// TODO: Re-enable, find a new house for the ToLua helper.
-		//t.Run("file", func(t *testing.T) {
-		//	file, err := asUser.PipelineFile(ctx, got.FileID)
-		//	assert.NoError(t, err)
-		//
-		//	code, err := processingrule.ToLua(in.Actions)
-		//	assert.NoError(t, err)
-		//	assert.Equal(t, string(file.Contents), code)
-		//
-		//	cs, err := asUser.ConfigSection(ctx, got.ConfigSectionID)
-		//	assert.NoError(t, err)
-		//	scriptPropVal, ok := cs.Properties.Get("script")
-		//	assert.True(t, ok)
-		//	scriptProp, ok := scriptPropVal.(string)
-		//	assert.True(t, ok)
-		//	assert.Equal(t, scriptProp, fmt.Sprintf("{{files.%s}}", file.Name))
-		//})
+		t.Run("file", func(t *testing.T) {
+			file, err := asUser.PipelineFile(ctx, got.FileID)
+			assert.NoError(t, err)
+
+			code, err := processingrule.ToLua(in.Actions)
+			assert.NoError(t, err)
+			assert.Equal(t, string(file.Contents), code)
+
+			cs, err := asUser.ConfigSection(ctx, got.ConfigSectionID)
+			assert.NoError(t, err)
+			scriptPropVal, ok := cs.Properties.Get("script")
+			assert.True(t, ok)
+			scriptProp, ok := scriptPropVal.(string)
+			assert.True(t, ok)
+			assert.Equal(t, scriptProp, fmt.Sprintf("{{files.%s}}", file.Name))
+		})
 	})
 }
 
