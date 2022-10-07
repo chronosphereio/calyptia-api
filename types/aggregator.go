@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -11,18 +12,18 @@ const (
 
 // Aggregator model.
 type Aggregator struct {
-	ID                    string           `json:"id" yaml:"id"`
-	Token                 string           `json:"token" yaml:"token"`
-	Name                  string           `json:"name" yaml:"name"`
-	ClusterLoggingEnabled bool             `json:"clusterLoggingEnabled" yaml:"clusterLoggingEnabled"`
-	EnvironmentName       string           `json:"environmentName" yaml:"environmentName"`
-	Version               string           `json:"version" yaml:"version"`
-	PipelinesCount        uint             `json:"pipelinesCount" yaml:"pipelinesCount"`
-	Tags                  []string         `json:"tags" yaml:"tags"`
-	Metadata              *json.RawMessage `json:"metadata" yaml:"metadata"`
-	Status                AggregatorStatus `json:"status" yaml:"status"`
-	CreatedAt             time.Time        `json:"createdAt" yaml:"createdAt"`
-	UpdatedAt             time.Time        `json:"updatedAt" yaml:"updatedAt"`
+	ID                    string             `json:"id" yaml:"id"`
+	Token                 string             `json:"token" yaml:"token"`
+	Name                  string             `json:"name" yaml:"name"`
+	ClusterLoggingEnabled bool               `json:"clusterLoggingEnabled" yaml:"clusterLoggingEnabled"`
+	EnvironmentName       string             `json:"environmentName" yaml:"environmentName"`
+	Version               string             `json:"version" yaml:"version"`
+	PipelinesCount        uint               `json:"pipelinesCount" yaml:"pipelinesCount"`
+	Tags                  []string           `json:"tags" yaml:"tags"`
+	Metadata              AggregatorMetadata `json:"metadata" yaml:"metadata"`
+	Status                AggregatorStatus   `json:"status" yaml:"status"`
+	CreatedAt             time.Time          `json:"createdAt" yaml:"createdAt"`
+	UpdatedAt             time.Time          `json:"updatedAt" yaml:"updatedAt"`
 }
 
 type AggregatorStatus string
@@ -67,6 +68,18 @@ type AggregatorMetadata struct {
 	MetadataGCP
 }
 
+// Scan method to unmarshal properly as a json.
+func (a *AggregatorMetadata) Scan(value interface{}) error {
+	if value == nil {
+		return nil
+	}
+	b, ok := value.([]byte)
+	if !ok {
+		return fmt.Errorf("type assertion failed, unable to convert metadata type")
+	}
+	return json.Unmarshal(b, &a)
+}
+
 // MetadataK8S See: https://github.com/kubernetes/website/blob/60390ff3c0ef0043a58568ad2e4c2b7634028074/content/en/examples/pods/inject/dapi-volume.yaml#L5
 // For further cluster information data that can be included check: https://pkg.go.dev/k8s.io/client-go/discovery#DiscoveryClient.
 type MetadataK8S struct {
@@ -103,14 +116,14 @@ type MetadataGCP struct {
 
 // CreateAggregator request payload for creating a new aggregator.
 type CreateAggregator struct {
-	Name                    string           `json:"name"`
-	Version                 string           `json:"version"`
-	AddHealthCheckPipeline  bool             `json:"addHealthCheckPipeline"`
-	HealthCheckPipelinePort uint             `json:"healthCheckPipelinePort"`
-	ClusterLogging          bool             `json:"clusterLogging"`
-	Tags                    []string         `json:"tags"`
-	Metadata                *json.RawMessage `json:"metadata"`
-	EnvironmentID           string           `json:"environmentID"`
+	Name                    string             `json:"name"`
+	Version                 string             `json:"version"`
+	AddHealthCheckPipeline  bool               `json:"addHealthCheckPipeline"`
+	HealthCheckPipelinePort uint               `json:"healthCheckPipelinePort"`
+	ClusterLogging          bool               `json:"clusterLogging"`
+	Tags                    []string           `json:"tags"`
+	Metadata                AggregatorMetadata `json:"metadata"`
+	EnvironmentID           string             `json:"environmentID"`
 }
 
 // CreatedAggregator response payload after creating an aggregator successfully.
@@ -140,12 +153,12 @@ type AggregatorsParams struct {
 
 // UpdateAggregator request payload for updating an aggregator.
 type UpdateAggregator struct {
-	Name           *string          `json:"name"`
-	Version        *string          `json:"version"`
-	EnvironmentID  *string          `json:"environmentID"`
-	ClusterLogging *bool            `json:"clusterLogging"`
-	Tags           *[]string        `json:"tags"`
-	Metadata       *json.RawMessage `json:"metadata"`
+	Name           *string             `json:"name"`
+	Version        *string             `json:"version"`
+	EnvironmentID  *string             `json:"environmentID"`
+	ClusterLogging *bool               `json:"clusterLogging"`
+	Tags           *[]string           `json:"tags"`
+	Metadata       *AggregatorMetadata `json:"metadata"`
 }
 
 // PipelinesMetricsParams request payload for bulk querying pipeline metrics for a given aggregator.

@@ -537,6 +537,16 @@ func defaultToken(t *testing.T, asUser *client.Client) types.Token {
 	return tt.Items[0]
 }
 
+func randStrSize(size int) string {
+	letterRunes := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+	b := make([]rune, size)
+	for i := range b {
+		b[i] = letterRunes[math_rand.Intn(len(letterRunes))]
+	}
+	return string(b)
+}
+
 func randStr(t *testing.T) string {
 	t.Helper()
 	math_rand.Seed(time.Now().UnixNano())
