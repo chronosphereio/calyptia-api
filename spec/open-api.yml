@@ -2721,6 +2721,172 @@ components:
           type: string
           format: date-time
       required: [updatedAt]
+    CoreInstanceMetricsByPlugin:
+      type: object
+      properties:
+        inputs:
+          type: array
+          items:
+            type: object
+            properties:
+              instance:
+                type: string
+                example: "storage_backlog.3"
+                description: plugin alias
+              metrics:
+                $ref: "#/components/schemas/InputMetrics"
+        outputs:
+          type: array
+          items:
+            type: object
+            properties:
+              instance:
+                type: string
+                example: "storage_backlog.3"
+                description: plugin alias
+              metrics:
+                $ref: "#/components/schemas/OutputMetrics"
+        filters:
+          type: array
+          items:
+            type: object
+            properties:
+                instance:
+                    type: string
+                    example: "filter.3"
+                    description: plugin alias
+                metrics:
+                    $ref: "#/components/schemas/FilterMetrics"
+      example: |
+        {
+            "inputs": [
+                {
+                    "instance": "storage_backlog.3",
+                    "metrics": {
+                        "bytes": 0,
+                        "records": 0
+                    }
+                }
+            ],
+            "outputs": [
+                {
+                    "instance": "stdout.0",
+                    "metrics": {
+                        "bytes": 5811996,
+                        "records": 25697,
+                        "errors": 0,
+                        "retries": 0,
+                        "retriedRecords": 0,
+                        "retriesFailed": 0,
+                        "droppedRecords": 0,
+                        "loads": 0
+                    }
+                }
+            ],
+            "filters": [
+                {
+                    "instance": "filter.3",
+                    "metrics": {
+                        "dropRecords": 0,
+                        "emitRecords": 0
+                    }
+                }
+            ]
+        }
+    InputMetrics:
+      type: object
+      properties:
+        metrics:
+          type: object
+          properties:
+            bytes:
+              type: integer
+              example: 0
+            records:
+              type: integer
+              example: 0
+    OutputMetrics:
+      type: object
+      properties:
+        metrics:
+          type: object
+          properties:
+            bytes:
+              type: integer
+              example: 0
+            records:
+              type: integer
+              example: 0
+            errors:
+              type: integer
+              example: 0
+            retries:
+              type: integer
+              example: 0
+            retriedRecords:
+              type: integer
+              example: 0
+            retriesFailed:
+              type: integer
+              example: 0
+            droppedRecords:
+              type: integer
+              example: 0
+            loads:
+              type: integer
+              example: 0
+    FilterMetrics:
+      type: object
+      properties:
+        instance:
+          type: string
+          example: "filter.0"
+        metrics:
+          type: object
+          properties:
+            dropRecords:
+              type: integer
+              example: 0
+            emitRecords:
+              type: integer
+              example: 0
+    CoreInstanceMetrics:
+      type: object
+      properties:
+        inputs:
+          $ref: "#/components/schemas/InputMetrics"
+        outputs:
+          $ref: "#/components/schemas/OutputMetrics"
+        filters:
+          $ref: "#/components/schemas/FilterMetrics"
+      example: |
+        {
+          "inputs": {
+            "metrics": {
+              "bytes": 0,
+              "records": 0
+            }
+          },
+          "outputs": {
+            "metrics": {
+              "bytes": 0,
+              "records": 0,
+              "errors": 0,
+              "retries": 0,
+              "retriedRecords": 0,
+              "retriesFailed": 0,
+              "droppedRecords": 0,
+              "loads": 0
+            }
+          },
+          "filters": {
+            "instance": "filter.0",
+            "metrics": {
+              "dropRecords": 0,
+              "emitRecords": 0
+            }
+          }
+        }
 
     PreviewProcessingRule:
       type: object
@@ -5438,3 +5604,74 @@ paths:
                 type: array
                 items:
                   $ref:  "#/components/schemas/FluentBitLog"
+
+  "/v1/core_instances/{coreInstanceID}/metrics":
+    description: |
+      Metrics for a core instance.
+    parameters:
+      - name: coreInstanceID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      parameters:
+        - name: start
+          required: false
+          in: query
+          description: |
+            Option to filter metrics since the given time ago
+          schema:
+            type: string
+            format: duration
+            default: -24h
+      security:
+        - user: []
+        - project: []
+      summary: Core instance metrics
+      operationId: coreInstanceMetrics
+      tags:
+        - metric
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreInstanceMetrics"
+  "/v1/core_instances/{coreInstanceID}/metricsByPlugin":
+    description: |
+      Metrics for a core instance organized by plugin.
+    parameters:
+      - name: coreInstanceID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      parameters:
+        - name: start
+          required: false
+          in: query
+          description: |
+            Option to filter metrics since the given time ago
+          schema:
+            type: string
+            format: duration
+            default: -24h
+      security:
+        - user: [ ]
+        - project: [ ]
+      summary: Core instance metrics by plugin.
+      operationId: coreInstanceMetricsByPlugin
+      tags:
+        - metric
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreInstanceMetricsByPlugin"

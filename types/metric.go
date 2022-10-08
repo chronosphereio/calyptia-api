@@ -70,6 +70,52 @@ func (a *ProjectMetrics) AddMeasurementMetrics(measurement string, metrics []Met
 	a.Measurements[measurement] = mm
 }
 
+type MetricsSummaryPlugin struct {
+	Inputs  []MetricsInputPlugin  `json:"inputs"`
+	Outputs []MetricsOutputPlugin `json:"outputs"`
+	Filters []MetricsFilterPlugin `json:"filters"`
+}
+
+type MetricsInputPlugin struct {
+	Instance string       `json:"instance"`
+	Metrics  MetricsInput `json:"metrics"`
+}
+
+type MetricsFilterPlugin struct {
+	Instance string        `json:"instance"`
+	Metrics  MetricsFilter `json:"metrics"`
+}
+
+type MetricsOutputPlugin struct {
+	Instance string        `json:"instance"`
+	Metrics  MetricsOutput `json:"metrics"`
+}
+
+type MetricsOutput struct {
+	Bytes          float64 `json:"bytes"`
+	Records        float64 `json:"records"`
+	Errors         float64 `json:"errors"`
+	Retries        float64 `json:"retries"`
+	RetriedRecords float64 `json:"retriedRecords"`
+	RetriesFails   float64 `json:"retriesFails"`
+	DroppedRecords float64 `json:"droppedRecords"`
+	Loads          float64 `json:"loads"`
+}
+
+type MetricsFilter struct {
+	DropRecords float64 `json:"dropRecords"`
+	EmitRecords float64 `json:"emitRecords"`
+}
+type MetricsInput struct {
+	Bytes   float64 `json:"bytes"`
+	Records float64 `json:"records"`
+}
+type MetricsSummary struct {
+	MetricsInput  `json:"input"`
+	MetricsFilter `json:"filter"`
+	MetricsOutput `json:"output"`
+}
+
 // AgentMetrics response payload for agent level metrics.
 type AgentMetrics struct {
 	Measurements map[string]AgentMeasurement `json:"measurements"`
