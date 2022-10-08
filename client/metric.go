@@ -73,3 +73,28 @@ func (c *Client) AggregatorPipelinesMetrics(ctx context.Context, aggregatorID st
 
 	return out, c.do(ctx, http.MethodGet, "/v1/aggregators/"+url.PathEscape(aggregatorID)+"/pipelines_metrics?"+q.Encode(), nil, &out)
 }
+
+// CoreInstanceMetrics contains an overview of the Core Instance metrics.
+// It includes metrics link the amount of records, bytes, and errors.
+func (c *Client) CoreInstanceMetrics(ctx context.Context, aggregatorID string, params types.MetricsParams) (types.MetricsSummary, error) {
+	q := url.Values{
+		"start": []string{params.Start.String()},
+	}
+
+	var out types.MetricsSummary
+	path := "/v1/core_instances/{coreInstanceID}/metrics" + url.PathEscape(aggregatorID) + "?" + q.Encode()
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+}
+
+// CoreInstanceMetricsByPlugin contains an overview of the Core Instance metrics.
+// It includes metrics link the amount of records, bytes, and errors per plugin.
+func (c *Client) CoreInstanceMetricsByPlugin(ctx context.Context, aggregatorID string, params types.MetricsParams) (types.MetricsSummaryPlugin, error) {
+	q := url.Values{
+		"start": []string{params.Start.String()},
+		"by":    []string{"plugin"},
+	}
+
+	var out types.MetricsSummaryPlugin
+	path := "/v1/core_instances/{coreInstanceID}/metrics" + url.PathEscape(aggregatorID) + "?" + q.Encode()
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+}

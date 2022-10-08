@@ -194,7 +194,7 @@ package client_test
 // type setupTraceRecordOpts struct {
 // 	Client     *client.Client
 // 	PipelineID *string
-// 	Input      *types.CreateTraceRecord
+// 	MetricsInput      *types.CreateTraceRecord
 // }
 
 // //nolint:unparam // returning trace record might be used in the tests later.
@@ -222,8 +222,8 @@ package client_test
 // 	nowUnixStr := strconv.FormatInt(now.Unix(), 10)
 
 // 	var in types.CreateTraceRecord
-// 	if opts.Input != nil {
-// 		in = *opts.Input
+// 	if opts.MetricsInput != nil {
+// 		in = *opts.MetricsInput
 // 	} else {
 // 		in = types.CreateTraceRecord{
 // 			Kind:           types.TraceRecordKindInput,
