@@ -11,7 +11,7 @@ type ProcessingRule struct {
 	ConfigSectionID string                 `json:"configSectionID" yaml:"configSectionID"`
 	FileID          string                 `json:"fileID" yaml:"fileID"`
 	Match           string                 `json:"match" yaml:"match"`
-	IsMatchRegexp   bool                   `json:"matchRegexp" yaml:"matchRegexp"`
+	IsMatchRegexp   bool                   `json:"isMatchRegexp" yaml:"isMatchRegexp"`
 	Language        ProcessingRuleLanguage `json:"language" yaml:"language"`
 	Actions         []RuleAction           `json:"actions" yaml:"actions"`
 	CreatedAt       time.Time              `json:"createdAt" yaml:"createdAt"`
@@ -103,7 +103,7 @@ type LogAttr struct {
 type CreateProcessingRule struct {
 	PipelineID    string                 `json:"-"`
 	Match         string                 `json:"match"`
-	IsMatchRegexp bool                   `json:"matchRegexp"`
+	IsMatchRegexp bool                   `json:"isMatchRegexp"`
 	Language      ProcessingRuleLanguage `json:"language"`
 	Actions       []RuleAction           `json:"actions"`
 }
@@ -133,7 +133,7 @@ type ProcessingRules struct {
 type UpdateProcessingRule struct {
 	ProcessingRuleID string                  `json:"-"`
 	Match            *string                 `json:"match,omitempty"`
-	IsMatchRegexp    *bool                   `json:"matchRegexp,omitempty"`
+	IsMatchRegexp    *bool                   `json:"isMatchRegexp,omitempty"`
 	Language         *ProcessingRuleLanguage `json:"language,omitempty"`
 	Actions          *[]RuleAction           `json:"actions,omitempty"`
 }

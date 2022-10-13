@@ -56,6 +56,7 @@ type CreatePipeline struct {
 	Files                     []CreatePipelineFile   `json:"files"`
 	ResourceProfileName       string                 `json:"resourceProfile"`
 	AutoCreatePortsFromConfig bool                   `json:"autoCreatePortsFromConfig"`
+	SkipConfigValidation      bool                   `json:"skipConfigValidation"`
 	Metadata                  *json.RawMessage       `json:"metadata"`
 	Tags                      []string               `json:"tags"`
 
