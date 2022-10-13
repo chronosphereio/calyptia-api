@@ -1451,6 +1451,8 @@ components:
             will be executed.
         autoCreatePortsFromConfig:
           type: boolean
+        skipConfigValidation:
+          type: boolean
         metadata:
           type: object
           nullable: true
@@ -1467,6 +1469,7 @@ components:
         - resourceProfile
         - autoCreatePortsFromConfig
         - autoCreateChecksFromConfig
+        - skipConfigValidation
     UpdatePipeline:
       description: Update pipeline request body.
       type: object

@@ -55,7 +55,9 @@ func (pp *Pairs) Remove(key string) {
 		}
 	}
 
-	*pp = append((*pp)[:deleteIndex], (*pp)[deleteIndex+1:]...)
+	if deleteIndex != -1 {
+		*pp = append((*pp)[:deleteIndex], (*pp)[deleteIndex+1:]...)
+	}
 }
 
 func (pp Pairs) AsMap() map[string]any {
