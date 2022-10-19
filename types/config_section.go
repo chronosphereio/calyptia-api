@@ -1,14 +1,17 @@
 package types
 
-import "time"
+import (
+	"time"
+)
 
 // ConfigSectionKind enum with known fluent-bit section types.
 type ConfigSectionKind string
 
 const (
-	SectionKindInput  ConfigSectionKind = "input"
-	SectionKindFilter ConfigSectionKind = "filter"
-	SectionKindOutput ConfigSectionKind = "output"
+	SectionKindService ConfigSectionKind = "service"
+	SectionKindInput   ConfigSectionKind = "input"
+	SectionKindFilter  ConfigSectionKind = "filter"
+	SectionKindOutput  ConfigSectionKind = "output"
 )
 
 // ConfigSection model represents a fluent-bit config section that can be reused

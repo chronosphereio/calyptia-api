@@ -8,7 +8,7 @@ import (
 // FluentBitLog is the Go representation of a fluent-bit log record.
 // Normally, the format is an array of mixed types.
 // [timestamp, attrs]
-// Where timestampt is a float with seconds and nanoseconds as fraction.
+// Where timestamp is a float with seconds and nanoseconds as fraction.
 // And attrs being an object with string key and values.
 type FluentBitLog struct {
 	Timestamp FluentBitTime
@@ -19,10 +19,10 @@ type FluentBitLog struct {
 type FluentBitTime float64
 
 // FluentBitLogAttrs wrapper.
-type FluentBitLogAttrs map[string]string
+type FluentBitLogAttrs map[string]any
 
 func (l FluentBitLog) AsSlice() []any {
-	return []any{float64(l.Timestamp), map[string]string(l.Attrs)}
+	return []any{float64(l.Timestamp), map[string]any(l.Attrs)}
 }
 
 // UnmarshalJSON parses fluent-big json representation of

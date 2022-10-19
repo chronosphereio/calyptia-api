@@ -65,4 +65,18 @@ func TestFluentBitLog_JSON(t *testing.T) {
 
 		assert.Equal(t, in, string(out))
 	})
+
+	t.Run("unmarshal_any", func(t *testing.T) {
+		now := time.Now().UTC()
+		// trucating to second precision for now.
+		// TODO: test correct parsing of unix fraction time.
+		now = now.Truncate(time.Second)
+
+		secs := now.Truncate(time.Second).Unix()
+		in := fmt.Sprintf(`[%d,{"foo":"bar","arr":[4,"test",[],false,{}],"obj":{"x":"y","arr":[1,true]}}]`, secs)
+
+		var l FluentBitLog
+		err := json.Unmarshal([]byte(in), &l)
+		assert.NoError(t, err)
+	})
 }
