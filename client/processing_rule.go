@@ -37,6 +37,10 @@ func (c *Client) UpdateProcessingRule(ctx context.Context, in types.UpdateProces
 	return out, c.do(ctx, http.MethodPatch, "/v1/processing_rules/"+url.PathEscape(in.ProcessingRuleID), in, &out)
 }
 
+func (c *Client) DeleteProcessingRule(ctx context.Context, processingRuleID string) error {
+	return c.do(ctx, http.MethodDelete, "/v1/processing_rules/"+url.PathEscape(processingRuleID), nil, nil)
+}
+
 func (c *Client) PreviewProcessingRule(ctx context.Context, in types.PreviewProcessingRule) ([]types.FluentBitLog, error) {
 	var out []types.FluentBitLog
 	return out, c.do(ctx, http.MethodPost, "/v1/preview_processing_rule", in, &out)
