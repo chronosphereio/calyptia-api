@@ -116,6 +116,7 @@ type UpdatePipeline struct {
 	AutoCreateChecksFromConfig *bool `json:"autoCreateChecksFromConfig"`
 	// this defines behavior; await for checks to complete before reporting the status back.
 	WaitForChecksBeforeDeploying *bool                  `json:"waitForChecksBeforeDeploying"`
+	SkipConfigValidation         bool                   `json:"skipConfigValidation"`
 	Metadata                     *json.RawMessage       `json:"metadata"`
 	Secrets                      []UpdatePipelineSecret `json:"secrets"`
 	Files                        []UpdatePipelineFile   `json:"files"`

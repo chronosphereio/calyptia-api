@@ -6,8 +6,106 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/alecthomas/assert/v2"
+
 	"github.com/calyptia/api/types"
 )
+
+func TestClient_PipelineConfig(t *testing.T) {
+	ctx := context.Background()
+	asUser := userClient(t)
+	aggregator := setupAggregator(t, withToken(t, asUser))
+
+	t.Run("fix for cloud/632", func(t *testing.T) {
+		pip, err := asUser.CreatePipeline(ctx, aggregator.ID, types.CreatePipeline{
+			Name: "test",
+			Kind: types.PipelineKindDeployment,
+			RawConfig: `
+{
+   "pipeline":{
+      "inputs":[
+         {
+            "dummy":{
+               "dummy":"{\"message\":\"dummy\"}",
+               "rate":"1",
+               "samples":"0",
+               "start_time_sec":"-1",
+               "start_time_nsec":"-1",
+               "Name":"dummy",
+               "tag":"dummy.2a227ce1-6a50-4ad2-ba37-9e436c454116"
+            }
+         }
+      ],
+      "outputs":[
+         {
+            "http":{
+               "host":"calyptia-vivo",
+               "port":"5489",
+               "uri":"/console",
+               "format":"json",
+               "Name":"http",
+               "Match":"*"
+            }
+         }
+      ]
+   }
+}
+`,
+			ConfigFormat: types.ConfigFormatJSON,
+		})
+
+		assert.NoError(t, err)
+		assert.NotZero(t, pip)
+
+		pr, err := asUser.CreateProcessingRule(ctx, types.CreateProcessingRule{
+			PipelineID:    pip.ID,
+			Match:         "*",
+			IsMatchRegexp: false,
+			Language:      types.ProcessingRuleLanguageLua,
+			Actions: []types.RuleAction{
+				{
+					Kind:        types.RuleActionKindAdd,
+					Description: "",
+					Enabled:     false,
+					Selectors:   nil,
+					Add: &types.LogAttr{
+						Key:   "aa",
+						Value: "bb",
+					},
+				},
+			},
+		})
+		assert.NoError(t, err)
+		assert.NotZero(t, pr)
+
+		format := types.ConfigFormatINI
+		fetchPip, err := asUser.Pipeline(ctx, pip.ID, types.PipelineParams{
+			RenderWithConfigSections: true,
+			ConfigFormat:             &format,
+		})
+		assert.NoError(t, err)
+		assert.NotZero(t, fetchPip)
+		assert.Contains(t, fetchPip.Config.RawConfig, `[INPUT]
+    dummy {"message":"dummy"}
+    rate 1
+    samples 0
+    start_time_sec -1
+    start_time_nsec -1
+    Name dummy
+    tag dummy.2a227ce1-6a50-4ad2-ba37-9e436c454116
+[OUTPUT]
+    host calyptia-vivo
+    port 5489
+    uri /console
+    format json
+    Name http
+    Match *
+[FILTER]
+    name lua
+    match *
+    call processing_rule`)
+	})
+}
 
 func TestClient_PipelineConfigHistory(t *testing.T) {
 	ctx := context.Background()
