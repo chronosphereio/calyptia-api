@@ -35,6 +35,7 @@ func (l *FluentBitLog) UnmarshalJSON(b []byte) error {
 		return err
 	}
 
+	//nolint:gomnd
 	if len(ss) != 2 {
 		return errors.New("unexpected log record parts length")
 	}
