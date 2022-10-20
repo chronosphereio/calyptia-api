@@ -2,7 +2,6 @@ package client_test
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -10,7 +9,6 @@ import (
 	"github.com/alecthomas/assert/v2"
 
 	"github.com/calyptia/api/client"
-	"github.com/calyptia/api/processingrule"
 	"github.com/calyptia/api/types"
 )
 
@@ -200,54 +198,6 @@ func TestClient_CreateProcessingRule(t *testing.T) {
 		})
 		assert.EqualError(t, err, "invalid processing rule action args")
 	})
-
-	t.Run("ok", func(t *testing.T) {
-		in := types.CreateProcessingRule{
-			PipelineID: pip.ID,
-			Match:      "*",
-			Language:   types.ProcessingRuleLanguageLua,
-			Actions:    sampleProcessingRuleActions,
-		}
-		got, err := asUser.CreateProcessingRule(ctx, in)
-		assert.NoError(t, err)
-		assert.NotZero(t, got)
-
-		pr, err := asUser.ProcessingRule(ctx, got.ID)
-		assert.NoError(t, err)
-
-		assert.Equal(t, got.ID, pr.ID)
-		assert.Equal(t, in.Match, pr.Match)
-		assert.Equal(t, in.IsMatchRegexp, pr.IsMatchRegexp)
-		assert.Equal(t, in.Language, pr.Language)
-
-		// revert transport layer
-		// automatically converting nil slices into empty arrays.
-		for i, a := range pr.Actions {
-			if len(a.Selectors) == 0 && a.Selectors != nil {
-				pr.Actions[i].Selectors = nil
-			}
-		}
-
-		assert.Equal(t, in.Actions, pr.Actions)
-		assert.Equal(t, got.CreatedAt, pr.CreatedAt)
-
-		t.Run("file", func(t *testing.T) {
-			file, err := asUser.PipelineFile(ctx, got.FileID)
-			assert.NoError(t, err)
-
-			code, err := processingrule.ToLua(in.Actions)
-			assert.NoError(t, err)
-			assert.Equal(t, string(file.Contents), code)
-
-			cs, err := asUser.ConfigSection(ctx, got.ConfigSectionID)
-			assert.NoError(t, err)
-			scriptPropVal, ok := cs.Properties.Get("script")
-			assert.True(t, ok)
-			scriptProp, ok := scriptPropVal.(string)
-			assert.True(t, ok)
-			assert.Equal(t, scriptProp, fmt.Sprintf("{{files.%s}}", file.Name))
-		})
-	})
 }
 
 func TestClient_ProcessingRules(t *testing.T) {
@@ -378,15 +328,6 @@ func TestClient_UpdateProcessingRule(t *testing.T) {
 
 		assert.Equal(t, *in.Actions, found.Actions)
 		assert.Equal(t, got.UpdatedAt, found.UpdatedAt)
-
-		t.Run("file", func(t *testing.T) {
-			file, err := asUser.PipelineFile(ctx, found.FileID)
-			assert.NoError(t, err)
-
-			code, err := processingrule.ToLua(*in.Actions)
-			assert.NoError(t, err)
-			assert.Equal(t, string(file.Contents), code)
-		})
 	})
 }
 
