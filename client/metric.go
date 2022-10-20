@@ -76,25 +76,49 @@ func (c *Client) AggregatorPipelinesMetrics(ctx context.Context, aggregatorID st
 
 // CoreInstanceMetrics contains an overview of the Core Instance metrics.
 // It includes metrics link the amount of records, bytes, and errors.
-func (c *Client) CoreInstanceMetrics(ctx context.Context, aggregatorID string, params types.MetricsParams) (types.MetricsSummary, error) {
+func (c *Client) CoreInstanceMetrics(ctx context.Context, coreInstanceID string, params types.MetricsParams) (types.MetricsSummary, error) {
 	q := url.Values{
 		"start": []string{params.Start.String()},
 	}
 
 	var out types.MetricsSummary
-	path := "/v1/core_instances/{coreInstanceID}/metrics" + url.PathEscape(aggregatorID) + "?" + q.Encode()
+	path := "/v1/core_instances/" + url.PathEscape(coreInstanceID) + "/metrics?" + q.Encode()
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }
 
 // CoreInstanceMetricsByPlugin contains an overview of the Core Instance metrics.
 // It includes metrics link the amount of records, bytes, and errors per plugin.
-func (c *Client) CoreInstanceMetricsByPlugin(ctx context.Context, aggregatorID string, params types.MetricsParams) (types.MetricsSummaryPlugin, error) {
+func (c *Client) CoreInstanceMetricsByPlugin(ctx context.Context, coreInstanceID string, params types.MetricsParams) (types.MetricsSummaryPlugin, error) {
 	q := url.Values{
 		"start": []string{params.Start.String()},
-		"by":    []string{"plugin"},
 	}
 
 	var out types.MetricsSummaryPlugin
-	path := "/v1/core_instances/{coreInstanceID}/metrics" + url.PathEscape(aggregatorID) + "?" + q.Encode()
+	path := "/v1/core_instances/" + url.PathEscape(coreInstanceID) + "/metrics_by_plugin?" + q.Encode()
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+}
+
+// CoreInstanceOverTimeMetrics contains Core Instance metrics overtime.
+// It includes metrics link the amount of records, bytes, and errors.
+func (c *Client) CoreInstanceOverTimeMetrics(ctx context.Context, coreInstanceID string, params types.MetricsParams) (types.MetricsOverTime, error) {
+	q := url.Values{
+		"start":    []string{params.Start.String()},
+		"interval": []string{params.Interval.String()},
+	}
+
+	var out types.MetricsOverTime
+	path := "/v1/core_instances/" + url.PathEscape(coreInstanceID) + "/metrics_over_time?" + q.Encode()
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+}
+
+// CoreInstanceMetricsOverTimeByPlugin contains an overview of the Core Instance metrics.
+// It includes metrics link the amount of records, bytes, and errors per plugin.
+func (c *Client) CoreInstanceMetricsOverTimeByPlugin(ctx context.Context, coreInstanceID string, params types.MetricsParams) (types.MetricsOverTimeByPlugin, error) {
+	q := url.Values{
+		"start": []string{params.Start.String()},
+	}
+
+	var out types.MetricsOverTimeByPlugin
+	path := "/v1/core_instances/" + url.PathEscape(coreInstanceID) + "/metrics_over_time_by_plugin?" + q.Encode()
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }

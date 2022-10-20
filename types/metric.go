@@ -70,10 +70,43 @@ func (a *ProjectMetrics) AddMeasurementMetrics(measurement string, metrics []Met
 	a.Measurements[measurement] = mm
 }
 
+// MetricsSummary stores a list of totals for a core instance.
+type MetricsSummary struct {
+	Input  MetricsInput  `json:"input"`
+	Filter MetricsFilter `json:"filter"`
+	Output MetricsOutput `json:"output"`
+}
+
+// MetricsInput stores totals for a core instance input.
+type MetricsInput struct {
+	Bytes   *float64 `json:"bytes"`
+	Records *float64 `json:"records"`
+}
+
+// MetricsFilter stores totals for a core instance filter.
+type MetricsFilter struct {
+	DropRecords *float64 `json:"dropRecords"`
+	EmitRecords *float64 `json:"emitRecords"`
+}
+
+// MetricsOutput stores totals for a core instance output.
+type MetricsOutput struct {
+	Bytes          *float64 `json:"bytes"`
+	Records        *float64 `json:"records"`
+	Errors         *float64 `json:"errors"`
+	Retries        *float64 `json:"retries"`
+	RetriedRecords *float64 `json:"retriedRecords"`
+	RetriesFailed  *float64 `json:"retriesFailed"`
+	DroppedRecords *float64 `json:"droppedRecords"`
+	Loads          *float64 `json:"loads"`
+}
+
+// MetricsSummaryPlugin stores a list of totals for a core instance
+// for a specific plugin.
 type MetricsSummaryPlugin struct {
 	Inputs  []MetricsInputPlugin  `json:"inputs"`
-	Outputs []MetricsOutputPlugin `json:"outputs"`
 	Filters []MetricsFilterPlugin `json:"filters"`
+	Outputs []MetricsOutputPlugin `json:"outputs"`
 }
 
 type MetricsInputPlugin struct {
@@ -89,31 +122,6 @@ type MetricsFilterPlugin struct {
 type MetricsOutputPlugin struct {
 	Instance string        `json:"instance"`
 	Metrics  MetricsOutput `json:"metrics"`
-}
-
-type MetricsOutput struct {
-	Bytes          float64 `json:"bytes"`
-	Records        float64 `json:"records"`
-	Errors         float64 `json:"errors"`
-	Retries        float64 `json:"retries"`
-	RetriedRecords float64 `json:"retriedRecords"`
-	RetriesFails   float64 `json:"retriesFails"`
-	DroppedRecords float64 `json:"droppedRecords"`
-	Loads          float64 `json:"loads"`
-}
-
-type MetricsFilter struct {
-	DropRecords float64 `json:"dropRecords"`
-	EmitRecords float64 `json:"emitRecords"`
-}
-type MetricsInput struct {
-	Bytes   float64 `json:"bytes"`
-	Records float64 `json:"records"`
-}
-type MetricsSummary struct {
-	MetricsInput  `json:"input"`
-	MetricsFilter `json:"filter"`
-	MetricsOutput `json:"output"`
 }
 
 // AgentMetrics response payload for agent level metrics.
@@ -179,6 +187,14 @@ type MetricFields struct {
 	Plugin string    `json:"-"`
 }
 
+// ToOverTime converts a regular MetricFields to a MetricOverTime.
+func (m MetricFields) ToOverTime() MetricOverTime {
+	return MetricOverTime{
+		Time:  m.Time,
+		Value: m.Value,
+	}
+}
+
 // MetricsParams parameters to filtering metrics by.
 type MetricsParams struct {
 	Start    time.Duration
@@ -195,3 +211,92 @@ type CreatedAgentMetrics struct {
 type PipelinesMetrics map[string]PipelineMetric
 
 // TODO: define "add metrics" type.
+
+// MetricsOverTime stores a list of metrics over time for a core instance.
+type MetricsOverTime struct {
+	Input  MetricsOverTimeInput  `json:"input"`
+	Filter MetricsOverTimeFilter `json:"filter"`
+	Output MetricsOverTimeOutput `json:"output"`
+}
+
+// MetricsOverTimeInput stores a list of metrics over time for a core instance input.
+type MetricsOverTimeInput struct {
+	Bytes   []MetricOverTime `json:"bytes"`
+	Records []MetricOverTime `json:"records"`
+}
+
+// MetricsOverTimeFilter stores a list of metrics over time for a core instance filter.
+type MetricsOverTimeFilter struct {
+	DropRecords []MetricOverTime `json:"dropRecords"`
+	EmitRecords []MetricOverTime `json:"emitRecords"`
+}
+
+// MetricsOverTimeOutput stores a list of metrics over time for a core instance output.
+type MetricsOverTimeOutput struct {
+	Bytes          []MetricOverTime `json:"bytes"`
+	Records        []MetricOverTime `json:"records"`
+	Errors         []MetricOverTime `json:"errors"`
+	Retries        []MetricOverTime `json:"retries"`
+	RetriedRecords []MetricOverTime `json:"retriedRecords"`
+	RetriesFailed  []MetricOverTime `json:"retriesFailed"`
+	DroppedRecords []MetricOverTime `json:"droppedRecords"`
+	Loads          []MetricOverTime `json:"loads"`
+}
+
+// MetricsOverTimeByPlugin stores a list of metrics over time for a core instance
+// for a specific plugin.
+type MetricsOverTimeByPlugin struct {
+	Inputs  []MetricsOverTimeByPluginInput  `json:"inputs"`
+	Filters []MetricsOverTimeByPluginFilter `json:"filters"`
+	Outputs []MetricsOverTimeByPluginOutput `json:"outputs"`
+}
+
+// MetricsOverTimeByPluginInput stores a list of metrics over time for core instance inputs
+// organized by plugin.
+type MetricsOverTimeByPluginInput struct {
+	Instance string               `json:"instance"`
+	Metrics  MetricsOverTimeInput `json:"metrics"`
+}
+
+// MetricsOverTimeByPluginFilter stores a list of metrics over time for core instance filters
+// organized by plugin.
+type MetricsOverTimeByPluginFilter struct {
+	Instance string                `json:"instance"`
+	Metrics  MetricsOverTimeFilter `json:"metrics"`
+}
+
+// MetricsOverTimeByPluginOutput stores a list of metrics over time for core instance outputs
+// organized by plugin.
+type MetricsOverTimeByPluginOutput struct {
+	Instance string                `json:"instance"`
+	Metrics  MetricsOverTimeOutput `json:"metrics"`
+}
+
+func (o *MetricsOverTimeOutput) Init() *MetricsOverTimeOutput {
+	o.Bytes = []MetricOverTime{}
+	o.Records = []MetricOverTime{}
+	o.Errors = []MetricOverTime{}
+	o.Retries = []MetricOverTime{}
+	o.RetriedRecords = []MetricOverTime{}
+	o.RetriesFailed = []MetricOverTime{}
+	o.DroppedRecords = []MetricOverTime{}
+	o.Loads = []MetricOverTime{}
+	return o
+}
+
+func (f *MetricsOverTimeFilter) Init() *MetricsOverTimeFilter {
+	f.DropRecords = []MetricOverTime{}
+	f.EmitRecords = []MetricOverTime{}
+	return f
+}
+
+func (i *MetricsOverTimeInput) Init() *MetricsOverTimeInput {
+	i.Bytes = []MetricOverTime{}
+	i.Records = []MetricOverTime{}
+	return i
+}
+
+type MetricOverTime struct {
+	Time  time.Time `json:"time"`
+	Value *float64  `json:"value"`
+}

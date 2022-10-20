@@ -1543,6 +1543,9 @@ components:
         autoCreateChecksFromConfig:
           type: boolean
           nullable: true
+        skipConfigValidation:
+          type: boolean
+          default: false
         checksBeforeDeploying:
           type: boolean
           nullable: true
@@ -2959,7 +2962,159 @@ components:
             }
           }
         }
-
+    MetricsOvertime:
+      type: object
+      properties:
+        input:
+          $ref: "#/components/schemas/MetricsOverTimeInput"
+        filter:
+          $ref: "#/components/schemas/MetricsOverTimeFilter"
+        output:
+          $ref: "#/components/schemas/MetricsOverTimeOutput"
+      required:
+        - input
+        - filter
+        - output
+    MetricsOverTimeInput:
+      type: object
+      properties:
+        bytes:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricOverTime"
+        records:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricOverTime"
+      required:
+        - bytes
+        - records
+    MetricsOverTimeFilter:
+      type: object
+      properties:
+        dropRecords:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricOverTime"
+        emitRecords:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricOverTime"
+      required:
+        - dropRecords
+        - emitRecords
+    MetricsOverTimeOutput:
+      type: object
+      properties:
+        bytes:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricOverTime"
+        records:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricOverTime"
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricOverTime"
+        retries:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricOverTime"
+        retriedRecords:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricOverTime"
+        retriesFailed:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricOverTime"
+        droppedRecords:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricOverTime"
+        loads:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricOverTime"
+      required:
+        - bytes
+        - records
+        - errors
+        - retries
+        - retriedRecords
+        - retriesFailed
+        - droppedRecords
+        - loads
+    MetricsOverTimeByPlugin:
+      type: object
+      properties:
+        input:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricsOverTimeByPluginInput"
+        filter:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricsOverTimeByPluginFilter"
+        output:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricsOverTimeByPluginOutput"
+      required:
+        - input
+        - filter
+        - output
+    MetricsOverTimeByPluginInput:
+      type: object
+      properties:
+        instance:
+          type: string
+          example: "storage_backlog.3"
+          description: plugin alias
+        metrics:
+          $ref: "#/components/schemas/MetricsOverTimeInput"
+      required:
+        - instance
+        - metrics
+    MetricsOverTimeByPluginFilter:
+      type: object
+      properties:
+        instance:
+          type: string
+          example: "storage_backlog.3"
+          description: plugin alias
+        metrics:
+          $ref: "#/components/schemas/MetricsOverTimeInput"
+      required:
+        - instance
+        - metrics
+    MetricsOverTimeByPluginOutput:
+      type: object
+      properties:
+        instance:
+          type: string
+          example: "storage_backlog.3"
+          description: plugin alias
+        metrics:
+          $ref: "#/components/schemas/MetricsOverTimeInput"
+      required:
+        - instance
+        - metrics
+    MetricOverTime:
+      type: object
+      properties:
+        time:
+          type: string
+          format: date-time
+        value:
+          type: number
+          format: float
+          nullable: true
+      required:
+        - time
+        - value
     PreviewProcessingRule:
       type: object
       properties:
@@ -5848,7 +6003,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CoreInstanceMetrics"
-  "/v1/core_instances/{coreInstanceID}/metricsByPlugin":
+  "/v1/core_instances/{coreInstanceID}/metrics_by_plugin":
     description: |
       Metrics for a core instance organized by plugin.
     parameters:
@@ -5883,3 +6038,91 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CoreInstanceMetricsByPlugin"
+  "/v1/core_instances/{coreInstanceID}/metrics_over_time":
+    description: |
+      Metrics over time for a core instance.
+    parameters:
+      - name: coreInstanceID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      parameters:
+        - name: start
+          required: false
+          in: query
+          description: |
+            Option to filter metrics since the given time ago
+          schema:
+            type: string
+            format: duration
+            default: -24h
+        - name: interval
+          required: false
+          in: query
+          description: |
+            Option to set the time window to group metrics
+          schema:
+            type: string
+            format: duration
+            default: 1h
+      security:
+        - user: []
+        - project: []
+      summary: Core instance metrics over time
+      operationId: coreInstanceMetricsOverTime
+      tags:
+        - metric
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetricsOvertime"
+  "/v1/core_instances/{coreInstanceID}/metrics_over_time_by_plugin":
+    description: |
+      Metrics over time for a core instance.
+    parameters:
+      - name: coreInstanceID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      parameters:
+        - name: start
+          required: false
+          in: query
+          description: |
+            Option to filter metrics since the given time ago
+          schema:
+            type: string
+            format: duration
+            default: -24h
+        - name: interval
+          required: false
+          in: query
+          description: |
+            Option to set the time window to group metrics
+          schema:
+            type: string
+            format: duration
+            default: 1h
+      security:
+        - user: []
+        - project: []
+      summary: Core instance metrics over time organized by plugin
+      operationId: coreInstanceMetricsOverTimeByPlugin
+      tags:
+        - metric
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetricsOverTimeByPlugin"
