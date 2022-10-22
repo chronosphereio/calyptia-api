@@ -4,6 +4,11 @@ import (
 	"time"
 )
 
+const (
+	// IngestCheckDefaultTimeout default timeout for an ingest check.
+	IngestCheckDefaultTimeout = AggregatorNextPingTimeout
+)
+
 // IngestCheck type for core_instance ingestion checks.
 type IngestCheck struct {
 	ID              string      `json:"id" yaml:"id"`
