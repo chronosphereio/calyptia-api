@@ -34,9 +34,9 @@ func (c *Client) AgentMetrics(ctx context.Context, agentID string, params types.
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }
 
-// PipelineMetrics contains an overview of the aggregated metrics for a pipeline.
+// PipelineMetricsV1 contains an overview of the aggregated metrics for a pipeline.
 // It includes metrics link the amount of records, bytes, and errors per plugin.
-func (c *Client) PipelineMetrics(ctx context.Context, pipelineID string, params types.MetricsParams) (types.AgentMetrics, error) {
+func (c *Client) PipelineMetricsV1(ctx context.Context, pipelineID string, params types.MetricsParams) (types.AgentMetrics, error) {
 	q := url.Values{
 		"start":    []string{params.Start.String()},
 		"interval": []string{params.Interval.String()},
@@ -115,10 +115,61 @@ func (c *Client) CoreInstanceOverTimeMetrics(ctx context.Context, coreInstanceID
 // It includes metrics link the amount of records, bytes, and errors per plugin.
 func (c *Client) CoreInstanceMetricsOverTimeByPlugin(ctx context.Context, coreInstanceID string, params types.MetricsParams) (types.MetricsOverTimeByPlugin, error) {
 	q := url.Values{
-		"start": []string{params.Start.String()},
+		"start":    []string{params.Start.String()},
+		"interval": []string{params.Interval.String()},
 	}
 
 	var out types.MetricsOverTimeByPlugin
 	path := "/v1/core_instances/" + url.PathEscape(coreInstanceID) + "/metrics_over_time_by_plugin?" + q.Encode()
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+}
+
+// PipelineMetrics contains an overview of the Pipeline metrics.
+// It includes metrics link the amount of records, bytes, and errors.
+func (c *Client) PipelineMetrics(ctx context.Context, pipelineID string, params types.MetricsParams) (types.MetricsSummary, error) {
+	q := url.Values{
+		"start": []string{params.Start.String()},
+	}
+
+	var out types.MetricsSummary
+	path := "/v1/pipelines/" + url.PathEscape(pipelineID) + "/metrics?" + q.Encode()
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+}
+
+// PipelineMetricsByPlugin contains an overview of the Pipeline metrics.
+// It includes metrics link the amount of records, bytes, and errors per plugin.
+func (c *Client) PipelineMetricsByPlugin(ctx context.Context, pipelineID string, params types.MetricsParams) (types.MetricsSummaryPlugin, error) {
+	q := url.Values{
+		"start": []string{params.Start.String()},
+	}
+
+	var out types.MetricsSummaryPlugin
+	path := "/v1/pipelines/" + url.PathEscape(pipelineID) + "/metrics_by_plugin?" + q.Encode()
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+}
+
+// PipelineOverTimeMetrics contains Pipeline metrics overtime.
+// It includes metrics link the amount of records, bytes, and errors.
+func (c *Client) PipelineOverTimeMetrics(ctx context.Context, pipelineID string, params types.MetricsParams) (types.MetricsOverTime, error) {
+	q := url.Values{
+		"start":    []string{params.Start.String()},
+		"interval": []string{params.Interval.String()},
+	}
+
+	var out types.MetricsOverTime
+	path := "/v1/pipelines/" + url.PathEscape(pipelineID) + "/metrics_over_time?" + q.Encode()
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+}
+
+// PipelineMetricsOverTimeByPlugin contains an overview of the Pipeline metrics.
+// It includes metrics link the amount of records, bytes, and errors per plugin.
+func (c *Client) PipelineMetricsOverTimeByPlugin(ctx context.Context, pipelineID string, params types.MetricsParams) (types.MetricsOverTimeByPlugin, error) {
+	q := url.Values{
+		"start":    []string{params.Start.String()},
+		"interval": []string{params.Interval.String()},
+	}
+
+	var out types.MetricsOverTimeByPlugin
+	path := "/v1/pipelines/" + url.PathEscape(pipelineID) + "/metrics_over_time_by_plugin?" + q.Encode()
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }
