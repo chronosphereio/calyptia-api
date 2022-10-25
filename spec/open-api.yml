@@ -2796,7 +2796,7 @@ components:
           type: string
           format: date-time
       required: [updatedAt]
-    CoreInstanceMetricsByPlugin:
+    MetricsByPlugin:
       type: object
       properties:
         inputs:
@@ -2925,7 +2925,7 @@ components:
             emitRecords:
               type: integer
               example: 0
-    CoreInstanceMetrics:
+    MetricsSummary:
       type: object
       properties:
         inputs:
@@ -5312,7 +5312,7 @@ paths:
         - metric
       summary: Pipeline metrics
       deprecated: true
-      operationId: pipelineMetrics
+      operationId: pipelineMetricsV1
       description: |-
         Contains an overview of the aggregated metrics for a pipeline.
         It includes metrics link the amount of records, bytes, and errors per plugin.
@@ -6002,7 +6002,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CoreInstanceMetrics"
+                $ref: "#/components/schemas/MetricsSummary"
   "/v1/core_instances/{coreInstanceID}/metrics_by_plugin":
     description: |
       Metrics for a core instance organized by plugin.
@@ -6037,7 +6037,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CoreInstanceMetricsByPlugin"
+                $ref: "#/components/schemas/MetricsByPlugin"
   "/v1/core_instances/{coreInstanceID}/metrics_over_time":
     description: |
       Metrics over time for a core instance.
@@ -6117,6 +6117,164 @@ paths:
         - project: []
       summary: Core instance metrics over time organized by plugin
       operationId: coreInstanceMetricsOverTimeByPlugin
+      tags:
+        - metric
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetricsOverTimeByPlugin"
+  "/v1/pipelines/{pipelineID}/metrics":
+    description: |
+      Metrics for a pipeline.
+    parameters:
+      - name: pipelineID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      parameters:
+        - name: start
+          required: false
+          in: query
+          description: |
+            Option to filter metrics since the given time ago
+          schema:
+            type: string
+            format: duration
+            default: -24h
+      security:
+        - user: []
+        - project: []
+      summary: Pipeline metrics
+      operationId: pipelineMetrics
+      tags:
+        - metric
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetricsSummary"
+  "/v1/pipelines/{pipelineID}/metrics_by_plugin":
+    description: |
+      Metrics for a pipeline organized by plugin.
+    parameters:
+      - name: pipelineID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      parameters:
+        - name: start
+          required: false
+          in: query
+          description: |
+            Option to filter metrics since the given time ago
+          schema:
+            type: string
+            format: duration
+            default: -24h
+      security:
+        - user: [ ]
+        - project: [ ]
+      summary: Pipeline metrics by plugin.
+      operationId: pipelineMetricsByPlugin
+      tags:
+        - metric
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetricsByPlugin"
+  "/v1/pipelines/{pipelineID}/metrics_over_time":
+    description: |
+      Metrics over time for a pipeline.
+    parameters:
+      - name: pipelineID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      parameters:
+        - name: start
+          required: false
+          in: query
+          description: |
+            Option to filter metrics since the given time ago
+          schema:
+            type: string
+            format: duration
+            default: -24h
+        - name: interval
+          required: false
+          in: query
+          description: |
+            Option to set the time window to group metrics
+          schema:
+            type: string
+            format: duration
+            default: 1h
+      security:
+        - user: []
+        - project: []
+      summary: Pipeline metrics over time
+      operationId: pipelineMetricsOverTime
+      tags:
+        - metric
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetricsOvertime"
+  "/v1/pipelines/{pipelineID}/metrics_over_time_by_plugin":
+    description: |
+      Metrics over time for a pipeline.
+    parameters:
+      - name: pipelineID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      parameters:
+        - name: start
+          required: false
+          in: query
+          description: |
+            Option to filter metrics since the given time ago
+          schema:
+            type: string
+            format: duration
+            default: -24h
+        - name: interval
+          required: false
+          in: query
+          description: |
+            Option to set the time window to group metrics
+          schema:
+            type: string
+            format: duration
+            default: 1h
+      security:
+        - user: []
+        - project: []
+      summary: Pipeline metrics over time organized by plugin
+      operationId: pipelineMetricsOverTimeByPlugin
       tags:
         - metric
       responses:
