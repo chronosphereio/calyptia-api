@@ -21,9 +21,9 @@ func (c *Client) ProjectMetrics(ctx context.Context, projectID string, params ty
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }
 
-// AgentMetrics contains an overview of the aggregated metrics for an agent.
+// AgentMetricsV1 contains an overview of the aggregated metrics for an agent.
 // It includes metrics link the amount of records, bytes, and errors per plugin.
-func (c *Client) AgentMetrics(ctx context.Context, agentID string, params types.MetricsParams) (types.AgentMetrics, error) {
+func (c *Client) AgentMetricsV1(ctx context.Context, agentID string, params types.MetricsParams) (types.AgentMetrics, error) {
 	q := url.Values{
 		"start":    []string{params.Start.String()},
 		"interval": []string{params.Interval.String()},
@@ -171,5 +171,55 @@ func (c *Client) PipelineMetricsOverTimeByPlugin(ctx context.Context, pipelineID
 
 	var out types.MetricsOverTimeByPlugin
 	path := "/v1/pipelines/" + url.PathEscape(pipelineID) + "/metrics_over_time_by_plugin?" + q.Encode()
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+}
+
+// AgentMetrics contains an overview of the Agent metrics.
+// It includes metrics link the amount of records, bytes, and errors.
+func (c *Client) AgentMetrics(ctx context.Context, agentID string, params types.MetricsParams) (types.MetricsSummary, error) {
+	q := url.Values{
+		"start": []string{params.Start.String()},
+	}
+
+	var out types.MetricsSummary
+	path := "/v1/agents/" + url.PathEscape(agentID) + "/metrics?" + q.Encode()
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+}
+
+// AgentMetricsByPlugin contains an overview of the Agent metrics.
+// It includes metrics link the amount of records, bytes, and errors per plugin.
+func (c *Client) AgentMetricsByPlugin(ctx context.Context, agentID string, params types.MetricsParams) (types.MetricsSummaryPlugin, error) {
+	q := url.Values{
+		"start": []string{params.Start.String()},
+	}
+
+	var out types.MetricsSummaryPlugin
+	path := "/v1/agents/" + url.PathEscape(agentID) + "/metrics_by_plugin?" + q.Encode()
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+}
+
+// AgentOverTimeMetrics contains Agent metrics overtime.
+// It includes metrics link the amount of records, bytes, and errors.
+func (c *Client) AgentOverTimeMetrics(ctx context.Context, agentID string, params types.MetricsParams) (types.MetricsOverTime, error) {
+	q := url.Values{
+		"start":    []string{params.Start.String()},
+		"interval": []string{params.Interval.String()},
+	}
+
+	var out types.MetricsOverTime
+	path := "/v1/agents/" + url.PathEscape(agentID) + "/metrics_over_time?" + q.Encode()
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+}
+
+// AgentMetricsOverTimeByPlugin contains an overview of the Agent metrics.
+// It includes metrics link the amount of records, bytes, and errors per plugin.
+func (c *Client) AgentMetricsOverTimeByPlugin(ctx context.Context, agentID string, params types.MetricsParams) (types.MetricsOverTimeByPlugin, error) {
+	q := url.Values{
+		"start":    []string{params.Start.String()},
+		"interval": []string{params.Interval.String()},
+	}
+
+	var out types.MetricsOverTimeByPlugin
+	path := "/v1/agents/" + url.PathEscape(agentID) + "/metrics_over_time_by_plugin?" + q.Encode()
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }

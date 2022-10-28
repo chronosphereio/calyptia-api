@@ -5266,7 +5266,7 @@ paths:
         - metric
       summary: Agent metrics
       deprecated: true
-      operationId: agentMetrics
+      operationId: agentMetricsV1
       description: |-
         Contains an overview of the aggregated metrics for an agent.
         It includes metrics link the amount of records, bytes, and errors per plugin.
@@ -5968,7 +5968,7 @@ paths:
                 items:
                   $ref:  "#/components/schemas/FluentBitLog"
 
-  "/v1/core_instances/{coreInstanceID}/metrics":
+  "/v2/core_instances/{coreInstanceID}/metrics":
     description: |
       Metrics for a core instance.
     parameters:
@@ -6003,7 +6003,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MetricsSummary"
-  "/v1/core_instances/{coreInstanceID}/metrics_by_plugin":
+  "/v2/core_instances/{coreInstanceID}/metrics_by_plugin":
     description: |
       Metrics for a core instance organized by plugin.
     parameters:
@@ -6038,7 +6038,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MetricsByPlugin"
-  "/v1/core_instances/{coreInstanceID}/metrics_over_time":
+  "/v2/core_instances/{coreInstanceID}/metrics_over_time":
     description: |
       Metrics over time for a core instance.
     parameters:
@@ -6082,7 +6082,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MetricsOvertime"
-  "/v1/core_instances/{coreInstanceID}/metrics_over_time_by_plugin":
+  "/v2/core_instances/{coreInstanceID}/metrics_over_time_by_plugin":
     description: |
       Metrics over time for a core instance.
     parameters:
@@ -6126,7 +6126,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MetricsOverTimeByPlugin"
-  "/v1/pipelines/{pipelineID}/metrics":
+  "/v2/pipelines/{pipelineID}/metrics":
     description: |
       Metrics for a pipeline.
     parameters:
@@ -6161,7 +6161,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MetricsSummary"
-  "/v1/pipelines/{pipelineID}/metrics_by_plugin":
+  "/v2/pipelines/{pipelineID}/metrics_by_plugin":
     description: |
       Metrics for a pipeline organized by plugin.
     parameters:
@@ -6196,7 +6196,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MetricsByPlugin"
-  "/v1/pipelines/{pipelineID}/metrics_over_time":
+  "/v2/pipelines/{pipelineID}/metrics_over_time":
     description: |
       Metrics over time for a pipeline.
     parameters:
@@ -6240,7 +6240,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MetricsOvertime"
-  "/v1/pipelines/{pipelineID}/metrics_over_time_by_plugin":
+  "/v2/pipelines/{pipelineID}/metrics_over_time_by_plugin":
     description: |
       Metrics over time for a pipeline.
     parameters:
@@ -6275,6 +6275,164 @@ paths:
         - project: []
       summary: Pipeline metrics over time organized by plugin
       operationId: pipelineMetricsOverTimeByPlugin
+      tags:
+        - metric
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetricsOverTimeByPlugin"
+  "/v2/agents/{agentID}/metrics":
+    description: |
+      Metrics for a agent.
+    parameters:
+      - name: agentID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      parameters:
+        - name: start
+          required: false
+          in: query
+          description: |
+            Option to filter metrics since the given time ago
+          schema:
+            type: string
+            format: duration
+            default: -24h
+      security:
+        - user: []
+        - project: []
+      summary: Agent metrics
+      operationId: agentMetrics
+      tags:
+        - metric
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetricsSummary"
+  "/v2/agents/{agentID}/metrics_by_plugin":
+    description: |
+      Metrics for a agent organized by plugin.
+    parameters:
+      - name: agentID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      parameters:
+        - name: start
+          required: false
+          in: query
+          description: |
+            Option to filter metrics since the given time ago
+          schema:
+            type: string
+            format: duration
+            default: -24h
+      security:
+        - user: [ ]
+        - project: [ ]
+      summary: Agent metrics by plugin.
+      operationId: agentMetricsByPlugin
+      tags:
+        - metric
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetricsByPlugin"
+  "/v2/agents/{agentID}/metrics_over_time":
+    description: |
+      Metrics over time for a agent.
+    parameters:
+      - name: agentID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      parameters:
+        - name: start
+          required: false
+          in: query
+          description: |
+            Option to filter metrics since the given time ago
+          schema:
+            type: string
+            format: duration
+            default: -24h
+        - name: interval
+          required: false
+          in: query
+          description: |
+            Option to set the time window to group metrics
+          schema:
+            type: string
+            format: duration
+            default: 1h
+      security:
+        - user: []
+        - project: []
+      summary: Agent metrics over time
+      operationId: agentMetricsOverTime
+      tags:
+        - metric
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetricsOvertime"
+  "/v2/agents/{agentID}/metrics_over_time_by_plugin":
+    description: |
+      Metrics over time for a agent.
+    parameters:
+      - name: agentID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      parameters:
+        - name: start
+          required: false
+          in: query
+          description: |
+            Option to filter metrics since the given time ago
+          schema:
+            type: string
+            format: duration
+            default: -24h
+        - name: interval
+          required: false
+          in: query
+          description: |
+            Option to set the time window to group metrics
+          schema:
+            type: string
+            format: duration
+            default: 1h
+      security:
+        - user: []
+        - project: []
+      summary: Agent metrics over time organized by plugin
+      operationId: agentMetricsOverTimeByPlugin
       tags:
         - metric
       responses:
