@@ -34,9 +34,7 @@ type IngestChecksParams struct {
 
 // UpdateIngestCheck request payload for updating a core_instance ingestion check.
 type UpdateIngestCheck struct {
-	Status          *CheckStatus `json:"status"`
-	Retries         *uint        `json:"retries"`
-	ConfigSectionID *string      `json:"configSectionID"`
+	Status *CheckStatus `json:"status"`
 }
 
 // CreateIngestCheck request payload for creating a core_instance ingestion check.
