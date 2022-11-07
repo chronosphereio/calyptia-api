@@ -1746,16 +1746,6 @@ components:
         status:
           $ref: "#/components/schemas/CheckStatus"
           nullable: true
-        configSectionID:
-          type: string
-          format: uuid
-          nullable: true
-          description: UUID of a configSection to be related to this Ingest check.
-        retries:
-          type: number
-          nullable: true
-          default: 3
-          description: number of retries for the check before marking it as unreachable.
 
     CreatePipelineSecret:
       description: Create pipeline secret request body.
