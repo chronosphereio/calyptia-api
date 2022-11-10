@@ -43,6 +43,7 @@ tags:
   - name: environment
   - name: trace_session
   - name: trace_record
+  - name: cluster_object
 
 components:
   securitySchemes:
@@ -112,6 +113,12 @@ components:
         - avatarURL
         - createdAt
         - updatedAt
+    ClusterObjectKind:
+      type: string
+      description: Kind of the kubernetes object
+      default: namespace
+      enum:
+        - namespace
     CheckStatus:
       type: string
       description: The status of a check.
@@ -716,6 +723,83 @@ components:
         - port
         - createdAt
         - updatedAt
+
+    CreateClusterObject:
+      type: object
+      description: |
+        Request body to create a new cluster object for a core instance.
+      properties:
+        name:
+          type: string
+          format: |
+            kubernetes valid hostname or namespace name.
+            https://kubernetes.io/docs/reference/labels-annotations-taints/
+        kind:
+          $ref: "#/components/schemas/ClusterObjectKind"
+      required:
+        - name
+        - kind
+
+    UpdateClusterObject:
+      type: object
+      description: |
+        Request body to update a cluster object.
+      properties:
+        name:
+          type: string
+          format: |
+            kubernetes valid hostname or namespace name.
+            https://kubernetes.io/docs/reference/labels-annotations-taints/
+        kind:
+          $ref: "#/components/schemas/ClusterObjectKind"
+
+
+    UpdatedClusterObject:
+      type: object
+      properties:
+        updatedAt:
+          type: string
+          format: date-time
+      required: [updatedAt]
+
+
+    CreatedClusterObject:
+      type: object
+      description: Response body for for a newly created cluster object.
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, createdAt]
+
+    ClusterObject:
+      type: object
+      description: A kubernetes cluster object that belongs to a given core instance.
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          format: kubernetes label
+        kind:
+          $ref: "#/components/schemas/ClusterObjectKind"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+          - id
+          - name
+          - kind
+          - createdAt
+          - updatedAt
+
     IngestCheck:
       type: object
       description: Core Ingest check model.
@@ -1086,7 +1170,6 @@ components:
         type: object
         properties:
           data:
-            nullable: true
             $ref: "#/components/schemas/AgentMetrics"
           error:
             type: string
@@ -2574,6 +2657,7 @@ components:
         properties:
           $ref: "#/components/schemas/Pairs"
           nullable: true
+
     UpdatedConfigSection:
       type: object
       properties:
@@ -5074,7 +5158,7 @@ paths:
             type: string
           in: query
           name: name
-          description: Name matching environmets.
+          description: Name matching environments.
       responses:
         "200":
           description: OK
@@ -5442,6 +5526,117 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AggregatorPipelinesMetrics"
+
+  "/v1/core_instances/{coreInstanceID}/cluster_objects":
+    parameters:
+      - name: coreInstanceID
+        in: path
+        schema:
+          type: string
+          format: uuid
+        required: true
+    post:
+      tags: [cluster_object]
+      security:
+        - user: []
+        - project: []
+      summary: Create cluster object
+      operationId: createClusterObject
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateClusterObject"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedClusterObject"
+    get:
+      tags: [cluster_object]
+      parameters:
+        - schema:
+            $ref: "#/components/schemas/ClusterObjectKind"
+          in: query
+          name: kind
+          description: Kind of the kubernetes object.
+          required: false
+        - schema:
+            type: string
+          in: query
+          required: false
+          name: name
+          description: Kubernetes object name to filter by.
+          example: kube-system
+      security:
+        - user: []
+        - project: []
+      summary: Cluster objects
+      operationId: clusterObjects
+      responses:
+        "200":
+          description: OK
+          headers:
+            Link:
+              schema:
+                type: string
+                example: </v1/core_instances/foo/cluster_objects?before=bar>; rel="next"
+              description: RFC5988 with `rel="next"`.
+          links:
+            NextClusterObjectsPage:
+              operationId: clusterObjects
+              parameters:
+                before: "$response.header.Link#rel=next"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ClusterObject"
+
+  "/v1/cluster_objects/{clusterObjectID}":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: clusterObjectID
+        in: path
+        required: true
+    patch:
+      tags:
+        - cluster_object
+      summary: Update cluster object
+      operationId: updateClusterObject
+      description: Updates a given cluster_object
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateClusterObject"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatedClusterObject"
+    delete:
+      tags:
+        - cluster_object
+      summary: Delete cluster object
+      operationId: deleteClusterObject
+      description: Delete a given cluster_object
+      security:
+        - user: []
+        - project: []
+      responses:
+        "200":
+          description: OK
 
   "/v1/pipelines/{pipelineID}/trace_sessions":
     parameters:
