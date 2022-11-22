@@ -14,6 +14,20 @@ const (
 	SectionKindOutput  ConfigSectionKind = "output"
 )
 
+func (k ConfigSectionKind) OK() bool {
+	for _, allowed := range [...]ConfigSectionKind{
+		SectionKindService,
+		SectionKindInput,
+		SectionKindFilter,
+		SectionKindOutput,
+	} {
+		if k == allowed {
+			return true
+		}
+	}
+	return false
+}
+
 // ConfigSection model represents a fluent-bit config section that can be reused
 // across pipelines on a project.
 type ConfigSection struct {
