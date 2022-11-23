@@ -2,6 +2,8 @@ package types
 
 import (
 	"strings"
+
+	"github.com/calyptia/go-fluentbit-config/property"
 )
 
 // Pair struct. It can be used to define any sorted key value pairs.
@@ -13,6 +15,17 @@ type Pair struct {
 
 // Pairs list.
 type Pairs []Pair
+
+func (pp Pairs) AsProperties() property.Properties {
+	out := make(property.Properties, len(pp))
+	for i, p := range pp {
+		out[i] = property.Property{
+			Key:   p.Key,
+			Value: p.Value,
+		}
+	}
+	return out
+}
 
 // Get a value matching its key case-insensitively.
 func (pp Pairs) Get(key string) (any, bool) {
