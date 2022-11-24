@@ -1528,8 +1528,15 @@ components:
         resourceProfile:
           type: string
           example: my-resource-profile
+        noAutoCreateChecksFromConfig:
+          type: boolean
+          default: false
+          description: |
+            If true, no Pipeline checks will be auto-generated from 
+            the configuration.
         autoCreateChecksFromConfig:
           type: boolean
+          deprecated: true
           default: false
           description: |
             If true, this will automatically create a set of Pipeline checks
@@ -1555,8 +1562,15 @@ components:
             If any of the checks associated with the pipeline fails, the status of
             the pipeline will be switched to CHECKS_FAILED and the deployment of the pipeline
             will be executed.
+        noAutoCreateEndpointsFromConfig:
+          type: boolean
+          default: false
+          description:
+            if true, no ports will be automatically generated from the configuration.
         autoCreatePortsFromConfig:
           type: boolean
+          default: false
+          deprecated: true
         skipConfigValidation:
           type: boolean
         metadata:
@@ -1573,8 +1587,6 @@ components:
         - secrets
         - files
         - resourceProfile
-        - autoCreatePortsFromConfig
-        - autoCreateChecksFromConfig
         - skipConfigValidation
     UpdatePipeline:
       description: Update pipeline request body.
@@ -1620,12 +1632,22 @@ components:
           type: string
           example: my-resource-profile
           nullable: true
+        noAutoCreateEndpointsFromConfig:
+          type: boolean
+          nullable: true
+          default: false
+        noAutoCreateChecksFromConfig:
+          type: boolean
+          nullable: true
+          default: false
         autoCreatePortsFromConfig:
           type: boolean
           nullable: true
+          deprecated: true
         autoCreateChecksFromConfig:
           type: boolean
           nullable: true
+          deprecated: true
         skipConfigValidation:
           type: boolean
           default: false
