@@ -43,9 +43,10 @@ type ConfigSection struct {
 // CreateConfigSection request payload for creating a new
 // fluent-bit config section on a project.
 type CreateConfigSection struct {
-	Kind             ConfigSectionKind `json:"kind"`
-	Properties       Pairs             `json:"properties"`
-	ProcessingRuleID *string           `json:"-"`
+	Kind                       ConfigSectionKind `json:"kind"`
+	Properties                 Pairs             `json:"properties"`
+	ProcessingRuleID           *string           `json:"-"`
+	PipelineClusterObjectSetID *string           `json:"-"`
 }
 
 // CreatedConfigSection response payload after creating

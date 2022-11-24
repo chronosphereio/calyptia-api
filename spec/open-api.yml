@@ -37,6 +37,7 @@ tags:
   - name: pipeline_secret
   - name: pipeline_port
   - name: pipeline_check
+  - name: pipeline_cluster_objects
   - name: config_validator
   - name: config_validator_v2
   - name: metric
@@ -55,6 +56,12 @@ components:
       type: apiKey
       in: header
   schemas:
+    UpdatePipelineClusterObjects:
+      type: object
+      properties:
+        clusterObjectsIDs:
+          type: array
+          format: uuid
     UpdateEnvironment:
       type: object
       properties:
@@ -723,7 +730,6 @@ components:
         - port
         - createdAt
         - updatedAt
-
     CreateClusterObject:
       type: object
       description: |
@@ -739,7 +745,6 @@ components:
       required:
         - name
         - kind
-
     UpdateClusterObject:
       type: object
       description: |
@@ -752,8 +757,6 @@ components:
             https://kubernetes.io/docs/reference/labels-annotations-taints/
         kind:
           $ref: "#/components/schemas/ClusterObjectKind"
-
-
     UpdatedClusterObject:
       type: object
       properties:
@@ -761,8 +764,6 @@ components:
           type: string
           format: date-time
       required: [updatedAt]
-
-
     CreatedClusterObject:
       type: object
       description: Response body for for a newly created cluster object.
@@ -774,7 +775,6 @@ components:
           type: string
           format: date-time
       required: [id, createdAt]
-
     ClusterObject:
       type: object
       description: A kubernetes cluster object that belongs to a given core instance.
@@ -799,7 +799,6 @@ components:
           - kind
           - createdAt
           - updatedAt
-
     IngestCheck:
       type: object
       description: Core Ingest check model.
@@ -829,7 +828,6 @@ components:
         - retries
         - createdAt
         - updatedAt
-
     PipelineFile:
       type: object
       description: Pipeline file model.
@@ -1760,7 +1758,6 @@ components:
         - status
         - retries
         - configSectionID
-
     CreatePipelineFile:
       description: Create pipeline file request body.
       type: object
@@ -1851,7 +1848,6 @@ components:
         status:
           $ref: "#/components/schemas/CheckStatus"
           nullable: true
-
     CreatePipelineSecret:
       description: Create pipeline secret request body.
       type: object
@@ -4866,6 +4862,54 @@ paths:
       responses:
         "204":
           description: No Content
+  "/v1/pipelines/{pipelineID}/cluster_objects":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: pipelineID
+        in: path
+        required: true
+    patch:
+      tags:
+        - pipeline_cluster_objects
+      summary: Update the cluster objects related to a pipeline (only for daemonSet kind).
+      operationId: updatePipelineClusterObjects
+      description: |-
+        Updates a pipeline to be related to a set of given cluster objects
+        this is only supported for pipelines of kind daemonSet.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePipelineClusterObjects"
+      responses:
+        "204":
+          description: No Content
+    delete:
+      tags:
+        - pipeline_cluster_objects
+      summary: Remove the relation between the cluster objects and the given pipeline.
+      operationId: deletePipelineClusterObjects
+      description: Remove the relation between the cluster objects and the pipeline (only for daemonSet kind).
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          in: query
+          name: cluster_object_id
+          description: List of cluster object IDs to delete.
+      responses:
+        "204":
+          description: Deleted
 
   "/v1/aggregator_pipelines/{pipelineID}/secrets":
     parameters:
