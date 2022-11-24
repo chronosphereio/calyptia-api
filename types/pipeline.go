@@ -47,21 +47,27 @@ type Pipelines struct {
 
 // CreatePipeline request payload for creating a new pipeline.
 type CreatePipeline struct {
-	Name                      string                 `json:"name"`
-	Kind                      PipelineKind           `json:"kind"`
-	ReplicasCount             uint                   `json:"replicasCount"`
-	RawConfig                 string                 `json:"rawConfig"`
-	ConfigFormat              ConfigFormat           `json:"configFormat"`
-	Secrets                   []CreatePipelineSecret `json:"secrets"`
-	Files                     []CreatePipelineFile   `json:"files"`
-	ResourceProfileName       string                 `json:"resourceProfile"`
-	AutoCreatePortsFromConfig bool                   `json:"autoCreatePortsFromConfig"`
-	SkipConfigValidation      bool                   `json:"skipConfigValidation"`
-	Metadata                  *json.RawMessage       `json:"metadata"`
-	Tags                      []string               `json:"tags"`
+	Name                 string                 `json:"name"`
+	Kind                 PipelineKind           `json:"kind"`
+	ReplicasCount        uint                   `json:"replicasCount"`
+	RawConfig            string                 `json:"rawConfig"`
+	ConfigFormat         ConfigFormat           `json:"configFormat"`
+	Secrets              []CreatePipelineSecret `json:"secrets"`
+	Files                []CreatePipelineFile   `json:"files"`
+	ResourceProfileName  string                 `json:"resourceProfile"`
+	SkipConfigValidation bool                   `json:"skipConfigValidation"`
+	Metadata             *json.RawMessage       `json:"metadata"`
+	Tags                 []string               `json:"tags"`
 
-	// automatically create checks based on the output configuration.
+	// Deprecated: in favor of NoAutoCreateEndpointsFromConfig
+	AutoCreatePortsFromConfig bool `json:"autoCreatePortsFromConfig"`
+	// Deprecated: in favor of NoAutoCreateChecksFromConfig
 	AutoCreateChecksFromConfig bool `json:"autoCreateChecksFromConfig"`
+
+	// no automatically create endpoints from config
+	NoAutoCreateEndpointsFromConfig bool `json:"noAutoCreateEndpointsFromConfig"`
+	// no automatically create checks based on the output configuration.
+	NoAutoCreateChecksFromConfig bool `json:"noAutoCreateChecksFromConfig"`
 
 	// WaitForChecksBeforeDeploying is a conditional variable that defines behavior on the
 	// pipeline deployment
@@ -104,23 +110,31 @@ type CreatedPipeline struct {
 
 // UpdatePipeline request payload for updating a pipeline.
 type UpdatePipeline struct {
-	Name                      *string             `json:"name"`
-	Kind                      *PipelineKind       `json:"kind"`
-	Status                    *PipelineStatusKind `json:"status"`
-	ConfigFormat              *ConfigFormat       `json:"configFormat"`
-	ReplicasCount             *uint               `json:"replicasCount"`
-	RawConfig                 *string             `json:"rawConfig"`
-	ResourceProfile           *string             `json:"resourceProfile"`
-	AutoCreatePortsFromConfig *bool               `json:"autoCreatePortsFromConfig"`
-	// automatically create checks based on the output configuration.
+	Name            *string             `json:"name"`
+	Kind            *PipelineKind       `json:"kind"`
+	Status          *PipelineStatusKind `json:"status"`
+	ConfigFormat    *ConfigFormat       `json:"configFormat"`
+	ReplicasCount   *uint               `json:"replicasCount"`
+	RawConfig       *string             `json:"rawConfig"`
+	ResourceProfile *string             `json:"resourceProfile"`
+	// Deprecated: in favor of NoAutoCreateEndpointsFromConfig
+	AutoCreatePortsFromConfig *bool `json:"autoCreatePortsFromConfig"`
+	// Deprecated: in favor of NoAutoCreateChecksFromConfig
 	AutoCreateChecksFromConfig *bool `json:"autoCreateChecksFromConfig"`
+
+	// no automatically create endpoints from config
+	NoAutoCreateEndpointsFromConfig bool `json:"noAutoCreateEndpointsFromConfig"`
+	// no automatically create checks based on the output configuration.
+	NoAutoCreateChecksFromConfig bool `json:"noAutoCreateChecksFromConfig"`
+
 	// this defines behavior; await for checks to complete before reporting the status back.
-	WaitForChecksBeforeDeploying *bool                  `json:"waitForChecksBeforeDeploying"`
-	SkipConfigValidation         bool                   `json:"skipConfigValidation"`
-	Metadata                     *json.RawMessage       `json:"metadata"`
-	Secrets                      []UpdatePipelineSecret `json:"secrets"`
-	Files                        []UpdatePipelineFile   `json:"files"`
-	Events                       []PipelineEvent        `json:"events"`
+	WaitForChecksBeforeDeploying *bool `json:"waitForChecksBeforeDeploying"`
+
+	SkipConfigValidation bool                   `json:"skipConfigValidation"`
+	Metadata             *json.RawMessage       `json:"metadata"`
+	Secrets              []UpdatePipelineSecret `json:"secrets"`
+	Files                []UpdatePipelineFile   `json:"files"`
+	Events               []PipelineEvent        `json:"events"`
 }
 
 // PipelinesParams request payload for querying pipelines.
