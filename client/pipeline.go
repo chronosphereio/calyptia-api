@@ -106,3 +106,17 @@ func (c *Client) DeletePipelines(ctx context.Context, aggregatorID string, pipel
 	}
 	return c.do(ctx, http.MethodDelete, "/v1/aggregators/"+url.PathEscape(aggregatorID)+"/pipelines?"+q.Encode(), nil, nil)
 }
+
+// UpdatePipelineClusterObjects update a list of related cluster objects to a pipeline.
+func (c *Client) UpdatePipelineClusterObjects(ctx context.Context, pipelineID string, opts types.UpdatePipelineClusterObjects) error {
+	return c.do(ctx, http.MethodPatch, "/v1/pipelines/"+url.PathEscape(pipelineID)+"/cluster_objects", opts, nil)
+}
+
+// DeletePipelineClusterObjects un-relate a list of cluster objects from a pipeline.
+func (c *Client) DeletePipelineClusterObjects(ctx context.Context, pipelineID string, clusterObjectIDs ...string) error {
+	q := url.Values{}
+	for _, id := range clusterObjectIDs {
+		q.Add("cluster_object_id", id)
+	}
+	return c.do(ctx, http.MethodDelete, "/v1/pipelines/"+url.PathEscape(pipelineID)+"/cluster_objects?"+q.Encode(), nil, nil)
+}

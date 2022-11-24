@@ -162,3 +162,8 @@ type UpdatedPipeline struct {
 	AddedChecks   []PipelineCheck `json:"addedChecks"`
 	RemovedChecks []PipelineCheck `json:"removedChecks"`
 }
+
+// UpdatePipelineClusterObjects update cluster objects associated to a pipeline.
+type UpdatePipelineClusterObjects struct {
+	ClusterObjectsIDs []string `json:"clusterObjectsIDs"`
+}
