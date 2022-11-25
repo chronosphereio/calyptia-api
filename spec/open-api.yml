@@ -62,6 +62,8 @@ components:
         clusterObjectsIDs:
           type: array
           format: uuid
+          items:
+            type: string
     UpdateEnvironment:
       type: object
       properties:
