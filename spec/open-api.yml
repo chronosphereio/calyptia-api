@@ -268,9 +268,11 @@ components:
         firstMetricsAddedAt:
           type: string
           format: date-time
+          nullable: true
         lastMetricsAddedAt:
           type: string
           format: date-time
+          nullable: true
         metricsCount:
           type: integer
           minimum: 0
@@ -626,7 +628,7 @@ components:
         events:
           type: array
           items:
-            $ref: '#/components/schemas/PipelineEvent'
+            $ref: "#/components/schemas/PipelineEvent"
         createdAt:
           type: string
           format: date-time
@@ -796,11 +798,11 @@ components:
           type: string
           format: date-time
       required:
-          - id
-          - name
-          - kind
-          - createdAt
-          - updatedAt
+        - id
+        - name
+        - kind
+        - createdAt
+        - updatedAt
     IngestCheck:
       type: object
       description: Core Ingest check model.
@@ -1532,7 +1534,7 @@ components:
           type: boolean
           default: false
           description: |
-            If true, no Pipeline checks will be auto-generated from 
+            If true, no Pipeline checks will be auto-generated from
             the configuration.
         autoCreateChecksFromConfig:
           type: boolean
@@ -1565,8 +1567,7 @@ components:
         noAutoCreateEndpointsFromConfig:
           type: boolean
           default: false
-          description:
-            if true, no ports will be automatically generated from the configuration.
+          description: if true, no ports will be automatically generated from the configuration.
         autoCreatePortsFromConfig:
           type: boolean
           default: false
@@ -2920,12 +2921,12 @@ components:
           items:
             type: object
             properties:
-                instance:
-                    type: string
-                    example: "filter.3"
-                    description: plugin alias
-                metrics:
-                    $ref: "#/components/schemas/FilterMetrics"
+              instance:
+                type: string
+                example: "filter.3"
+                description: plugin alias
+              metrics:
+                $ref: "#/components/schemas/FilterMetrics"
       example: |
         {
             "inputs": [
@@ -6219,7 +6220,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref:  "#/components/schemas/FluentBitLog"
+                  $ref: "#/components/schemas/FluentBitLog"
 
   "/v2/core_instances/{coreInstanceID}/metrics":
     description: |
@@ -6278,8 +6279,8 @@ paths:
             format: duration
             default: -24h
       security:
-        - user: [ ]
-        - project: [ ]
+        - user: []
+        - project: []
       summary: Core instance metrics by plugin.
       operationId: coreInstanceMetricsByPlugin
       tags:
@@ -6436,8 +6437,8 @@ paths:
             format: duration
             default: -24h
       security:
-        - user: [ ]
-        - project: [ ]
+        - user: []
+        - project: []
       summary: Pipeline metrics by plugin.
       operationId: pipelineMetricsByPlugin
       tags:
@@ -6594,8 +6595,8 @@ paths:
             format: duration
             default: -24h
       security:
-        - user: [ ]
-        - project: [ ]
+        - user: []
+        - project: []
       summary: Agent metrics by plugin.
       operationId: agentMetricsByPlugin
       tags:

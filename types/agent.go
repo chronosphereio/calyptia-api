@@ -20,8 +20,8 @@ type Agent struct {
 	RawConfig           string           `json:"rawConfig" yaml:"rawConfig"`
 	Metadata            *json.RawMessage `json:"metadata" yaml:"metadata"`
 	Tags                []string         `json:"tags" yaml:"tags"`
-	FirstMetricsAddedAt time.Time        `json:"firstMetricsAddedAt" yaml:"firstMetricsAddedAt"`
-	LastMetricsAddedAt  time.Time        `json:"lastMetricsAddedAt" yaml:"lastMetricsAddedAt"`
+	FirstMetricsAddedAt *time.Time       `json:"firstMetricsAddedAt" yaml:"firstMetricsAddedAt"`
+	LastMetricsAddedAt  *time.Time       `json:"lastMetricsAddedAt" yaml:"lastMetricsAddedAt"`
 	MetricsCount        uint             `json:"metricsCount" yaml:"metricsCount"`
 	CreatedAt           time.Time        `json:"createdAt" yaml:"createdAt"`
 	UpdatedAt           time.Time        `json:"updatedAt" yaml:"updatedAt"`
