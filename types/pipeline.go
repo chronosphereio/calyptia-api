@@ -167,3 +167,9 @@ type UpdatedPipeline struct {
 type UpdatePipelineClusterObjects struct {
 	ClusterObjectsIDs []string `json:"clusterObjectsIDs"`
 }
+
+// PipelineClusterObjectsParams request payload to filter cluster objects belonging to a pipeline.
+type PipelineClusterObjectsParams struct {
+	Last   *uint
+	Before *string
+}

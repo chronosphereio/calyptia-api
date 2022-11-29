@@ -120,3 +120,18 @@ func (c *Client) DeletePipelineClusterObjects(ctx context.Context, pipelineID st
 	}
 	return c.do(ctx, http.MethodDelete, "/v1/pipelines/"+url.PathEscape(pipelineID)+"/cluster_objects?"+q.Encode(), nil, nil)
 }
+
+// PipelineClusterObjects returns the entire set of cluster objects associated to a pipeline.
+func (c *Client) PipelineClusterObjects(ctx context.Context, pipelineID string, params types.PipelineClusterObjectsParams) (types.ClusterObjects, error) {
+	q := url.Values{}
+	if params.Last != nil {
+		q.Set("last", strconv.FormatUint(uint64(*params.Last), uintBase))
+	}
+	if params.Before != nil {
+		q.Set("before", *params.Before)
+	}
+
+	var out types.ClusterObjects
+	path := "/v1/pipelines/" + url.PathEscape(pipelineID) + "/cluster_objects?" + q.Encode()
+	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
+}
