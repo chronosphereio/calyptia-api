@@ -4670,7 +4670,7 @@ paths:
             Link:
               schema:
                 type: string
-                example: </v1/core_instances/foo/Ingest_checks?before=bar>; rel="next"
+                example: </v1/core_instances/foo/ingest_checks?before=bar>; rel="next"
               description: RFC5988 with `rel="next"`.
           links:
             NextChecksPage:
@@ -4873,6 +4873,48 @@ paths:
         name: pipelineID
         in: path
         required: true
+    get:
+      tags:
+        - pipeline_cluster_objects
+      summary: Get a list of cluster objects associated to a pipeline.
+      operationId: pipelineClusterObjects
+      security:
+        - user: []
+        - project: []
+      description: |-
+        Get a list of all the cluster objects that are associated to a pipeline.
+      parameters:
+        - schema:
+            type: integer
+            minimum: 0
+          in: query
+          name: last
+          description: Last cluster objects.
+        - schema:
+            type: string
+          in: query
+          name: before
+          description: Cluster objects before the given cursor.
+      responses:
+        "200":
+          description: OK
+          headers:
+            Link:
+              schema:
+                type: string
+                example: </v1/pipelines/foo/cluster_objects?before=bar>; rel="next"
+              description: RFC5988 with `rel="next"`.
+          links:
+            NextClusterObjectsPage:
+              operationId: pipelineClusterObjects
+              parameters:
+                before: "$response.header.Link#rel=next"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ClusterObject"
     patch:
       tags:
         - pipeline_cluster_objects
