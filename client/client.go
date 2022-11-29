@@ -95,7 +95,6 @@ func (c *Client) do(ctx context.Context, method, path string, v, dest interface{
 		if err != nil {
 			return err
 		}
-
 		body = bytes.NewReader(b)
 	}
 
