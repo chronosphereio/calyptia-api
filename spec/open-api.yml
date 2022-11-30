@@ -2633,6 +2633,7 @@ components:
         - input
         - filter
         - output
+        - service
     Pairs:
       type: array
       items:
