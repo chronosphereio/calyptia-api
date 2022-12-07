@@ -4,12 +4,12 @@ import "time"
 
 // Project model.
 type Project struct {
-	ID               string    `json:"id" yaml:"id"`
-	Name             string    `json:"name" yaml:"name"`
-	MembersCount     uint      `json:"membersCount" yaml:"membersCount"`
-	AgentsCount      uint      `json:"agentsCount" yaml:"agentsCount"`
-	AggregatorsCount uint      `json:"aggregatorsCount" yaml:"aggregatorsCount"`
-	CreatedAt        time.Time `json:"createdAt" yaml:"createdAt"`
+	ID                 string    `json:"id" yaml:"id"`
+	Name               string    `json:"name" yaml:"name"`
+	MembersCount       uint      `json:"membersCount" yaml:"membersCount"`
+	AgentsCount        uint      `json:"agentsCount" yaml:"agentsCount"`
+	CoreInstancesCount uint      `json:"aggregatorsCount" yaml:"aggregatorsCount"`
+	CreatedAt          time.Time `json:"createdAt" yaml:"createdAt"`
 
 	Membership *Membership `json:"membership" yaml:"membership"`
 }

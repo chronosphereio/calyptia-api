@@ -13,7 +13,7 @@ import (
 // These tokens are to authorize other applications to access the project.
 // For example:
 // - an agent might use it to register itself to the project.
-// - you might create a new aggregator in the project using the aggregator CLI.
+// - you might create a new core instance in the project using the Calyptia CLI.
 // - you might use it within the Calyptia CLI to grant access to your project.
 func (c *Client) CreateToken(ctx context.Context, projectID string, payload types.CreateToken) (types.Token, error) {
 	var out types.Token

@@ -11,7 +11,7 @@ import (
 
 // CreateProject creates a new project.
 // A project is the base unit of work at Calyptia Cloud.
-// You can register agents here, create aggregators in which you can deploy an entire set of pipelines, and monitor them.
+// You can register agents here, create core instances in which you can deploy an entire set of pipelines, and monitor them.
 // You can even invite other people to the project and have a team.
 func (c *Client) CreateProject(ctx context.Context, payload types.CreateProject) (types.CreatedProject, error) {
 	var out types.CreatedProject

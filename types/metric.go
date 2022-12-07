@@ -10,13 +10,13 @@ type AggregatorMeasurement struct {
 	Totals  map[string][]MetricFields `json:"totals"`
 }
 
-// AggregatorMetrics stores a set of AggregatorMeasurement metrics for an aggregator.
-type AggregatorMetrics struct {
+// CoreInstanceMetricsV1 stores a set of AggregatorMeasurement metrics for an aggregator.
+type CoreInstanceMetricsV1 struct {
 	Measurements map[string]AggregatorMeasurement `json:"measurements"`
 }
 
 // AddMeasurementMetrics appends a set of metrics/totals to a given measurement field on a AggregatorMetrics struct.
-func (a *AggregatorMetrics) AddMeasurementMetrics(measurement string, metrics, totals []MetricFields) {
+func (a *CoreInstanceMetricsV1) AddMeasurementMetrics(measurement string, metrics, totals []MetricFields) {
 	if a.Measurements == nil {
 		a.Measurements = map[string]AggregatorMeasurement{}
 	}
@@ -199,6 +199,12 @@ func (m MetricFields) ToOverTime() MetricOverTime {
 type MetricsParams struct {
 	Start    time.Duration
 	Interval time.Duration
+}
+
+// PipelinesMetricsParams request payload for bulk querying pipeline metrics for a given aggregator.
+type PipelinesMetricsParams struct {
+	MetricsParams
+	PipelineIDs []string
 }
 
 // CreatedAgentMetrics response model for created agent metrics.

@@ -12,19 +12,19 @@ import (
 	"github.com/calyptia/api/types"
 )
 
-// CreateResourceProfile within an aggregator.
+// CreateResourceProfile within a core instance.
 // A resource profile is a specification of a resource used during the deployment of a pipeline.
-// By default, when you setup an aggregator, Calyptia Cloud will generate 3 resource profiles for you:
+// By default, when you setup a core instance, Calyptia Cloud will generate 3 resource profiles for you:
 // - high-performance-guaranteed-delivery.
 // - high-performance-optimal-throughput.
 // - best-effort-low-resource.
-func (c *Client) CreateResourceProfile(ctx context.Context, aggregatorID string, payload types.CreateResourceProfile) (types.CreatedResourceProfile, error) {
+func (c *Client) CreateResourceProfile(ctx context.Context, instanceID string, payload types.CreateResourceProfile) (types.CreatedResourceProfile, error) {
 	var out types.CreatedResourceProfile
-	return out, c.do(ctx, http.MethodPost, "/v1/aggregators/"+url.PathEscape(aggregatorID)+"/resource_profiles", payload, &out)
+	return out, c.do(ctx, http.MethodPost, "/v1/aggregators/"+url.PathEscape(instanceID)+"/resource_profiles", payload, &out)
 }
 
-// ResourceProfiles from an aggregator in descending order.
-func (c *Client) ResourceProfiles(ctx context.Context, aggregatorID string, params types.ResourceProfilesParams) (types.ResourceProfiles, error) {
+// ResourceProfiles from a core instance in descending order.
+func (c *Client) ResourceProfiles(ctx context.Context, instanceID string, params types.ResourceProfilesParams) (types.ResourceProfiles, error) {
 	q := url.Values{}
 	if params.Last != nil {
 		q.Set("last", strconv.FormatUint(uint64(*params.Last), uintBase))
@@ -34,7 +34,7 @@ func (c *Client) ResourceProfiles(ctx context.Context, aggregatorID string, para
 	}
 
 	var out types.ResourceProfiles
-	path := "/v1/aggregators/" + url.PathEscape(aggregatorID) + "/resource_profiles?" + q.Encode()
+	path := "/v1/aggregators/" + url.PathEscape(instanceID) + "/resource_profiles?" + q.Encode()
 	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }
 

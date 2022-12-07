@@ -25,11 +25,11 @@ const (
 type Client struct {
 	BaseURL string
 	// Tip: Use oauth2.NewClient(context.Context, *oauth2.TokenSource)
-	Client          *http.Client
-	userAgent       string
-	projectToken    string
-	agentToken      string
-	aggregatorToken string
+	Client            *http.Client
+	userAgent         string
+	projectToken      string
+	agentToken        string
+	coreInstanceToken string
 }
 
 // New default client.
@@ -55,9 +55,9 @@ func (c *Client) SetAgentToken(s string) {
 	c.agentToken = s
 }
 
-// SetAggregatorToken sets the "X-Aggregator-Token" header of the client.
-func (c *Client) SetAggregatorToken(s string) {
-	c.aggregatorToken = s
+// SetCoreInstanceToken sets the "X-Aggregator-Token" header of the client.
+func (c *Client) SetCoreInstanceToken(s string) {
+	c.coreInstanceToken = s
 }
 
 func (c *Client) setRequestHeaders(req *http.Request) {
@@ -69,8 +69,8 @@ func (c *Client) setRequestHeaders(req *http.Request) {
 		req.Header.Set("X-Agent-Token", c.agentToken)
 	}
 
-	if c.aggregatorToken != "" {
-		req.Header.Set("X-Aggregator-Token", c.aggregatorToken)
+	if c.coreInstanceToken != "" {
+		req.Header.Set("X-Aggregator-Token", c.coreInstanceToken)
 	}
 
 	if c.userAgent != "" {

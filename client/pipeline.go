@@ -9,17 +9,17 @@ import (
 	"github.com/calyptia/api/types"
 )
 
-// CreatePipeline within an aggregator.
-// The pipeline name must be unique within the aggregator.
+// CreatePipeline within a core instance.
+// The pipeline name must be unique within the core instance.
 // The resource profile must exist already. If you don't provide one, it will default to "best-effort-low-resource".
-// Use them to easily deploy configured agents to the aggregator.
-func (c *Client) CreatePipeline(ctx context.Context, aggregatorID string, payload types.CreatePipeline) (types.CreatedPipeline, error) {
+// Use them to easily deploy configured agents to the core instance.
+func (c *Client) CreatePipeline(ctx context.Context, instanceID string, payload types.CreatePipeline) (types.CreatedPipeline, error) {
 	var out types.CreatedPipeline
-	return out, c.do(ctx, http.MethodPost, "/v1/aggregators/"+url.PathEscape(aggregatorID)+"/pipelines", payload, &out)
+	return out, c.do(ctx, http.MethodPost, "/v1/aggregators/"+url.PathEscape(instanceID)+"/pipelines", payload, &out)
 }
 
-// Pipelines from an aggregator in descending order.
-func (c *Client) Pipelines(ctx context.Context, aggregatorID string, params types.PipelinesParams) (types.Pipelines, error) {
+// Pipelines from a core instance in descending order.
+func (c *Client) Pipelines(ctx context.Context, instanceID string, params types.PipelinesParams) (types.Pipelines, error) {
 	q := url.Values{}
 	if params.Last != nil {
 		q.Set("last", strconv.FormatUint(uint64(*params.Last), uintBase))
@@ -41,7 +41,7 @@ func (c *Client) Pipelines(ctx context.Context, aggregatorID string, params type
 	}
 
 	var out types.Pipelines
-	path := "/v1/aggregators/" + url.PathEscape(aggregatorID) + "/pipelines?" + q.Encode()
+	path := "/v1/aggregators/" + url.PathEscape(instanceID) + "/pipelines?" + q.Encode()
 	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }
 
@@ -98,13 +98,13 @@ func (c *Client) DeletePipeline(ctx context.Context, pipelineID string) error {
 	return c.do(ctx, http.MethodDelete, "/v1/aggregator_pipelines/"+url.PathEscape(pipelineID), nil, nil)
 }
 
-// DeletePipelines from an aggregator passing a list of the IDs to be deleted.
-func (c *Client) DeletePipelines(ctx context.Context, aggregatorID string, pipelineIDs ...string) error {
+// DeletePipelines from a core instance passing a list of the IDs to be deleted.
+func (c *Client) DeletePipelines(ctx context.Context, instanceID string, pipelineIDs ...string) error {
 	q := url.Values{}
 	for _, id := range pipelineIDs {
 		q.Add("pipeline_id", id)
 	}
-	return c.do(ctx, http.MethodDelete, "/v1/aggregators/"+url.PathEscape(aggregatorID)+"/pipelines?"+q.Encode(), nil, nil)
+	return c.do(ctx, http.MethodDelete, "/v1/aggregators/"+url.PathEscape(instanceID)+"/pipelines?"+q.Encode(), nil, nil)
 }
 
 // UpdatePipelineClusterObjects update a list of related cluster objects to a pipeline.
