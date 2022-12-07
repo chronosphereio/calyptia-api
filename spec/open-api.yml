@@ -2967,79 +2967,65 @@ components:
     InputMetrics:
       type: object
       properties:
-        metrics:
-          type: object
-          properties:
-            bytes:
-              type: integer
-              example: 0
-            records:
-              type: integer
-              example: 0
+        bytes:
+          type: integer
+          example: 0
+        records:
+          type: integer
+          example: 0
     OutputMetrics:
       type: object
       properties:
-        metrics:
-          type: object
-          properties:
-            bytes:
-              type: integer
-              example: 0
-            records:
-              type: integer
-              example: 0
-            errors:
-              type: integer
-              example: 0
-            retries:
-              type: integer
-              example: 0
-            retriedRecords:
-              type: integer
-              example: 0
-            retriesFailed:
-              type: integer
-              example: 0
-            droppedRecords:
-              type: integer
-              example: 0
-            loads:
-              type: integer
-              example: 0
+        bytes:
+          type: integer
+          example: 0
+        records:
+          type: integer
+          example: 0
+        errors:
+          type: integer
+          example: 0
+        retries:
+          type: integer
+          example: 0
+        retriedRecords:
+          type: integer
+          example: 0
+        retriesFailed:
+          type: integer
+          example: 0
+        droppedRecords:
+          type: integer
+          example: 0
+        loads:
+          type: integer
+          example: 0
     FilterMetrics:
       type: object
       properties:
-        instance:
-          type: string
-          example: "filter.0"
-        metrics:
-          type: object
-          properties:
-            dropRecords:
-              type: integer
-              example: 0
-            emitRecords:
-              type: integer
-              example: 0
+        dropRecords:
+          type: integer
+          example: 0
+        emitRecords:
+          type: integer
+          example: 0
     MetricsSummary:
       type: object
       properties:
-        inputs:
+        input:
           $ref: "#/components/schemas/InputMetrics"
-        outputs:
+        output:
           $ref: "#/components/schemas/OutputMetrics"
-        filters:
+        filter:
           $ref: "#/components/schemas/FilterMetrics"
       example: |
         {
-          "inputs": {
-            "metrics": {
+          "input": {
               "bytes": 0,
               "records": 0
             }
           },
           "outputs": {
-            "metrics": {
               "bytes": 0,
               "records": 0,
               "errors": 0,
@@ -3051,8 +3037,6 @@ components:
             }
           },
           "filters": {
-            "instance": "filter.0",
-            "metrics": {
               "dropRecords": 0,
               "emitRecords": 0
             }
