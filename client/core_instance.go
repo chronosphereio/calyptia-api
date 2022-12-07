@@ -9,16 +9,16 @@ import (
 	"github.com/calyptia/api/types"
 )
 
-// CreateAggregator within a project.
-// The project in which the aggregator is created is parser from the authorization token.
-// Users are not allowed to create aggregators.
-func (c *Client) CreateAggregator(ctx context.Context, payload types.CreateAggregator) (types.CreatedAggregator, error) {
-	var out types.CreatedAggregator
+// CreateCoreInstance within a project.
+// The project in which the core instance is created is parser from the authorization token.
+// Users are not allowed to create core instances.
+func (c *Client) CreateCoreInstance(ctx context.Context, payload types.CreateCoreInstance) (types.CreatedCoreInstance, error) {
+	var out types.CreatedCoreInstance
 	return out, c.do(ctx, http.MethodPost, "/v1/aggregators", payload, &out)
 }
 
-// Aggregators from a project in descending order.
-func (c *Client) Aggregators(ctx context.Context, projectID string, params types.AggregatorsParams) (types.Aggregators, error) {
+// CoreInstances from a project in descending order.
+func (c *Client) CoreInstances(ctx context.Context, projectID string, params types.CoreInstancesParams) (types.CoreInstances, error) {
 	q := url.Values{}
 	if params.Last != nil {
 		q.Set("last", strconv.FormatUint(uint64(*params.Last), uintBase))
@@ -36,37 +36,37 @@ func (c *Client) Aggregators(ctx context.Context, projectID string, params types
 		q.Set("environment_id", *params.EnvironmentID)
 	}
 
-	var out types.Aggregators
+	var out types.CoreInstances
 	path := "/v1/projects/" + url.PathEscape(projectID) + "/aggregators?" + q.Encode()
 	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }
 
-// Aggregator by ID.
-func (c *Client) Aggregator(ctx context.Context, aggregatorID string) (types.Aggregator, error) {
-	var out types.Aggregator
-	return out, c.do(ctx, http.MethodGet, "/v1/aggregators/"+url.PathEscape(aggregatorID), nil, &out)
+// CoreInstance by ID.
+func (c *Client) CoreInstance(ctx context.Context, instanceID string) (types.CoreInstance, error) {
+	var out types.CoreInstance
+	return out, c.do(ctx, http.MethodGet, "/v1/aggregators/"+url.PathEscape(instanceID), nil, &out)
 }
 
-// UpdateAggregator by its ID.
-func (c *Client) UpdateAggregator(ctx context.Context, aggregatorID string, payload types.UpdateAggregator) error {
-	return c.do(ctx, http.MethodPatch, "/v1/aggregators/"+url.PathEscape(aggregatorID), payload, nil)
+// UpdateCoreInstance by its ID.
+func (c *Client) UpdateCoreInstance(ctx context.Context, instanceID string, payload types.UpdateCoreInstance) error {
+	return c.do(ctx, http.MethodPatch, "/v1/aggregators/"+url.PathEscape(instanceID), payload, nil)
 }
 
-// DeleteAggregator by its ID.
-func (c *Client) DeleteAggregator(ctx context.Context, aggregatorID string) error {
-	return c.do(ctx, http.MethodDelete, "/v1/aggregators/"+url.PathEscape(aggregatorID), nil, nil)
+// DeleteCoreInstance by its ID.
+func (c *Client) DeleteCoreInstance(ctx context.Context, instanceID string) error {
+	return c.do(ctx, http.MethodDelete, "/v1/aggregators/"+url.PathEscape(instanceID), nil, nil)
 }
 
-// AggregatorPing by its ID.
-func (c *Client) AggregatorPing(ctx context.Context, aggregatorID string) (types.AggregatorPingResponse, error) {
-	var out types.AggregatorPingResponse
-	return out, c.do(ctx, http.MethodPost, "/v1/aggregators/"+url.PathEscape(aggregatorID)+"/ping", nil, &out)
+// CoreInstancePing by its ID.
+func (c *Client) CoreInstancePing(ctx context.Context, instanceID string) (types.CoreInstancePingResponse, error) {
+	var out types.CoreInstancePingResponse
+	return out, c.do(ctx, http.MethodPost, "/v1/aggregators/"+url.PathEscape(instanceID)+"/ping", nil, &out)
 }
 
-// DeleteAggregators from a project passing a list of the IDs to be deleted.
-func (c *Client) DeleteAggregators(ctx context.Context, projectID string, aggregatorIDs ...string) error {
+// DeleteCoreInstances from a project passing a list of the IDs to be deleted.
+func (c *Client) DeleteCoreInstances(ctx context.Context, projectID string, instanceIDs ...string) error {
 	q := url.Values{}
-	for _, id := range aggregatorIDs {
+	for _, id := range instanceIDs {
 		q.Add("aggregator_id", id)
 	}
 	return c.do(ctx, http.MethodDelete, "/v1/projects/"+url.PathEscape(projectID)+"/aggregators?"+q.Encode(), nil, nil)

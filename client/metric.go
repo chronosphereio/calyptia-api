@@ -8,9 +8,9 @@ import (
 	"github.com/calyptia/api/types"
 )
 
-// ProjectMetrics contains an overview of the aggregated metrics for a project.
+// ProjectMetricsV1 contains an overview of the aggregated metrics for a project.
 // It includes metrics link the amount of records, bytes, and errors per plugin.
-func (c *Client) ProjectMetrics(ctx context.Context, projectID string, params types.MetricsParams) (types.ProjectMetrics, error) {
+func (c *Client) ProjectMetricsV1(ctx context.Context, projectID string, params types.MetricsParams) (types.ProjectMetrics, error) {
 	q := url.Values{
 		"start":    []string{params.Start.String()},
 		"interval": []string{params.Interval.String()},
@@ -46,21 +46,21 @@ func (c *Client) PipelineMetricsV1(ctx context.Context, pipelineID string, param
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }
 
-// AggregatorMetrics contains an overview of the aggregated metrics for a project.
+// CoreInstanceMetricsV1 contains an overview of the aggregated metrics for a project.
 // It includes metrics link the amount of records, bytes, and errors per plugin.
-func (c *Client) AggregatorMetrics(ctx context.Context, aggregatorID string, params types.MetricsParams) (types.AggregatorMetrics, error) {
+func (c *Client) CoreInstanceMetricsV1(ctx context.Context, instanceID string, params types.MetricsParams) (types.CoreInstanceMetricsV1, error) {
 	q := url.Values{
 		"start":    []string{params.Start.String()},
 		"interval": []string{params.Interval.String()},
 	}
 
-	var out types.AggregatorMetrics
-	path := "/v1/aggregator_metrics/" + url.PathEscape(aggregatorID) + "?" + q.Encode()
+	var out types.CoreInstanceMetricsV1
+	path := "/v1/aggregator_metrics/" + url.PathEscape(instanceID) + "?" + q.Encode()
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }
 
-// AggregatorPipelinesMetrics get the metrics for a set of pipelineIDs belonging to an aggregator (bulk mode).
-func (c *Client) AggregatorPipelinesMetrics(ctx context.Context, aggregatorID string, params types.PipelinesMetricsParams) (types.PipelinesMetrics, error) {
+// PipelinesMetricsV1 get the metrics for a set of pipelineIDs belonging to a core instance (bulk mode).
+func (c *Client) PipelinesMetricsV1(ctx context.Context, instanceID string, params types.PipelinesMetricsParams) (types.PipelinesMetrics, error) {
 	var out types.PipelinesMetrics
 	q := url.Values{
 		"start":    []string{params.Start.String()},
@@ -71,7 +71,7 @@ func (c *Client) AggregatorPipelinesMetrics(ctx context.Context, aggregatorID st
 		q.Add("pipeline_id", pipelineID)
 	}
 
-	return out, c.do(ctx, http.MethodGet, "/v1/aggregators/"+url.PathEscape(aggregatorID)+"/pipelines_metrics?"+q.Encode(), nil, &out)
+	return out, c.do(ctx, http.MethodGet, "/v1/aggregators/"+url.PathEscape(instanceID)+"/pipelines_metrics?"+q.Encode(), nil, &out)
 }
 
 // CoreInstanceMetrics contains an overview of the Core Instance metrics.

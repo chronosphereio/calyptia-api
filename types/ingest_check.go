@@ -6,7 +6,7 @@ import (
 
 const (
 	// IngestCheckDefaultTimeout default timeout for an ingest check.
-	IngestCheckDefaultTimeout = AggregatorNextPingTimeout
+	IngestCheckDefaultTimeout = CoreInstanceNextPingTimeout
 )
 
 // IngestCheck type for core_instance ingestion checks.
