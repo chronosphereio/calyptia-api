@@ -11,8 +11,8 @@ import (
 // Where timestamp is a float with seconds and nanoseconds as fraction.
 // And attrs being an object with string key and values.
 type FluentBitLog struct {
-	Timestamp FluentBitTime
-	Attrs     FluentBitLogAttrs
+	Timestamp FluentBitTime     `json:"timestamp"`
+	Attrs     FluentBitLogAttrs `json:"record"`
 }
 
 // FluentBitTime wrapper.
