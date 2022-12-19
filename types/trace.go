@@ -19,7 +19,7 @@ type TraceSession struct {
 
 // Active tells whether a session is still within its lifespan.
 func (ts TraceSession) Active() bool {
-	now := time.Now()
+	now := time.Now().Add(time.Microsecond)
 	return ts.EndTime().Equal(now) || ts.EndTime().After(now)
 }
 

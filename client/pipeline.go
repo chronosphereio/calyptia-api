@@ -118,6 +118,7 @@ func (c *Client) DeletePipelineClusterObjects(ctx context.Context, pipelineID st
 	for _, id := range clusterObjectIDs {
 		q.Add("cluster_object_id", id)
 	}
+
 	return c.do(ctx, http.MethodDelete, "/v1/pipelines/"+url.PathEscape(pipelineID)+"/cluster_objects?"+q.Encode(), nil, nil)
 }
 
