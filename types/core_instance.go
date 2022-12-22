@@ -22,6 +22,7 @@ type CoreInstance struct {
 	Tags                  []string             `json:"tags" yaml:"tags"`
 	Metadata              CoreInstanceMetadata `json:"metadata" yaml:"metadata"`
 	Status                CoreInstanceStatus   `json:"status" yaml:"status"`
+	SkipServiceCreation   bool                 `json:"skipServiceCreation" yaml:"skipServiceCreation"`
 	CreatedAt             time.Time            `json:"createdAt" yaml:"createdAt"`
 	UpdatedAt             time.Time            `json:"updatedAt" yaml:"updatedAt"`
 }
@@ -124,6 +125,7 @@ type CreateCoreInstance struct {
 	Tags                    []string             `json:"tags"`
 	Metadata                CoreInstanceMetadata `json:"metadata"`
 	EnvironmentID           string               `json:"environmentID"`
+	SkipServiceCreation     bool                 `json:"skipServiceCreation"`
 }
 
 // CreatedCoreInstance response payload after creating a core instance successfully.
@@ -140,6 +142,7 @@ type CreatedCoreInstance struct {
 	ClusterLoggingPipeline *Pipeline         `json:"clusterLoggingPipeline"`
 	ResourceProfiles       []ResourceProfile `json:"resourceProfiles"`
 	EnvironmentName        string            `json:"environmentName"`
+	SkipServiceCreation    bool              `json:"skipServiceCreation"`
 }
 
 // CoreInstancesParams request payload for querying core instances.
@@ -153,10 +156,11 @@ type CoreInstancesParams struct {
 
 // UpdateCoreInstance request payload for updating a core instance.
 type UpdateCoreInstance struct {
-	Name           *string               `json:"name"`
-	Version        *string               `json:"version"`
-	EnvironmentID  *string               `json:"environmentID"`
-	ClusterLogging *bool                 `json:"clusterLogging"`
-	Tags           *[]string             `json:"tags"`
-	Metadata       *CoreInstanceMetadata `json:"metadata"`
+	Name                *string               `json:"name"`
+	Version             *string               `json:"version"`
+	EnvironmentID       *string               `json:"environmentID"`
+	ClusterLogging      *bool                 `json:"clusterLogging"`
+	Tags                *[]string             `json:"tags"`
+	Metadata            *CoreInstanceMetadata `json:"metadata"`
+	SkipServiceCreation *bool                 `json:"skipServiceCreation"`
 }
