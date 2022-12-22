@@ -443,12 +443,16 @@ components:
           type: string
           default: default
           example: default
+        skipServiceCreation:
+          type: boolean
+          default: false
       required:
         - id
         - token
         - name
         - pipelinesCount
         - environmentName
+        - skipServiceCreation
         - createdAt
         - updatedAt
     ResourceProfile:
@@ -1365,6 +1369,13 @@ components:
           type: string
           nullable: true
           description: environment ID to associate this aggregator with.
+        skipServiceCreation:
+          type: boolean
+          nullable: true
+          default: false
+          description: |
+            If true, kubernetes service creation will be skipped for all pipelines
+            that exists on this core_instance.
       required:
         - name
         - version
@@ -1398,6 +1409,13 @@ components:
           type: string
           nullable: true
           description: environment ID to associate this aggregator with.
+        skipServiceCreation:
+          type: boolean
+          nullable: true
+          default: false
+          description: |
+            If true, kubernetes service creation will be skipped for all pipelines
+            that exists on this core_instance.
     CreateResourceProfile:
       description: Create resource profile request body.
       type: object
@@ -2025,6 +2043,9 @@ components:
           type: string
           description: environment name on which the agent belongs to.
           default: default
+        skipServiceCreation:
+          type: boolean
+          default: false
       required:
         - id
         - token
@@ -2033,6 +2054,8 @@ components:
         - name
         - createdAt
         - resourceProfiles
+        - environmentName
+        - skipServiceCreation
     CreatedResourceProfile:
       type: object
       description: Created resource profile response body.
