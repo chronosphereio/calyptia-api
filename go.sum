@@ -1,7 +1,9 @@
-github.com/calyptia/go-fluentbit-config v0.7.0 h1:nWzhVXZSAU3ixchSmdMZMlhqE/scLWc+uHhnaERjHvM=
-github.com/calyptia/go-fluentbit-config v0.7.0/go.mod h1:soHx0rX7IO2uCMoYIGnNBb/d5+Hvo0orsc8DjFLqRVk=
+github.com/calyptia/go-fluentbit-config v0.8.0 h1:C4FIO2uEjNSpMr5VMb7+zCP9kw+/irjcvwQG3q4d5ak=
+github.com/calyptia/go-fluentbit-config v0.8.0/go.mod h1:ZeQb8TOP7iYO9H8qco4ZP7Txs919x2uQ4gR53IWwsGE=
 github.com/peterhellberg/link v1.2.0 h1:UA5pg3Gp/E0F2WdX7GERiNrPQrM1K6CVJUUWfHa4t6c=
 github.com/peterhellberg/link v1.2.0/go.mod h1:gYfAh+oJgQu2SrZHg5hROVRQe1ICoK0/HHJTcE0edxc=
+golang.org/x/exp v0.0.0-20230108222341-4b8118a2686a h1:tlXy25amD5A7gOfbXdqCGN5k8ESEed/Ee1E5RcrYnqU=
+golang.org/x/exp v0.0.0-20230108222341-4b8118a2686a/go.mod h1:CxIveKay+FTh1D0yPZemJVgC/95VzuuOLq5Qi4xnoYc=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
