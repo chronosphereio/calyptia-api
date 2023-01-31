@@ -3256,10 +3256,10 @@ paths:
     get:
       tags:
         - user
-      summary: Send verification email
-      operationId: sendVerificationEmail
+      summary: Request verification email
+      operationId: requestVerificationEmail
       description: |-
-        Sends a verification email to the user.
+        Request a verification email for the user.
         When a new user registers within Calyptia Cloud with password, it should receive a verification email, in the case it didn't receive it, or the email expired already, use this endpoint to request a new one.
       security:
         - user: []
