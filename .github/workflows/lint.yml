@@ -34,6 +34,9 @@ jobs:
           ./actionlint -color -shellcheck=
         shell: bash
 
+      - name: PR - Shellcheck
+        uses: ludeeus/action-shellcheck@master
+
   sonarcloud:
     runs-on: ubuntu-latest
     name: PR - Sonarcloud

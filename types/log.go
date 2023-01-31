@@ -28,14 +28,15 @@ func (l FluentBitLog) AsSlice() []any {
 // UnmarshalJSON parses fluent-big json representation of
 // [timestamp, attrs].
 func (l *FluentBitLog) UnmarshalJSON(b []byte) error {
-	var ss [2]json.RawMessage
+	const MessageSize = 2
+	var ss [MessageSize]json.RawMessage
 
 	err := json.Unmarshal(b, &ss)
 	if err != nil {
 		return err
 	}
 
-	if len(ss) != 2 {
+	if len(ss) != MessageSize {
 		return errors.New("unexpected log record parts length")
 	}
 

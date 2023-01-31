@@ -3253,7 +3253,7 @@ components:
 
 paths:
   /v1/verification_email:
-    post:
+    get:
       tags:
         - user
       summary: Send verification email

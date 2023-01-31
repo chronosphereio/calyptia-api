@@ -10,5 +10,5 @@ import (
 // in the case it didn't receive it, or the email expired already,
 // use this endpoint to request a new one.
 func (c *Client) SendVerificationEmail(ctx context.Context) error {
-	return c.do(ctx, http.MethodPost, "/v1/verification_email", nil, nil)
+	return c.do(ctx, http.MethodGet, "/v1/verification_email", nil, nil)
 }
