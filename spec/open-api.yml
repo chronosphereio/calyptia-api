@@ -45,6 +45,7 @@ tags:
   - name: trace_session
   - name: trace_record
   - name: cluster_object
+  - name: fleet
 
 components:
   securitySchemes:
@@ -226,6 +227,10 @@ components:
         id:
           type: string
           format: uuid
+        fleetID:
+          type: string
+          format: uuid
+          nullable: true
         token:
           type: string
           example: redacted
@@ -288,6 +293,7 @@ components:
           example: default
       required:
         - id
+        - fleetID
         - token
         - name
         - machineID
@@ -320,6 +326,195 @@ components:
         - id
         - rawConfig
         - createdAt
+    Fleet:
+      type: object
+      description: Group of agents sharing the same config.
+      properties:
+        id:
+          type: string
+          format: uuid
+        projectID:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: my-fleet
+        minFluentBitVersion:
+          type: string
+          example: v1.0.0
+        config:
+          $ref: "#/components/schemas/FluentBitConfig"
+        tags:
+          type: array
+          items:
+            type: string
+            example: dev
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - projectID
+        - name
+        - minFluentBitVersion
+        - config
+        - tags
+        - createdAt
+        - updatedAt
+    CreateFleet:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 32
+          example: my-fleet
+        minFluentBitVersion:
+          type: string
+          description: semver
+          example: v1.0.0
+        config:
+          $ref: "#/components/schemas/FluentBitConfig"
+        tags:
+          type: array
+          items:
+            type: string
+            pattern: ^[a-z]+$
+            example: dev
+        skipConfigValidation:
+          type: boolean
+          default: false
+      required:
+        - name
+        - minFluentBitVersion
+        - config
+        - tags
+        - skipConfigValidation
+    CreatedFleet:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - createdAt
+    UpdateFleet:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 32
+          nullable: true
+          example: updated-fleet
+        config:
+          $ref: "#/components/schemas/FluentBitConfig"
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+            pattern: ^[a-z]+$
+            example: updated
+          nullable: true
+        skipConfigValidation:
+          type: boolean
+          default: false
+      required:
+        - skipConfigValidation
+    UpdatedFleet:
+      type: object
+      properties:
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - updatedAt
+    DeletedFleet:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - deleted
+        - deletedAt
+    FluentBitConfig:
+      type: object
+      description: Fluent-bit configuration in JSON format. Shares the same structure as the YAML config format.
+      properties:
+        env:
+          type: object
+          example:
+            FOO: bar
+        includes:
+          type: array
+          items:
+            type: string
+            example: another/config.yaml
+        service:
+          type: object
+          additionalProperties: true
+          example:
+            log_level: error
+        customs:
+          type: array
+          items:
+            $ref: "#/components/schemas/PropertiesByName"
+          example:
+            - calyptia:
+                name: calyptia
+                api_key: secret
+        pipeline:
+          $ref: "#/components/schemas/FluentBitConfigPipeline"
+    PropertiesByName:
+      type: object
+      additionalProperties:
+        type: object
+      maxItems: 1
+    FluentBitConfigPipeline:
+      type: object
+      properties:
+        inputs:
+          type: array
+          items:
+            $ref: "#/components/schemas/PropertiesByName"
+          example:
+            - syslog:
+                name: syslog
+                port: 5140
+        parsers:
+          type: array
+          items:
+            $ref: "#/components/schemas/PropertiesByName"
+          example:
+            - dummy_test:
+                name: dummy_test
+                format: regex
+        filters:
+          type: array
+          items:
+            $ref: "#/components/schemas/PropertiesByName"
+          example:
+            - throttle:
+                name: throttle
+                match: syslog
+        outputs:
+          type: array
+          items:
+            $ref: "#/components/schemas/PropertiesByName"
+          example:
+            - stdout:
+                name: stdout
+                match: "*"
     AggregatorPingResponse:
       type: object
       description: Aggregator Ping Response model.
@@ -542,6 +737,10 @@ components:
           $ref: "#/components/schemas/PipelineStatus"
         resourceProfile:
           $ref: "#/components/schemas/ResourceProfile"
+        image:
+          type: string
+          example: ghcr.io/calyptia/core/calyptia-fluent-bit:23.1.2
+          nullable: true
         replicasCount:
           type: integer
           minimum: 0
@@ -583,6 +782,7 @@ components:
         - configSections
         - status
         - resourceProfile
+        - image
         - replicasCount
         - metadata
         - createdAt
@@ -1267,6 +1467,10 @@ components:
       description: Register agent request body.
       type: object
       properties:
+        fleetID:
+          type: string
+          format: uuid
+          nullable: true
         name:
           type: string
           example: new-agent
@@ -1312,6 +1516,10 @@ components:
       description: Update agent request body.
       type: object
       properties:
+        fleetID:
+          type: string
+          format: uuid
+          nullable: true
         name:
           type: string
           example: new-agent
@@ -1535,6 +1743,10 @@ components:
             - ini
             - json
             - yaml
+        image:
+          type: string
+          example: ghcr.io/calyptia/core/calyptia-fluent-bit:23.1.2
+          nullable: true
         secrets:
           type: array
           nullable: true
@@ -1603,6 +1815,7 @@ components:
         - name
         - replicasCount
         - rawConfig
+        - image
         - secrets
         - files
         - resourceProfile
@@ -1636,6 +1849,10 @@ components:
             - ini
             - json
             - yaml
+          nullable: true
+        image:
+          type: string
+          example: ghcr.io/calyptia/core/calyptia-fluent-bit:23.1.2
           nullable: true
         secrets:
           type: array
@@ -3599,6 +3816,12 @@ paths:
         - user: []
         - project: []
       parameters:
+        - name: fleet_id
+          description: Filter agents from a single fleet.
+          in: query
+          schema:
+            type: string
+            format: uuid
         - schema:
             type: integer
             minimum: 0
@@ -6746,3 +6969,146 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MetricsOverTimeByPlugin"
+  /v1/projects/{projectID}/fleets:
+    parameters:
+      - name: projectID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      operationId: createFleet
+      summary: Create fleet.
+      description: |-
+        Create a fleet on the given project.
+        Agents can be added later to this fleet
+        and all of them will share the same config.
+      security:
+        - user: []
+        - project: []
+      tags: [fleet]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateFleet"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedFleet"
+    get:
+      operationId: fleets
+      summary: Fleets.
+      description: |-
+        List all the fleets within a project.
+      security:
+        - user: []
+        - project: []
+      tags: [fleet]
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+            maxLength: 32
+        - name: tags_query
+          in: query
+          description: \"AND\" separated query
+          schema:
+            type: string
+            example: dev AND prod
+        - name: last
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+        - name: before
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            Link:
+              schema:
+                type: string
+                example: </v1/projects/foo/fleets?before=bar>; rel="next"
+              description: RFC5988 with `rel="next"`.
+          links:
+            NextFleetsPage:
+              operationId: fleets
+              parameters:
+                before: "$response.header.Link#rel=next"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Fleet"
+  /v1/fleets/{fleetID}:
+    parameters:
+      - name: fleetID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: fleet
+      summary: Fleet.
+      description: |-
+        Retrieve a single fleet by ID.
+      security:
+        - user: []
+        - project: []
+      tags: [fleet]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Fleet"
+    patch:
+      operationId: updateFleet
+      summary: Update fleet.
+      description: |-
+        Update a fleet details.
+      security:
+        - user: []
+        - project: []
+      tags: [fleet]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateFleet"
+      responses:
+        "200":
+          description: Updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatedFleet"
+    delete:
+      operationId: deleteFleet
+      summary: Delete fleet.
+      description: |-
+        Delete a single fleet by its ID.
+        All associated agents will remain but the shared config wil be detached.
+      security:
+        - user: []
+        - project: []
+      tags: [fleet]
+      responses:
+        "200":
+          description: Deleted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeletedFleet"

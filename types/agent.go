@@ -9,6 +9,7 @@ import (
 // Agent model.
 type Agent struct {
 	ID                  string           `json:"id" yaml:"id"`
+	FleetID             *string          `json:"fleetID" yaml:"fleetID"`
 	Token               string           `json:"token" yaml:"token"`
 	Name                string           `json:"name" yaml:"name"`
 	MachineID           string           `json:"machineID" yaml:"machineID"`
@@ -56,6 +57,8 @@ const (
 // RegisterAgent request payload for registering a new agent.
 type RegisterAgent struct {
 	Name          string           `json:"name"`
+	EnvironmentID string           `json:"environmentID"`
+	FleetID       *string          `json:"fleetID"`
 	MachineID     string           `json:"machineID"`
 	Type          AgentType        `json:"type"`
 	Version       string           `json:"version"`
@@ -64,7 +67,6 @@ type RegisterAgent struct {
 	RawConfig     string           `json:"rawConfig"`
 	Metadata      *json.RawMessage `json:"metadata"`
 	Tags          []string         `json:"tags"`
-	EnvironmentID string           `json:"environmentID"`
 }
 
 // RegisteredAgent response payload after registering an agent successfully.
@@ -82,16 +84,18 @@ type AgentsParams struct {
 	Before        *string
 	Name          *string
 	Tags          *string
+	FleetID       *string
 	EnvironmentID *string
 }
 
 // UpdateAgent request payload for updating an agent.
 type UpdateAgent struct {
+	FleetID       *string          `json:"fleetID"`
+	EnvironmentID *string          `json:"environmentID"`
 	Name          *string          `json:"name"`
 	Version       *string          `json:"version"`
 	Edition       *AgentEdition    `json:"edition"`
 	Flags         *[]string        `json:"flags"`
 	RawConfig     *string          `json:"rawConfig"`
 	Metadata      *json.RawMessage `json:"metadata"`
-	EnvironmentID *string          `json:"environmentID"`
 }
