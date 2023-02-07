@@ -25,6 +25,7 @@ type Pipeline struct {
 	Kind                         PipelineKind     `json:"kind" yaml:"kind"`
 	Config                       PipelineConfig   `json:"config" yaml:"config"`
 	ConfigSections               []ConfigSection  `json:"configSections" yaml:"configSections"`
+	Image                        *string          `json:"image" yaml:"image"`
 	Status                       PipelineStatus   `json:"status" yaml:"status"`
 	ResourceProfile              ResourceProfile  `json:"resourceProfile" yaml:"resourceProfile"`
 	TracingEnabled               bool             `json:"tracingEnabled" yaml:"tracingEnabled"`
@@ -55,6 +56,7 @@ type CreatePipeline struct {
 	Secrets              []CreatePipelineSecret `json:"secrets"`
 	Files                []CreatePipelineFile   `json:"files"`
 	ResourceProfileName  string                 `json:"resourceProfile"`
+	Image                *string                `json:"image"`
 	SkipConfigValidation bool                   `json:"skipConfigValidation"`
 	Metadata             *json.RawMessage       `json:"metadata"`
 	Tags                 []string               `json:"tags"`
@@ -117,6 +119,7 @@ type UpdatePipeline struct {
 	ReplicasCount   *uint               `json:"replicasCount"`
 	RawConfig       *string             `json:"rawConfig"`
 	ResourceProfile *string             `json:"resourceProfile"`
+	Image           *string             `json:"image"`
 	// Deprecated: in favor of NoAutoCreateEndpointsFromConfig
 	AutoCreatePortsFromConfig *bool `json:"autoCreatePortsFromConfig"`
 	// Deprecated: in favor of NoAutoCreateChecksFromConfig
