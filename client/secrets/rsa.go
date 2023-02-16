@@ -8,6 +8,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"hash"
 )
 
 const (
@@ -32,12 +33,71 @@ func (r *RSA) EncryptWithPublicKey(msg []byte, key []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	hash := sha512.New()
-	ciphertext, err := rsa.EncryptOAEP(hash, rand.Reader, publicKey, msg, nil)
+	h := sha512.New()
+	ciphertext, err := Encrypt(h, publicKey, msg)
 	if err != nil {
 		return nil, err
 	}
 	return ciphertext, nil
+}
+
+// Encrypt encrypts the given message using RSA-OAEP with the given public key.
+//
+// The message is split into chunks of size k - 2*hLen - 2, where k is the size of the public key in bytes and hLen is the length of the hash function used.
+// Each chunk is encrypted separately and the resulting ciphertexts are concatenated.
+//
+// At the end it returns the ciphertext encrypted.
+func Encrypt(hash hash.Hash, publicKey *rsa.PublicKey, msg []byte) ([]byte, error) {
+	k := publicKey.Size()
+	limit := k - 2*hash.Size() - 2
+	chunks := splitByteBySizeLimit(msg, limit)
+	var cipherText []byte
+	for _, chunk := range chunks {
+		ciphertextChunk, err := rsa.EncryptOAEP(hash, rand.Reader, publicKey, chunk, nil)
+		if err != nil {
+			return nil, err
+		}
+		cipherText = append(cipherText, ciphertextChunk...)
+	}
+	return cipherText, nil
+}
+
+// splitByteBySizeLimit splits the given byte array into chunks of size limit.
+// If the given byte array is smaller than the limit, it returns a slice with the given byte array.
+func splitByteBySizeLimit(buf []byte, sizeLimit int) [][]byte {
+	if len(buf) <= sizeLimit {
+		return [][]byte{buf}
+	}
+	var chunk []byte
+	chunks := make([][]byte, 0, len(buf)/sizeLimit+1)
+	for len(buf) >= sizeLimit {
+		chunk, buf = buf[:sizeLimit], buf[sizeLimit:]
+		chunks = append(chunks, chunk)
+	}
+	if len(buf) > 0 {
+		chunks = append(chunks, buf)
+	}
+	return chunks
+}
+
+// Decrypt decrypts the given ciphertext using RSA-OAEP with the given private key.
+//
+// The ciphertext is split into chunks of size k, where k is the size of the private key in bytes.
+// Each chunk is decrypted separately and the resulting plaintexts are concatenated.
+//
+// At the end it returns the plaintext decrypted.
+func Decrypt(hash hash.Hash, privateKey *rsa.PrivateKey, msg []byte) ([]byte, error) {
+	limit := privateKey.Size()
+	chunks := splitByteBySizeLimit(msg, limit)
+	var plaintext []byte
+	for _, chunk := range chunks {
+		plaintextChunk, err := rsa.DecryptOAEP(hash, rand.Reader, privateKey, chunk, nil)
+		if err != nil {
+			return nil, err
+		}
+		plaintext = append(plaintext, plaintextChunk...)
+	}
+	return plaintext, nil
 }
 
 func (r *RSA) DecryptWithPrivateKey(msg []byte, key []byte) ([]byte, error) {
@@ -45,8 +105,8 @@ func (r *RSA) DecryptWithPrivateKey(msg []byte, key []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	hash := sha512.New()
-	plaintext, err := rsa.DecryptOAEP(hash, rand.Reader, privateKey, msg, nil)
+	h := sha512.New()
+	plaintext, err := Decrypt(h, privateKey, msg)
 	if err != nil {
 		return nil, err
 	}
