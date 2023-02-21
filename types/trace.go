@@ -118,7 +118,7 @@ func (k TraceRecordKind) String() string {
 // GoString implements fmt.GoStringer.
 func (k TraceRecordKind) GoString() string { return k.String() }
 
-// CreateTraceRecord request payload for creating a new trace record.
+// CreateTraceRecord payload for a single record in trace records.
 type CreateTraceRecord struct {
 	Kind    TraceRecordKind `json:"type"`
 	TraceID string          `json:"trace_id"`
@@ -130,7 +130,8 @@ type CreateTraceRecord struct {
 	PluginAlias    string `json:"plugin_alias"`
 	ReturnCode     int    `json:"return_code"`
 	// Records array, each record is a JSON object,
-	// warranted to have a flb_time `timestamp` field.
+	// warranted to have a flb_time `timestamp` field and a record
+	// field with the actual record's values.
 	Records json.RawMessage `json:"records"`
 }
 
