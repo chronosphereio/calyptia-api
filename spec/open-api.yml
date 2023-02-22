@@ -741,6 +741,7 @@ components:
           type: string
           example: ghcr.io/calyptia/core/calyptia-fluent-bit:23.1.2
           nullable: true
+          default: null
         replicasCount:
           type: integer
           minimum: 0
@@ -1747,6 +1748,7 @@ components:
           type: string
           example: ghcr.io/calyptia/core/calyptia-fluent-bit:23.1.2
           nullable: true
+          default: null
         secrets:
           type: array
           nullable: true
@@ -1854,6 +1856,7 @@ components:
           type: string
           example: ghcr.io/calyptia/core/calyptia-fluent-bit:23.1.2
           nullable: true
+          default: null
         secrets:
           type: array
           nullable: true
@@ -3432,6 +3435,7 @@ components:
           type: number
           format: float
           nullable: true
+          default: null
       required:
         - time
         - value
