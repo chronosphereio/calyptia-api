@@ -71,6 +71,7 @@ components:
         name:
           type: string
           nullable: true
+          default: null
     CreateEnvironment:
       type: object
       properties:
@@ -109,6 +110,7 @@ components:
         avatarURL:
           type: string
           nullable: true
+          default: null
           format: uri
         createdAt:
           type: string
@@ -205,6 +207,7 @@ components:
         roles:
           type: array
           nullable: true
+          default: null
           uniqueItems: true
           items:
             type: string
@@ -231,6 +234,7 @@ components:
           type: string
           format: uuid
           nullable: true
+          default: null
         token:
           type: string
           example: redacted
@@ -256,12 +260,14 @@ components:
         flags:
           type: array
           nullable: true
+          default: null
           uniqueItems: true
           items:
             type: string
         tags:
           type: array
           nullable: true
+          default: null
           uniqueItems: true
           items:
             type: string
@@ -270,14 +276,17 @@ components:
         metadata:
           type: object
           nullable: true
+          default: null
         firstMetricsAddedAt:
           type: string
           format: date-time
           nullable: true
+          default: null
         lastMetricsAddedAt:
           type: string
           format: date-time
           nullable: true
+          default: null
         metricsCount:
           type: integer
           minimum: 0
@@ -411,10 +420,12 @@ components:
           type: string
           maxLength: 32
           nullable: true
+          default: null
           example: updated-fleet
         config:
           $ref: "#/components/schemas/FluentBitConfig"
           nullable: true
+          default: null
         tags:
           type: array
           items:
@@ -422,6 +433,7 @@ components:
             pattern: ^[a-z]+$
             example: updated
           nullable: true
+          default: null
         skipConfigValidation:
           type: boolean
           default: false
@@ -444,6 +456,7 @@ components:
           type: string
           format: date-time
           nullable: true
+          default: null
       required:
         - deleted
         - deletedAt
@@ -631,6 +644,7 @@ components:
         tags:
           type: array
           nullable: true
+          default: null
           uniqueItems: true
           items:
             type: string
@@ -760,16 +774,19 @@ components:
         tags:
           type: array
           nullable: true
+          default: null
           uniqueItems: true
           items:
             type: string
         metadata:
           type: object
           nullable: true
+          default: null
           properties:
             nodeSelector:
               type: object
               nullable: true
+              default: null
         createdAt:
           type: string
           format: date-time
@@ -1048,6 +1065,7 @@ components:
           type: string
           format: uuid
           nullable: true
+          default: null
         name:
           type: string
           example: myfile
@@ -1118,14 +1136,17 @@ components:
         pluginID:
           type: string
           nullable: true
+          default: null
           example: forward.0
         pluginName:
           type: string
           nullable: true
+          default: null
           example: forward
         pluginAlias:
           type: string
           nullable: true
+          default: null
           example: myforwardinput
         createdAt:
           type: string
@@ -1159,6 +1180,7 @@ components:
                   type: number
                   format: float
                   nullable: true
+                  default: null
               plugins:
                 type: object
                 additionalProperties:
@@ -1174,6 +1196,7 @@ components:
               type: number
               format: float
               nullable: true
+              default: null
       required:
         - measurements
         - topPlugins
@@ -1381,6 +1404,7 @@ components:
           error:
             type: string
             nullable: true
+            default: null
         required: [data, error]
     Metrics:
       type: object
@@ -1405,6 +1429,7 @@ components:
           type: number
           format: float
           nullable: true
+          default: null
       required:
         - time
         - value
@@ -1425,6 +1450,7 @@ components:
           type: string
           example: new-project
           nullable: true
+          default: null
     CreateToken:
       description: Create token request body.
       type: object
@@ -1442,6 +1468,7 @@ components:
           type: string
           example: new-token
           nullable: true
+          default: null
     CreateInvitation:
       description: Create invitation request body.
       type: object
@@ -1472,6 +1499,7 @@ components:
           type: string
           format: uuid
           nullable: true
+          default: null
         name:
           type: string
           example: new-agent
@@ -1494,6 +1522,7 @@ components:
         flags:
           type: array
           nullable: true
+          default: null
           items:
             type: string
         rawConfig:
@@ -1501,9 +1530,11 @@ components:
         metadata:
           type: object
           nullable: true
+          default: null
         environmentID:
           type: string
           nullable: true
+          default: null
           description: environment ID to associate this agent with.
       required:
         - name
@@ -1521,35 +1552,43 @@ components:
           type: string
           format: uuid
           nullable: true
+          default: null
         name:
           type: string
           example: new-agent
           format: hostname
           nullable: true
+          default: null
         version:
           type: string
           example: v1.8.6
           nullable: true
+          default: null
         edition:
           type: string
           enum:
             - community
             - enterprise
           nullable: true
+          default: null
         flags:
           type: array
           nullable: true
+          default: null
           items:
             type: string
         rawConfig:
           type: string
           nullable: true
+          default: null
         metadata:
           type: object
           nullable: true
+          default: null
         environmentID:
           type: string
           nullable: true
+          default: null
           description: environment ID to associate this agent with.
     CreateAggregator:
       description: Create aggregator request body.
@@ -1574,14 +1613,16 @@ components:
         metadata:
           type: object
           nullable: true
+          default: null
         environmentID:
           type: string
           nullable: true
+          default: null
           description: environment ID to associate this aggregator with.
         skipServiceCreation:
           type: boolean
           nullable: true
-          default: false
+          default: null
           description: |
             If true, kubernetes service creation will be skipped for all pipelines
             that exists on this core_instance.
@@ -1599,17 +1640,21 @@ components:
           format: hostname
           example: new-aggregator
           nullable: true
+          default: null
         clusterLogging:
           type: boolean
           description: enable or disable cluster-logging functionality.
           nullable: true
+          default: null
         version:
           type: string
           example: v0.1.12
           nullable: true
+          default: null
         tags:
           type: array
           nullable: true
+          default: null
           items:
             type: string
         metadata:
@@ -1617,11 +1662,12 @@ components:
         environmentID:
           type: string
           nullable: true
+          default: null
           description: environment ID to associate this aggregator with.
         skipServiceCreation:
           type: boolean
           nullable: true
-          default: false
+          default: null
           description: |
             If true, kubernetes service creation will be skipped for all pipelines
             that exists on this core_instance.
@@ -1680,44 +1726,55 @@ components:
           type: string
           example: my-resource-profile
           nullable: true
+          default: null
         storageMaxChunksUp:
           type: integer
           format: int32
           nullable: true
+          default: null
         storageSyncFull:
           type: boolean
           nullable: true
+          default: null
         storageBacklogMemLimit:
           type: string
           example: 1Mi
           nullable: true
+          default: null
         storageVolumeSize:
           type: string
           example: 2Mi
           nullable: true
+          default: null
         storageMaxChunksPause:
           type: boolean
           nullable: true
+          default: null
         cpuBufferWorkers:
           type: integer
           format: int32
           nullable: true
+          default: null
         cpuLimit:
           type: string
           example: 3Mi
           nullable: true
+          default: null
         cpuRequest:
           type: string
           example: 4Mi
           nullable: true
+          default: null
         memoryLimit:
           type: string
           example: 5Mi
           nullable: true
+          default: null
         memoryRequest:
           type: string
           example: 6Mi
           nullable: true
+          default: null
     CreatePipeline:
       description: Create pipeline request body.
       type: object
@@ -1752,11 +1809,13 @@ components:
         secrets:
           type: array
           nullable: true
+          default: null
           items:
             $ref: "#/components/schemas/CreatePipelineSecret"
         files:
           type: array
           nullable: true
+          default: null
           items:
             $ref: "#/components/schemas/CreatePipelineFile"
         resourceProfile:
@@ -1809,10 +1868,12 @@ components:
         metadata:
           type: object
           nullable: true
+          default: null
           properties:
             nodeSelector:
               type: object
               nullable: true
+              default: null
       required:
         - name
         - replicasCount
@@ -1831,6 +1892,7 @@ components:
           description: DNS label format as of defined on RFC1123
           example: new-pipeline
           nullable: true
+          default: null
         kind:
           type: string
           description: Kind of deployment used when deploying this pipeline
@@ -1842,9 +1904,11 @@ components:
           type: integer
           minimum: 0
           nullable: true
+          default: null
         rawConfig:
           type: string
           nullable: true
+          default: null
         configFormat:
           type: string
           enum:
@@ -1852,6 +1916,7 @@ components:
             - json
             - yaml
           nullable: true
+          default: null
         image:
           type: string
           example: ghcr.io/calyptia/core/calyptia-fluent-bit:23.1.2
@@ -1860,32 +1925,37 @@ components:
         secrets:
           type: array
           nullable: true
+          default: null
           items:
             $ref: "#/components/schemas/UpdatePipelineSecret"
         files:
           type: array
           nullable: true
+          default: null
           items:
             $ref: "#/components/schemas/UpdatePipelineFile"
         resourceProfile:
           type: string
           example: my-resource-profile
           nullable: true
+          default: null
         noAutoCreateEndpointsFromConfig:
           type: boolean
           nullable: true
-          default: false
+          default: null
         noAutoCreateChecksFromConfig:
           type: boolean
           nullable: true
-          default: false
+          default: null
         autoCreatePortsFromConfig:
           type: boolean
           nullable: true
+          default: null
           deprecated: true
         autoCreateChecksFromConfig:
           type: boolean
           nullable: true
+          default: null
           deprecated: true
         skipConfigValidation:
           type: boolean
@@ -1893,6 +1963,7 @@ components:
         checksBeforeDeploying:
           type: boolean
           nullable: true
+          default: null
           description: |
             If set to true:
 
@@ -1913,6 +1984,7 @@ components:
         status:
           type: string
           nullable: true
+          default: null
           enum:
             - NEW
             - FAILED
@@ -1924,15 +1996,18 @@ components:
         events:
           type: array
           nullable: true
+          default: null
           items:
             $ref: "#/components/schemas/PipelineEvent"
         metadata:
           type: object
           nullable: true
+          default: null
           properties:
             nodeSelector:
               type: object
               nullable: true
+              default: null
     CreatePipelineCheck:
       description: Create pipeline check request body.
       type: object
@@ -2023,13 +2098,16 @@ components:
           type: string
           example: newfile
           nullable: true
+          default: null
         contents:
           type: string
           format: byte
           nullable: true
+          default: null
         encrypted:
           type: boolean
           nullable: true
+          default: null
     UpdatePipelineCheck:
       description: Update pipeline check request body.
       type: object
@@ -2037,17 +2115,20 @@ components:
         protocol:
           $ref: "#/components/schemas/PipelinePortProtocol"
           nullable: true
+          default: null
         status:
           $ref: "#/components/schemas/CheckStatus"
           nullable: true
+          default: null
         retries:
           type: number
           nullable: true
-          default: 3
+          default: null
           description: number of retries for the check before marking it as unreachable.
         host:
           type: string
           nullable: true
+          default: null
           description: DNS label format as of defined on RFC1123 or an IPv4 address.
           example: localhost
         port:
@@ -2055,6 +2136,7 @@ components:
           minimum: 0
           maximum: 65535
           nullable: true
+          default: null
           description: valid 0-65535 port number
     UpdateCoreInstanceCheck:
       description: Update a core instance check request body.
@@ -2063,12 +2145,15 @@ components:
         protocol:
           $ref: "#/components/schemas/PipelinePortProtocol"
           nullable: true
+          default: null
         status:
           $ref: "#/components/schemas/CheckStatus"
           nullable: true
+          default: null
         host:
           type: string
           nullable: true
+          default: null
           description: DNS label format as of defined on RFC1123 or an IPv4 address.
           example: localhost
         port:
@@ -2076,11 +2161,12 @@ components:
           minimum: 0
           maximum: 65535
           nullable: true
+          default: null
           description: valid 0-65535 port number
         retries:
           type: number
           nullable: true
-          default: 3
+          default: null
           description: number of retries for the check before marking it as unreachable.
     UpdateIngestCheck:
       description: Update a core instance Ingest check request body.
@@ -2089,6 +2175,7 @@ components:
         status:
           $ref: "#/components/schemas/CheckStatus"
           nullable: true
+          default: null
     CreatePipelineSecret:
       description: Create pipeline secret request body.
       type: object
@@ -2110,10 +2197,12 @@ components:
           type: string
           example: newsecret
           nullable: true
+          default: null
         value:
           type: string
           format: byte
           nullable: true
+          default: null
     CreatePipelinePort:
       description: Create pipeline port request body.
       type: object
@@ -2144,17 +2233,21 @@ components:
           type: string
           example: tcp
           nullable: true
+          default: null
         frontendPort:
           type: integer
           format: int32
           nullable: true
+          default: null
         backendPort:
           type: integer
           format: int32
           nullable: true
+          default: null
         endpoint:
           type: string
           nullable: true
+          default: null
     ValidatingConfig:
       description: Validating configuration request body.
       type: object
@@ -2173,6 +2266,7 @@ components:
                 additionalProperties:
                   type: string
                 nullable: true
+                default: null
               id:
                 type: string
             required:
@@ -2425,14 +2519,17 @@ components:
         pluginID:
           type: string
           nullable: true
+          default: null
           example: forward.0
         pluginName:
           type: string
           nullable: true
+          default: null
           example: forward
         pluginAlias:
           type: string
           nullable: true
+          default: null
           example: myforwardinput
         createdAt:
           type: string
@@ -2493,6 +2590,7 @@ components:
           description: property name, value
           type: string
           nullable: true
+          default: null
         errors:
           type: array
           items:
@@ -2637,12 +2735,14 @@ components:
             type: string
             example: "dummy.0"
           nullable: true
+          default: null
         lifespan:
           description: For how long will this session be active and process records.
           type: string
           format: duration
           example: "10m"
           nullable: true
+          default: null
 
     UpdatedTraceSession:
       type: object
@@ -2852,6 +2952,7 @@ components:
           type: string
           format: uuid
           nullable: true
+          default: null
         kind:
           $ref: "#/components/schemas/ConfigSectionKind"
         properties:
@@ -2922,6 +3023,7 @@ components:
         properties:
           $ref: "#/components/schemas/Pairs"
           nullable: true
+          default: null
 
     UpdatedConfigSection:
       type: object
@@ -2999,20 +3101,24 @@ components:
         add:
           $ref: "#/components/schemas/LogAttr"
           nullable: true
+          default: null
           description: Only required when kind is "add".
         renameTo:
           type: string
           nullable: true
+          default: null
           example: renamed
           description: Only required when kind is "rename".
         copyAs:
           type: string
           nullable: true
+          default: null
           example: copied
           description: Only required when kind is "copy".
         maskWith:
           type: string
           nullable: true
+          default: null
           example: masked
           description: Only required when kind is "mask".
       required:
@@ -3116,17 +3222,21 @@ components:
           type: string
           example: "*"
           nullable: true
+          default: null
         isMatchRegexp:
           type: boolean
           nullable: true
+          default: null
         language:
           $ref: "#/components/schemas/ProcessingRuleLanguage"
           nullable: true
+          default: null
         actions:
           type: array
           items:
             $ref: "#/components/schemas/RuleAction"
           nullable: true
+          default: null
 
     UpdatedProcessingRule:
       type: object
