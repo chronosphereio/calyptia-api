@@ -109,6 +109,13 @@ type MetricsSummaryPlugin struct {
 	Outputs []MetricsOutputPlugin `json:"outputs"`
 }
 
+func (msp *MetricsSummaryPlugin) Init() *MetricsSummaryPlugin {
+	msp.Inputs = []MetricsInputPlugin{}
+	msp.Filters = []MetricsFilterPlugin{}
+	msp.Outputs = []MetricsOutputPlugin{}
+	return msp
+}
+
 type MetricsInputPlugin struct {
 	Instance string       `json:"instance"`
 	Metrics  MetricsInput `json:"metrics"`
@@ -225,6 +232,13 @@ type MetricsOverTime struct {
 	Output MetricsOverTimeOutput `json:"output"`
 }
 
+func (mot *MetricsOverTime) Init() *MetricsOverTime {
+	mot.Input.Init()
+	mot.Filter.Init()
+	mot.Output.Init()
+	return mot
+}
+
 // MetricsOverTimeInput stores a list of metrics over time for a core instance input.
 type MetricsOverTimeInput struct {
 	Bytes   []MetricOverTime `json:"bytes"`
@@ -255,6 +269,13 @@ type MetricsOverTimeByPlugin struct {
 	Inputs  []MetricsOverTimeByPluginInput  `json:"inputs"`
 	Filters []MetricsOverTimeByPluginFilter `json:"filters"`
 	Outputs []MetricsOverTimeByPluginOutput `json:"outputs"`
+}
+
+func (motbp *MetricsOverTimeByPlugin) Init() *MetricsOverTimeByPlugin {
+	motbp.Inputs = []MetricsOverTimeByPluginInput{}
+	motbp.Filters = []MetricsOverTimeByPluginFilter{}
+	motbp.Outputs = []MetricsOverTimeByPluginOutput{}
+	return motbp
 }
 
 // MetricsOverTimeByPluginInput stores a list of metrics over time for core instance inputs

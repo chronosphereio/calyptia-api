@@ -1,8 +1,8 @@
 package types
 
 import (
+	"bytes"
 	"encoding/json"
-	"fmt"
 	"time"
 )
 
@@ -69,16 +69,29 @@ type CoreInstanceMetadata struct {
 	MetadataGCP
 }
 
-// Scan method to unmarshal properly as a json.
-func (a *CoreInstanceMetadata) Scan(value interface{}) error {
-	if value == nil {
+func (m *CoreInstanceMetadata) UnmarshalJSON(data []byte) error {
+	if data == nil {
 		return nil
 	}
-	b, ok := value.([]byte)
-	if !ok {
-		return fmt.Errorf("type assertion failed, unable to convert metadata type")
+
+	if bytes.Equal(data, []byte("null")) {
+		return nil
 	}
-	return json.Unmarshal(b, &a)
+
+	if bytes.Equal(data, []byte("{}")) {
+		*m = CoreInstanceMetadata{}
+		return nil
+	}
+
+	// This is a workaround to avoid a recursive call to UnmarshalJSON.
+	type Copy CoreInstanceMetadata
+	var dest Copy
+	if err := json.Unmarshal(data, &dest); err != nil {
+		return err
+	}
+
+	*m = CoreInstanceMetadata(dest)
+	return nil
 }
 
 // MetadataK8S See: https://github.com/kubernetes/website/blob/60390ff3c0ef0043a58568ad2e4c2b7634028074/content/en/examples/pods/inject/dapi-volume.yaml#L5
