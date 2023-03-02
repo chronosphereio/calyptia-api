@@ -46,6 +46,7 @@ tags:
   - name: trace_record
   - name: cluster_object
   - name: fleet
+  - name: search
 
 components:
   securitySchemes:
@@ -3581,6 +3582,24 @@ components:
             additionalProperties:
               type: string
         example: '[1234.5, {"key": "value"}]'
+
+    SearchResult:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required: [id, name]
+
+    SearchResource:
+      type: string
+      enum:
+        - core_instance
+        - resource_profile
+        - pipeline
+        - agent
 
 paths:
   /v1/verification_email:
@@ -7226,3 +7245,39 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DeletedFleet"
+  /v1/search:
+    get:
+      operationId: search
+      summary: Search.
+      description: |-
+        Search different kinds of resources from the API.
+        It returns just the ID and name of the matching resource.
+        Results are sorted by name in ascending order.
+        If you don't provide a search term, all data is returned.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - name: project_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: resource
+          in: query
+          schema:
+            $ref: "#/components/schemas/SearchResource"
+        - name: term
+          in: query
+          schema:
+            type: string
+      tags: [search]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchResult"
