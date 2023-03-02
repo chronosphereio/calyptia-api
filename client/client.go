@@ -46,8 +46,9 @@ func (c *Client) SetUserAgent(s string) {
 }
 
 // SetProjectToken sets the "X-Project-Token" header of the client.
-func (c *Client) SetProjectToken(s string) {
+func (c *Client) SetProjectToken(s string) *Client {
 	c.projectToken = s
+	return c
 }
 
 // SetAgentToken sets the "X-Agent-Token" header of the client.
