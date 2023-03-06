@@ -47,7 +47,7 @@ jobs:
       - uses: FranzDiebold/github-env-vars-action@v2
 
       - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@v1.8
+        uses: sonarsource/sonarcloud-github-action@v1.9
         with:
           args: >
             -Dsonar.organization=calyptia
