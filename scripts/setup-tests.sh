@@ -8,17 +8,9 @@ CLOUD_URL=${CLOUD_URL:-http://localhost:$CLOUD_EXPOSED_PORT}
 CLOUD_IMAGE_TAG=${CLOUD_IMAGE_TAG:-main}
 CLOUD_IMAGE=${CLOUD_IMAGE:-ghcr.io/calyptia/cloud/all-in-one:$CLOUD_IMAGE_TAG}
 TOKEN_DIR=${TOKEN_DIR:-$SCRIPT_DIR/resources}
-TOKENFILE="$TOKEN_DIR/token"
 TEST_AUTH0_DOMAIN=${TEST_AUTH0_DOMAIN:?}
 TEST_AUTH0_MANAGEMENT_CLIENT_ID=${TEST_AUTH0_MANAGEMENT_CLIENT_ID:?}
 TEST_AUTH0_MANAGEMENT_CLIENT_SECRET=${TEST_AUTH0_MANAGEMENT_CLIENT_SECRET:?}
-
-# TODO: only due to permissions issues: https://github.com/calyptia/cloud/issues/309
-mkdir -p "$TOKEN_DIR"
-rm -f "$TOKENFILE"
-touch "$TOKENFILE"
-chmod 666 "$TOKENFILE"
-# END OF TODO
 
 docker rm -f cloud
 docker run -d \
@@ -39,12 +31,3 @@ do
 done
 echo
 echo "Container responding"
-
-echo "Waiting for token to be created"
-until [[ -f "$TOKENFILE" ]]
-do
-    echo -n "."
-    sleep 1
-done
-echo
-echo "Found token file"
