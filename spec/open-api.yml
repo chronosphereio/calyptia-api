@@ -47,6 +47,7 @@ tags:
   - name: cluster_object
   - name: fleet
   - name: search
+  - name: aws_marketplace
 
 components:
   securitySchemes:
@@ -3600,6 +3601,14 @@ components:
         - resource_profile
         - pipeline
         - agent
+
+    CreateAWSContractFromToken:
+      type: object
+      properties:
+        amazonMarketplaceToken:
+          type: string
+          minLength: 1
+      required: [amazonMarketplaceToken]
 
 paths:
   /v1/verification_email:
@@ -7281,3 +7290,64 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/SearchResult"
+
+  /v1/aws-customer-redirect:
+    post:
+      operationId: awsCustomerRedirect
+      summary: AWS customer redirect
+      description: |-
+        Redirect a request made from the AWS marketplace to the front-end
+        so the customer can be registered with a selected project.
+        The given AWS token will be decoded and stored for future reference.
+      security: []
+      tags: [aws_marketplace]
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                x-amzn-marketplace-token:
+                  type: string
+                  minLength: 1
+              required: [x-amzn-marketplace-token]
+      responses:
+        302:
+          description: Redirect
+          headers:
+            Location:
+              schema:
+                type: string
+                example: https://core.calyptia.com/aws-customers?amazon_marketplace_token=sample
+                description: |-
+                  Front-end page to be redirected. It will include a
+                  `amazon_marketplace_token` query string parameter.
+
+  /v1/projects/{projectID}/aws-contracts:
+    parameters:
+      - name: projectID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      operationId: createAWSContractFromToken
+      summary: Create AWS contract from token
+      description: |-
+        This endpoint should be called after being redirected from
+        `awsCustomerRedirect`. The previous redirect should have stored the token
+        for usage. This endpoint attaches the token (and such the customer details)
+        to the selected project.
+      security:
+        - user: []
+        - project: []
+      tags: [aws_marketplace]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAWSContractFromToken"
+      responses:
+        204:
+          description: No Content

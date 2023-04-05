@@ -186,3 +186,14 @@ func nextLinkBefore(s string) (string, error) {
 
 	return "", nil
 }
+
+func disableRedirect(c *http.Client) func() {
+	old := c.CheckRedirect
+	c.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		return http.ErrUseLastResponse
+	}
+
+	return func() {
+		c.CheckRedirect = old
+	}
+}
