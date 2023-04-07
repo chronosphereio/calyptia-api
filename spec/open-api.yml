@@ -3485,22 +3485,22 @@ components:
     MetricsOverTimeByPlugin:
       type: object
       properties:
-        input:
+        inputs:
           type: array
           items:
             $ref: "#/components/schemas/MetricsOverTimeByPluginInput"
-        filter:
+        filters:
           type: array
           items:
             $ref: "#/components/schemas/MetricsOverTimeByPluginFilter"
-        output:
+        outputs:
           type: array
           items:
             $ref: "#/components/schemas/MetricsOverTimeByPluginOutput"
       required:
-        - input
-        - filter
-        - output
+        - inputs
+        - filters
+        - outputs
     MetricsOverTimeByPluginInput:
       type: object
       properties:
