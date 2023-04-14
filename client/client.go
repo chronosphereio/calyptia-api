@@ -11,6 +11,7 @@ import (
 	"net/url"
 
 	"github.com/peterhellberg/link"
+	"gopkg.in/yaml.v2"
 
 	"github.com/calyptia/api/types"
 )
@@ -79,6 +80,36 @@ func (c *Client) setRequestHeaders(req *http.Request) {
 	}
 }
 
+func decodeResponse(resp *http.Response, dest interface{}) error {
+	var err error
+
+	switch resp.Header.Get("Content-Type") {
+	default:
+		fallthrough
+	case "application/json":
+		err = json.NewDecoder(resp.Body).Decode(dest)
+		if err != nil {
+			return fmt.Errorf("could not json decode response: %w", err)
+		}
+	case "application/yaml":
+		err = yaml.NewDecoder(resp.Body).Decode(dest)
+		if err != nil {
+			return fmt.Errorf("could not yaml decode response: %w", err)
+		}
+	case "text/plain":
+		strp, ok := dest.(*string)
+		if !ok {
+			return fmt.Errorf("must decode plain text response into string")
+		}
+		r, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("read response body text: %w", err)
+		}
+		*strp = string(r)
+	}
+	return nil
+}
+
 func (c *Client) do(ctx context.Context, method, path string, v, dest interface{}, oo ...opt) error {
 	var options opts
 	for _, o := range oo {
@@ -141,10 +172,7 @@ func (c *Client) do(ctx context.Context, method, path string, v, dest interface{
 	}
 
 	if dest != nil {
-		err = json.NewDecoder(resp.Body).Decode(dest)
-		if err != nil {
-			return fmt.Errorf("could not json decode response: %w", err)
-		}
+		return decodeResponse(resp, dest)
 	}
 
 	return nil

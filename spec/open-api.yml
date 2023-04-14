@@ -47,6 +47,7 @@ tags:
   - name: cluster_object
   - name: fleet
   - name: search
+  - name: agent_error
   - name: aws_marketplace
 
 components:
@@ -3247,6 +3248,7 @@ components:
           type: string
           format: date-time
       required: [updatedAt]
+
     MetricsByPlugin:
       type: object
       properties:
@@ -3323,47 +3325,71 @@ components:
       type: object
       properties:
         bytes:
-          type: integer
-          example: 0
+          type: number
+          format: float
+          nullable: true
+          default: null
         records:
-          type: integer
-          example: 0
+          type: number
+          format: float
+          nullable: true
+          default: null
     OutputMetrics:
       type: object
       properties:
         bytes:
-          type: integer
-          example: 0
+          type: number
+          format: float
+          nullable: true
+          default: null
         records:
-          type: integer
-          example: 0
+          type: number
+          format: float
+          nullable: true
+          default: null
         errors:
-          type: integer
-          example: 0
+          type: number
+          format: float
+          nullable: true
+          default: null
         retries:
-          type: integer
-          example: 0
+          type: number
+          format: float
+          nullable: true
+          default: null
         retriedRecords:
-          type: integer
-          example: 0
+          type: number
+          format: float
+          nullable: true
+          default: null
         retriesFailed:
-          type: integer
-          example: 0
+          type: number
+          format: float
+          nullable: true
+          default: null
         droppedRecords:
-          type: integer
-          example: 0
+          type: number
+          format: float
+          nullable: true
+          default: null
         loads:
-          type: integer
-          example: 0
+          type: number
+          format: float
+          nullable: true
+          default: null
     FilterMetrics:
       type: object
       properties:
         dropRecords:
-          type: integer
-          example: 0
+          type: number
+          format: float
+          nullable: true
+          default: null
         emitRecords:
-          type: integer
-          example: 0
+          type: number
+          format: float
+          nullable: true
+          default: null
     MetricsSummary:
       type: object
       properties:
@@ -3601,6 +3627,91 @@ components:
         - resource_profile
         - pipeline
         - agent
+
+    AgentError:
+      type: object
+      description: |-
+        An Agent Error represent an error that occurred on an agent.
+        It can be an invalid configuration, or a malfunctioning plugin.
+        These come directly from agents.
+        Any agent that has errors since the last time it was updated
+        will be marked as "errored".
+        Errors can be dismissed by the user.
+      properties:
+        id:
+          type: string
+          format: uuid
+        agentID:
+          type: string
+          format: uuid
+        error:
+          type: string
+          example: |-
+            [config] section 'foo' tried to instance a plugin name that don't exists
+        dismissedAt:
+          type: string
+          format: date-time
+          nullable: true
+          default: null
+        dismissReason:
+          type: string
+          nullable: true
+          default: null
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - agentID
+        - error
+        - dismissedAt
+        - dismissReason
+        - createdAt
+
+    CreateAgentError:
+      type: object
+      description: Request body required to create a new Agent Error.
+      properties:
+        error:
+          type: string
+          minLength: 1
+          maxLength: 1024
+          example: |-
+            [config] section 'foo' tried to instance a plugin name that don't exists
+      required: [error]
+
+    CreatedAgentError:
+      type: object
+      description: Response body after creating a new Agent Error.
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, createdAt]
+
+    DismissAgentError:
+      type: object
+      description: Request body required to dismiss an existing agent error.
+      properties:
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: |-
+            It was just a test, this config is not used in production.
+      required: [reason]
+
+    DismissedAgentError:
+      type: object
+      description: Response body after dismissing an Agent Error.
+      properties:
+        dismissedAt:
+          type: string
+          format: date-time
+      required: [dismissedAt]
 
     CreateAWSContractFromToken:
       type: object
@@ -7290,6 +7401,180 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/SearchResult"
+
+  /v1/agents/{agentID}/errors:
+    parameters:
+      - name: agentID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      operationId: createAgentError
+      summary: Create agent error
+      description: |-
+        Create a new agent error.
+        This endpoint should be called directly by agents themselves.
+        Notice that if there is an error that matches exactly
+        and has not been dismissed yet
+        since the last time the config was updated,
+        then the error will be simply ignored and not persisted.
+      security:
+        - project: []
+      tags: [agent_error]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAgentError"
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedAgentError"
+    get:
+      operationId: agentErrors
+      summary: Agent errors
+      description: |-
+        List all agent errors in descending order with backward pagination.
+        You can optionally filter dismissed or not dismissed errors.
+      security:
+        - user: []
+        - project: []
+      tags: [agent_error]
+      parameters:
+        - name: dismissed
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Filter agent errors that either were dismissed or were not.
+        - name: last
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+          description: Last agent errors.
+        - name: before
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Agents errors before the given cursor.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgentError"
+          headers:
+            Link:
+              schema:
+                type: string
+                example: </v1/agents/foo/errors?before=bar>; rel="next"
+              description: RFC5988 with `rel="next"`.
+          links:
+            NextFleetsPage:
+              operationId: agentErrors
+              parameters:
+                before: "$response.header.Link#rel=next"
+
+  /v1/fleets/{fleetID}/agent_errors:
+    parameters:
+      - name: fleetID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: fleetAgentErrors
+      summary: Fleet agent errors
+      description: |-
+        List all agent errors from the given fleet
+        in descending order with backward pagination.
+        You can optionally filter dismissed or not dismissed errors.
+      security:
+        - user: []
+        - project: []
+      tags: [agent_error]
+      parameters:
+        - name: dismissed
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Filter agent errors that either were dismissed or were not.
+        - name: last
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+          description: Last agent errors.
+        - name: before
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Agents errors before the given cursor.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgentError"
+          headers:
+            Link:
+              schema:
+                type: string
+                example: </v1/fleets/foo/agent_errors?before=bar>; rel="next"
+              description: RFC5988 with `rel="next"`.
+          links:
+            NextFleetsPage:
+              operationId: fleetAgentErrors
+              parameters:
+                before: "$response.header.Link#rel=next"
+
+  /v1/agent_errors/{agentErrorID}/dismiss:
+    post:
+      operationId: dismissAgentError
+      summary: Dismiss agent error
+      description: |-
+        Dismiss the given agent error. You must pass the reason for dismissal.
+      security:
+        - user: []
+        - project: []
+      tags: [agent_error]
+      parameters:
+        - name: agentErrorID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DismissAgentError"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DismissedAgentError"
 
   /v1/aws-customer-redirect:
     post:

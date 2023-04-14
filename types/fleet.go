@@ -17,6 +17,10 @@ type Fleet struct {
 	UpdatedAt           time.Time              `json:"updatedAt"`
 }
 
+type FleetConfigParams struct {
+	ConfigFormat *ConfigFormat
+}
+
 type CreateFleet struct {
 	ProjectID           string                 `json:"-"`
 	Name                string                 `json:"name"`
