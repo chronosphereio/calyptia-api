@@ -23,6 +23,7 @@ type CoreInstance struct {
 	Metadata              CoreInstanceMetadata `json:"metadata" yaml:"metadata"`
 	Status                CoreInstanceStatus   `json:"status" yaml:"status"`
 	SkipServiceCreation   bool                 `json:"skipServiceCreation" yaml:"skipServiceCreation"`
+	Image                 string               `json:"image" yaml:"image"`
 	CreatedAt             time.Time            `json:"createdAt" yaml:"createdAt"`
 	UpdatedAt             time.Time            `json:"updatedAt" yaml:"updatedAt"`
 }
@@ -51,7 +52,7 @@ type CoreInstances struct {
 	EndCursor *string
 }
 
-// CoreInstancePingResponse response from ancore instance ping call.
+// CoreInstancePingResponse response from a core instance ping call.
 type CoreInstancePingResponse struct {
 	NextPing time.Duration `json:"nextPing"`
 }
@@ -136,6 +137,7 @@ type CreateCoreInstance struct {
 	HealthCheckPipelinePort uint                 `json:"healthCheckPipelinePort"`
 	ClusterLogging          bool                 `json:"clusterLogging"`
 	Tags                    []string             `json:"tags"`
+	Image                   string               `json:"image"`
 	Metadata                CoreInstanceMetadata `json:"metadata"`
 	EnvironmentID           string               `json:"environmentID"`
 	SkipServiceCreation     bool                 `json:"skipServiceCreation"`
@@ -149,6 +151,7 @@ type CreatedCoreInstance struct {
 	PublicRSAKey           []byte            `json:"publicRSAKey"`
 	Name                   string            `json:"name"`
 	Version                string            `json:"version"`
+	Image                  string            `json:"image"`
 	CreatedAt              time.Time         `json:"createdAt"`
 	Tags                   []string          `json:"tags"`
 	HealthCheckPipeline    *Pipeline         `json:"healthCheckPipeline"`
@@ -176,4 +179,5 @@ type UpdateCoreInstance struct {
 	Tags                *[]string             `json:"tags"`
 	Metadata            *CoreInstanceMetadata `json:"metadata"`
 	SkipServiceCreation *bool                 `json:"skipServiceCreation"`
+	Image               *string               `json:"image"`
 }

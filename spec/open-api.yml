@@ -1601,6 +1601,10 @@ components:
           type: string
           format: hostname
           example: new-aggregator
+        image:
+          type: string
+          description: default core-fluent-bit image to use by the pipelines created on this core_instance.
+          example: ghcr.io/calyptia/core/calyptia-fluent-bit:23.1.2
         version:
           type: string
           example: v0.1.12
@@ -1642,6 +1646,12 @@ components:
           type: string
           format: hostname
           example: new-aggregator
+          nullable: true
+          default: null
+        image:
+          type: string
+          description: default core-fluent-bit image to use by the pipelines created on this core_instance.
+          example: ghcr.io/calyptia/core/calyptia-fluent-bit:23.1.2
           nullable: true
           default: null
         clusterLogging:
@@ -2342,6 +2352,10 @@ components:
           type: string
           format: hostname
           example: my-aggregator
+        image:
+          type: string
+          description: default core-fluent-bit image to use by the pipelines created on this core_instance.
+          example: ghcr.io/calyptia/core/calyptia-fluent-bit:23.1.2
         version:
           type: string
           example: v0.1.12
