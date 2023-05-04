@@ -1605,6 +1605,8 @@ components:
           type: string
           description: default core-fluent-bit image to use by the pipelines created on this core_instance.
           example: ghcr.io/calyptia/core/calyptia-fluent-bit:23.1.2
+          nullable: true
+          default: null
         version:
           type: string
           example: v0.1.12
@@ -2356,6 +2358,7 @@ components:
           type: string
           description: default core-fluent-bit image to use by the pipelines created on this core_instance.
           example: ghcr.io/calyptia/core/calyptia-fluent-bit:23.1.2
+          default: ""
         version:
           type: string
           example: v0.1.12
