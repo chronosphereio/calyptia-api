@@ -23,9 +23,11 @@ type CoreInstance struct {
 	Metadata              CoreInstanceMetadata `json:"metadata" yaml:"metadata"`
 	Status                CoreInstanceStatus   `json:"status" yaml:"status"`
 	SkipServiceCreation   bool                 `json:"skipServiceCreation" yaml:"skipServiceCreation"`
-	Image                 string               `json:"image" yaml:"image"`
-	CreatedAt             time.Time            `json:"createdAt" yaml:"createdAt"`
-	UpdatedAt             time.Time            `json:"updatedAt" yaml:"updatedAt"`
+	//  Pointer to a string (*string) allows the value to be nullable, which means it can be assigned a NULL value from the database.
+	//  If a value is not nullable, such as a regular string, it cannot be assigned a NULL value from the database and would result in the error "cannot scan NULL into string."
+	Image     *string   `json:"image" yaml:"image"`
+	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
 
 type CoreInstanceStatus string
@@ -137,7 +139,7 @@ type CreateCoreInstance struct {
 	HealthCheckPipelinePort uint                 `json:"healthCheckPipelinePort"`
 	ClusterLogging          bool                 `json:"clusterLogging"`
 	Tags                    []string             `json:"tags"`
-	Image                   string               `json:"image"`
+	Image                   *string              `json:"image"`
 	Metadata                CoreInstanceMetadata `json:"metadata"`
 	EnvironmentID           string               `json:"environmentID"`
 	SkipServiceCreation     bool                 `json:"skipServiceCreation"`
