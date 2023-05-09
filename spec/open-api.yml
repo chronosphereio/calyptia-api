@@ -790,6 +790,24 @@ components:
               type: object
               nullable: true
               default: null
+        secrets:
+          type: array
+          nullable: true
+          default: null
+          items:
+            $ref: "#/components/schemas/PipelineSecret"
+        files:
+          type: array
+          nullable: true
+          default: null
+          items:
+            $ref: "#/components/schemas/PipelineFile"
+        ports:
+          type: array
+          nullable: true
+          default: null
+          items:
+            $ref: "#/components/schemas/PipelinePort"
         createdAt:
           type: string
           format: date-time
@@ -4622,6 +4640,15 @@ paths:
           in: query
           name: config_format
           description: Desired output config format.
+        - schema:
+            type: string
+            enum:
+              - ports
+              - files
+              - secrets
+          in: query
+          name: include
+          description: Include all ports, secrets and files objects in the pipeline.
       responses:
         "200":
           description: OK
