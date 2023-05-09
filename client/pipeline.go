@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/calyptia/api/types"
 )
@@ -38,6 +39,22 @@ func (c *Client) Pipelines(ctx context.Context, instanceID string, params types.
 	}
 	if params.RenderWithConfigSections {
 		q.Set("render_with_config_sections", "true")
+	}
+
+	if params.IncludeObjects != nil {
+		var objects []string
+		if params.IncludeObjects.Ports {
+			objects = append(objects, "ports")
+		}
+		if params.IncludeObjects.Files {
+			objects = append(objects, "files")
+		}
+		if params.IncludeObjects.Secrets {
+			objects = append(objects, "secrets")
+		}
+		if len(objects) > 0 {
+			q.Set("include", strings.Join(objects, ","))
+		}
 	}
 
 	var out types.Pipelines

@@ -2,7 +2,11 @@ package types
 
 import (
 	"encoding/json"
+	"net/http"
+	"strings"
 	"time"
+
+	"golang.org/x/exp/slices"
 )
 
 type PipelineKind string
@@ -38,6 +42,9 @@ type Pipeline struct {
 	ChecksRunning                uint             `json:"checksRunning" yaml:"checksRunning"`
 	CreatedAt                    time.Time        `json:"createdAt" yaml:"createdAt"`
 	UpdatedAt                    time.Time        `json:"updatedAt" yaml:"updatedAt"`
+	Ports                        []PipelinePort   `json:"ports,omitempty" yaml:"ports,omitempty"`
+	Files                        []PipelineFile   `json:"files,omitempty" yaml:"files,omitempty"`
+	Secrets                      []PipelineSecret `json:"secrets,omitempty" yaml:"secrets,omitempty"`
 }
 
 // Pipelines paginated list.
@@ -140,14 +147,32 @@ type UpdatePipeline struct {
 	Events               []PipelineEvent        `json:"events"`
 }
 
-// PipelinesParams request payload for querying pipelines.
+// PipelinesParams represents the request payload for querying pipelines.
 type PipelinesParams struct {
 	Last                     *uint
 	Before                   *string
 	Name                     *string
 	Tags                     *string
 	ConfigFormat             *ConfigFormat
+	IncludeObjects           *PipelineObjectsParams
 	RenderWithConfigSections bool
+}
+
+// PipelineObjectsParams represents the options for including different types of pipeline objects in the response.
+type PipelineObjectsParams struct {
+	Files   bool // include files in the response.
+	Secrets bool // include secrets in the response.
+	Ports   bool // include ports in the response.
+}
+
+// NewPipelineObjectsParams creates and returns a new PipelineObjectsParams object based on the "include" parameter in the given request.
+func NewPipelineObjectsParams(r *http.Request) *PipelineObjectsParams {
+	include := strings.Split(r.URL.Query().Get("include"), ",")
+	return &PipelineObjectsParams{
+		Files:   slices.Contains(include, "files"),
+		Secrets: slices.Contains(include, "secrets"),
+		Ports:   slices.Contains(include, "ports"),
+	}
 }
 
 // PipelineParams request payload for querying a single pipeline.
