@@ -72,16 +72,19 @@ type CoreInstanceMetadata struct {
 	MetadataGCP
 }
 
+// UnmarshalJSON deserializes JSON data into a CoreInstanceMetadata struct.
+// Implements the json.Unmarshaler interface.
+//
+// If the input data is nil, UnmarshalJSON returns nil without modifying the receiver.
+//
+// If the input data is "null", an empty CoreInstanceMetadata struct is assigned to the receiver.
+//
+// If the input data is an empty JSON object "{}", an empty CoreInstanceMetadata struct is assigned to the receiver.
+//
+// If the input data is any other valid JSON object, it is first unmarshalled into a copy of CoreInstanceMetadata using the
+// standard library's json.Unmarshal function, and then the copy is assigned to the receiver.
 func (m *CoreInstanceMetadata) UnmarshalJSON(data []byte) error {
-	if data == nil {
-		return nil
-	}
-
-	if bytes.Equal(data, []byte("null")) {
-		return nil
-	}
-
-	if bytes.Equal(data, []byte("{}")) {
+	if len(data) == 0 || bytes.Equal(data, []byte("null")) || bytes.Equal(data, []byte("{}")) {
 		*m = CoreInstanceMetadata{}
 		return nil
 	}

@@ -13,6 +13,8 @@ servers:
     description: prod
   - url: "https://cloud-api-dev.calyptia.com"
     description: dev
+  - url: "https://cloud-api-staging.calyptia.com"
+    description: staging
   - url: "http://localhost:{port}"
     description: local
     variables:
@@ -192,6 +194,11 @@ components:
         name:
           type: string
           example: my-token
+        permissions:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/Permission"
         createdAt:
           type: string
           format: date-time
@@ -199,6 +206,7 @@ components:
         - id
         - token
         - name
+        - permissions
         - createdAt
       description: Token model.
     Membership:
@@ -217,6 +225,11 @@ components:
             enum:
               - creator
               - admin
+        permissions:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/Permission"
         createdAt:
           type: string
           format: date-time
@@ -225,8 +238,19 @@ components:
       required:
         - id
         - roles
+        - permissions
         - createdAt
       description: Membership of a user in a project.
+    UpdateMember:
+      type: object
+      properties:
+        permissions:
+          description: An empty list means it has all permissions.
+          type: array
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/Permission"
+          nullable: true
     Agent:
       type: object
       properties:
@@ -1479,8 +1503,20 @@ components:
         name:
           type: string
           example: new-token
+        permissions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Permission"
       required:
         - name
+        - permissions
+    Permission:
+      type: string
+      enum:
+        - "create:*"
+        - "read:*"
+        - "update:*"
+        - "delete:*"
     UpdateToken:
       description: Update token request body.
       type: object
@@ -1490,6 +1526,13 @@ components:
           example: new-token
           nullable: true
           default: null
+        permissions:
+          description: An empty list means it has all permissions.
+          type: array
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/Permission"
+          nullable: true
     CreateInvitation:
       description: Create invitation request body.
       type: object
@@ -1497,11 +1540,18 @@ components:
         email:
           type: string
           format: email
+        permissions:
+          description: An empty list means it has all permissions.
+          type: array
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/Permission"
         redirectURI:
           type: string
           format: uri
       required:
         - email
+        - permissions
         - redirectURI
     AcceptInvitation:
       description: Accept invitation request body.
@@ -4015,6 +4065,30 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Membership"
+  "/v1/members/{memberID}":
+    parameters:
+      - name: memberID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      tags: [membership]
+      operationId: updateMember
+      summary: Update member
+      description: Update member by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMember"
+      responses:
+        "204":
+          description: No Content
   "/v1/projects/{projectID}/invite":
     parameters:
       - schema:

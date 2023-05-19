@@ -45,8 +45,8 @@ func (c *Client) Token(ctx context.Context, tokenID string) (types.Token, error)
 }
 
 // UpdateToken by its ID.
-func (c *Client) UpdateToken(ctx context.Context, tokenID string, opts types.UpdateToken) error {
-	return c.do(ctx, http.MethodPatch, "/v1/project_tokens/"+url.PathEscape(tokenID), opts, nil)
+func (c *Client) UpdateToken(ctx context.Context, in types.UpdateToken) error {
+	return c.do(ctx, http.MethodPatch, "/v1/project_tokens/"+url.PathEscape(in.TokenID), in, nil)
 }
 
 // DeleteToken by its ID.

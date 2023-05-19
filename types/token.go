@@ -4,10 +4,11 @@ import "time"
 
 // Token model.
 type Token struct {
-	ID        string    `json:"id" yaml:"id"`
-	Token     string    `json:"token" yaml:"token"`
-	Name      string    `json:"name" yaml:"name"`
-	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
+	ID          string    `json:"id" yaml:"id"`
+	Token       string    `json:"token" yaml:"token"`
+	Name        string    `json:"name" yaml:"name"`
+	Permissions []string  `json:"permissions" yaml:"permissions"`
+	CreatedAt   time.Time `json:"createdAt" yaml:"createdAt"`
 }
 
 // Tokens paginated list.
@@ -18,7 +19,8 @@ type Tokens struct {
 
 // CreateToken request payload for creating a new token.
 type CreateToken struct {
-	Name string `json:"name"`
+	Name        string   `json:"name"`
+	Permissions []string `json:"permissions"`
 }
 
 // TokensParams request payload for querying tokens.
@@ -30,5 +32,7 @@ type TokensParams struct {
 
 // UpdateToken request payload for updating a token.
 type UpdateToken struct {
-	Name *string `json:"name"`
+	TokenID     string    `json:"-"`
+	Name        *string   `json:"name"`
+	Permissions *[]string `json:"permissions"`
 }

@@ -4,9 +4,10 @@ import "time"
 
 // Membership model.
 type Membership struct {
-	ID        string           `json:"id" yaml:"id"`
-	Roles     []MembershipRole `json:"roles" yaml:"roles"`
-	CreatedAt time.Time        `json:"createdAt" yaml:"createdAt"`
+	ID          string           `json:"id" yaml:"id"`
+	Roles       []MembershipRole `json:"roles" yaml:"roles"`
+	Permissions []string         `json:"permissions" yaml:"permissions"`
+	CreatedAt   time.Time        `json:"createdAt" yaml:"createdAt"`
 
 	User *User `json:"user" yaml:"user"`
 }
@@ -31,4 +32,10 @@ const (
 type MembersParams struct {
 	Last   *uint
 	Before *string
+}
+
+// UpdateMember request body.
+type UpdateMember struct {
+	MemberID    string    `json:"-"`
+	Permissions *[]string `json:"permissions"`
 }
