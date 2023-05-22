@@ -23,3 +23,7 @@ func (c *Client) Members(ctx context.Context, projectID string, params types.Mem
 	path := "/v1/projects/" + url.PathEscape(projectID) + "/members?" + q.Encode()
 	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }
+
+func (c *Client) UpdateMember(ctx context.Context, in types.UpdateMember) error {
+	return c.do(ctx, http.MethodPatch, "/v1/members/"+url.PathEscape(in.MemberID), in, nil)
+}
