@@ -3,7 +3,7 @@ module github.com/calyptia/api
 go 1.19
 
 require (
-	github.com/calyptia/go-fluentbit-config v0.8.0
+	github.com/calyptia/go-fluentbit-config/v2 v2.0.0-20230522080737-cda242fb5f42
 	github.com/peterhellberg/link v1.2.0
 )
 
