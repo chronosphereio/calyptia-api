@@ -3,7 +3,7 @@ package types
 import (
 	"strings"
 
-	"github.com/calyptia/go-fluentbit-config/property"
+	"github.com/calyptia/go-fluentbit-config/v2/property"
 )
 
 // Pair struct. It can be used to define any sorted key value pairs.
