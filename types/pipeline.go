@@ -49,8 +49,9 @@ type Pipeline struct {
 
 // Pipelines paginated list.
 type Pipelines struct {
-	Items     []Pipeline
-	EndCursor *string
+	Items     []Pipeline `json:"items"`
+	EndCursor *string    `json:"endCursor"`
+	Count     int        `json:"count"`
 }
 
 // CreatePipeline request payload for creating a new pipeline.
@@ -149,13 +150,28 @@ type UpdatePipeline struct {
 
 // PipelinesParams represents the request payload for querying pipelines.
 type PipelinesParams struct {
+	ProjectID      *string
+	CoreInstanceID *string
+
 	Last                     *uint
 	Before                   *string
 	Name                     *string
-	Tags                     *string
+	TagsQuery                *string
 	ConfigFormat             *ConfigFormat
 	IncludeObjects           *PipelineObjectsParams
 	RenderWithConfigSections bool
+}
+
+func (p PipelinesParams) Tags() *[]string {
+	if p.TagsQuery == nil {
+		return nil
+	}
+
+	tags := strings.Split(*p.TagsQuery, " AND ")
+	for i, tag := range tags {
+		tags[i] = strings.TrimSpace(tag)
+	}
+	return &tags
 }
 
 // PipelineObjectsParams represents the options for including different types of pipeline objects in the response.

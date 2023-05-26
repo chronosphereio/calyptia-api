@@ -50,8 +50,9 @@ const (
 
 // CoreInstances paginated list.
 type CoreInstances struct {
-	Items     []CoreInstance
-	EndCursor *string
+	Items     []CoreInstance `json:"items"`
+	EndCursor *string        `json:"endCursor"`
+	Count     int            `json:"count"`
 }
 
 // CoreInstancePingResponse response from a core instance ping call.

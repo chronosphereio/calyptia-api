@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -20,73 +21,54 @@ func (c *Client) CreatePipeline(ctx context.Context, instanceID string, payload 
 }
 
 // Pipelines from a core instance in descending order.
-func (c *Client) Pipelines(ctx context.Context, instanceID string, params types.PipelinesParams) (types.Pipelines, error) {
+func (c *Client) Pipelines(ctx context.Context, in types.PipelinesParams) (types.Pipelines, error) {
 	q := url.Values{}
-	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(uint64(*params.Last), uintBase))
+	if in.Last != nil {
+		q.Set("last", strconv.FormatUint(uint64(*in.Last), uintBase))
 	}
-	if params.Before != nil {
-		q.Set("before", *params.Before)
+	if in.Before != nil {
+		q.Set("before", *in.Before)
 	}
-	if params.Name != nil {
-		q.Set("name", *params.Name)
+	if in.Name != nil {
+		q.Set("name", *in.Name)
 	}
-	if params.Tags != nil {
-		q.Set("tags_query", *params.Tags)
+	if in.TagsQuery != nil {
+		q.Set("tags_query", *in.TagsQuery)
 	}
-	if params.ConfigFormat != nil {
-		q.Set("config_format", string(*params.ConfigFormat))
+	if in.ConfigFormat != nil {
+		q.Set("config_format", string(*in.ConfigFormat))
 	}
-	if params.RenderWithConfigSections {
+	if in.RenderWithConfigSections {
 		q.Set("render_with_config_sections", "true")
 	}
 
-	if params.IncludeObjects != nil {
+	if in.IncludeObjects != nil {
 		var objects []string
-		if params.IncludeObjects.Ports {
+		if in.IncludeObjects.Ports {
 			objects = append(objects, "ports")
 		}
-		if params.IncludeObjects.Files {
+		if in.IncludeObjects.Files {
 			objects = append(objects, "files")
 		}
-		if params.IncludeObjects.Secrets {
+		if in.IncludeObjects.Secrets {
 			objects = append(objects, "secrets")
 		}
 		if len(objects) > 0 {
 			q.Set("include", strings.Join(objects, ","))
 		}
 	}
-
 	var out types.Pipelines
-	path := "/v1/aggregators/" + url.PathEscape(instanceID) + "/pipelines?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
-}
-
-// ProjectPipelines returns the entire set of pipelines from a project.
-func (c *Client) ProjectPipelines(ctx context.Context, projectID string, params types.PipelinesParams) (types.Pipelines, error) {
-	q := url.Values{}
-	if params.Last != nil {
-		q.Set("last", strconv.FormatUint(uint64(*params.Last), uintBase))
-	}
-	if params.Before != nil {
-		q.Set("before", *params.Before)
-	}
-	if params.Name != nil {
-		q.Set("name", *params.Name)
-	}
-	if params.Tags != nil {
-		q.Set("tags_query", *params.Tags)
-	}
-	if params.ConfigFormat != nil {
-		q.Set("config_format", string(*params.ConfigFormat))
-	}
-	if params.RenderWithConfigSections {
-		q.Set("render_with_config_sections", "true")
+	var path string
+	switch {
+	case in.ProjectID != nil:
+		path = "/v1/projects/" + url.PathEscape(*in.ProjectID) + "/pipelines?" + q.Encode()
+	case in.CoreInstanceID != nil:
+		path = "/v1/core_instances/" + url.PathEscape(*in.CoreInstanceID) + "/pipelines?" + q.Encode()
+	default:
+		return out, errors.New("either project_id or core_instance_id must be provided")
 	}
 
-	var out types.Pipelines
-	path := "/v1/projects/" + url.PathEscape(projectID) + "/aggregator_pipelines?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }
 
 // Pipeline by ID.
