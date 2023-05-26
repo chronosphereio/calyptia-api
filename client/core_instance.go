@@ -37,8 +37,8 @@ func (c *Client) CoreInstances(ctx context.Context, projectID string, params typ
 	}
 
 	var out types.CoreInstances
-	path := "/v1/projects/" + url.PathEscape(projectID) + "/aggregators?" + q.Encode()
-	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
+	path := "/v1/projects/" + url.PathEscape(projectID) + "/core_instances?" + q.Encode()
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }
 
 // CoreInstance by ID.

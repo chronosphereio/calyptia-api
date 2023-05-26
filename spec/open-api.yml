@@ -28,6 +28,7 @@ tags:
   - name: invitation
   - name: agent
   - name: agent_config
+  - name: core_instance
   - name: aggregator
   - name: resource_profile
   - name: core_instance_check
@@ -691,6 +692,25 @@ components:
         - skipServiceCreation
         - createdAt
         - updatedAt
+    CoreInstance:
+      $ref: "#/components/schemas/Aggregator"
+    CoreInstances:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CoreInstance"
+        endCursor:
+          type: string
+          nullable: true
+        count:
+          type: number
+          format: int32
+      required:
+        - items
+        - endCursor
+        - count
     ResourceProfile:
       type: object
       description: Resource profile model.
@@ -850,6 +870,23 @@ components:
         - metadata
         - createdAt
         - updatedAt
+    Pipelines:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Pipeline"
+        endCursor:
+          type: string
+          nullable: true
+        count:
+          type: number
+          format: int32
+      required:
+        - items
+        - endCursor
+        - count
     PipelineConfig:
       type: object
       description: Pipeline configuration history entry.
@@ -4373,11 +4410,12 @@ paths:
         in: path
         required: true
     get:
+      deprecated: true
       tags:
         - aggregator
-      summary: Aggregators
-      operationId: aggregators
-      description: Aggregators from a project.
+      summary: Aggregators (deprecated)
+      operationId: aggregatorsV1
+      description: Aggregators from a project (deprecated).
       security:
         - user: []
         - project: []
@@ -4450,6 +4488,61 @@ paths:
       responses:
         "204":
           description: Deleted
+
+  "/v1/projects/{projectID}/core_instances":
+    parameters:
+      - name: projectID
+        schema:
+          type: string
+          format: uuid
+        in: path
+        description: Parent project ID.
+        required: true
+    get:
+      operationId: coreInstances
+      tags: [core_instance]
+      summary: Core Instances
+      description: |-
+        Core Instances from a project with backward pagination.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - name: last
+          schema:
+            type: integer
+            minimum: 0
+          in: query
+          description: Limit to the last core instances.
+        - name: before
+          schema:
+            type: string
+          in: query
+          description: Paginate core instances before the given cursor.
+        - name: name
+          schema:
+            type: string
+          in: query
+          description: Filter core instances with the given name.
+        - name: environment_id
+          schema:
+            type: string
+          in: query
+          description: Filter core instances with the given environment ID.
+        - name: tags_query
+          schema:
+            type: string
+            example: tagone AND tagtwo
+          in: query
+          description: Filter core instances with the given tags query.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreInstances"
+
   "/v1/aggregators/{aggregatorID}/ping":
     parameters:
       - schema:
@@ -4674,11 +4767,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/CreatedPipeline"
     get:
+      deprecated: true
       tags:
         - pipeline
-      summary: Pipelines
-      operationId: pipelines
-      description: Pipelines from an aggregator.
+      summary: Pipelines (deprecated)
+      operationId: pipelinesV1
+      description: Pipelines from an aggregator (deprecated).
       security:
         - user: []
         - project: []
@@ -4764,7 +4858,76 @@ paths:
       responses:
         "204":
           description: Deleted
-  "/v1/projects/{projectID}/pipelines":
+
+  "/v1/core_instances/{coreInstanceID}/pipelines":
+    parameters:
+      - name: coreInstanceID
+        schema:
+          type: string
+          format: uuid
+        in: path
+        description: Parent core instance ID.
+        required: true
+    get:
+      operationId: pipelines
+      tags: [pipeline]
+      summary: Pipelines
+      description: Pipelines from a core instance with backward pagination.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - name: last
+          schema:
+            type: integer
+            minimum: 0
+          in: query
+          description: Limit to the last pipelines.
+        - name: before
+          schema:
+            type: string
+          in: query
+          description: Paginate pipelines before the given cursor.
+        - name: name
+          schema:
+            type: string
+          in: query
+          description: Filter pipelines by name.
+        - name: tags_query
+          schema:
+            type: string
+            example: tagone AND tagtwo
+          in: query
+          description: Filter pipelines by giving a tags query.
+        - name: config_format
+          schema:
+            type: string
+            enum:
+              - ini
+              - json
+              - yaml
+          in: query
+          description: Desired output config format.
+        - name: include
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ports
+                - files
+                - secrets
+          in: query
+          description: Whether to include ports, secrets and files objects in the pipeline.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pipelines"
+
+  "/v1/projects/{projectID}/aggregator_pipelines":
     parameters:
       - schema:
           type: string
@@ -4773,11 +4936,12 @@ paths:
         in: path
         required: true
     get:
+      deprecated: true
       tags:
         - pipeline
-      summary: Project pipelines
-      operationId: projectPipelines
-      description: Pipelines from a project.
+      summary: Project pipelines (deprecated)
+      operationId: projectPipelinesV1
+      description: Pipelines from a project (deprecated).
       security:
         - user: []
         - project: []
@@ -4817,6 +4981,75 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Pipeline"
+
+  "/v1/projects/{projectID}/pipelines":
+    parameters:
+      - name: projectID
+        schema:
+          type: string
+          format: uuid
+        in: path
+        description: Parent project ID.
+        required: true
+    get:
+      operationId: projectPipelines
+      tags: [pipeline]
+      summary: Project pipelines
+      description: Pipelines from a project with backward pagination.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - name: last
+          schema:
+            type: integer
+            minimum: 0
+          in: query
+          description: Limit to the last pipelines.
+        - name: before
+          schema:
+            type: string
+          in: query
+          description: Paginate pipelines before the given cursor.
+        - name: name
+          schema:
+            type: string
+          in: query
+          description: Filter pipelines by name.
+        - name: tags_query
+          schema:
+            type: string
+            example: tagone AND tagtwo
+          in: query
+          description: Filter pipelines by giving a tags query.
+        - name: config_format
+          schema:
+            type: string
+            enum:
+              - ini
+              - json
+              - yaml
+          in: query
+          description: Desired output config format.
+        - name: include
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ports
+                - files
+                - secrets
+          in: query
+          description: Whether to include ports, secrets and files objects in the pipeline.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pipelines"
+
   "/v1/aggregator_pipelines/{pipelineID}":
     parameters:
       - schema:
