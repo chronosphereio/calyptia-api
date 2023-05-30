@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/calyptia/api/types"
-	fluentbitconfig "github.com/calyptia/go-fluentbit-config"
+	fluentbitconfig "github.com/calyptia/go-fluentbit-config/v2"
 )
 
 func (c *Client) CreateFleet(ctx context.Context, in types.CreateFleet) (types.CreatedFleet, error) {

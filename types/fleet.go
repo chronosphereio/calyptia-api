@@ -3,7 +3,7 @@ package types
 import (
 	"time"
 
-	fluentbitconfig "github.com/calyptia/go-fluentbit-config"
+	fluentbitconfig "github.com/calyptia/go-fluentbit-config/v2"
 )
 
 type Fleet struct {
