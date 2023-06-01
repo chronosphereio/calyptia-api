@@ -2,31 +2,27 @@ package types
 
 import (
 	"time"
-
-	fluentbitconfig "github.com/calyptia/go-fluentbit-config/v2"
 )
 
 type Fleet struct {
-	ID                  string                 `json:"id"`
-	ProjectID           string                 `json:"projectID"`
-	Name                string                 `json:"name"`
-	MinFluentBitVersion string                 `json:"minFluentBitVersion"`
-	Config              fluentbitconfig.Config `json:"config"`
-	Tags                []string               `json:"tags"`
-	CreatedAt           time.Time              `json:"createdAt"`
-	UpdatedAt           time.Time              `json:"updatedAt"`
-}
-
-type FleetConfigParams struct {
-	ConfigFormat *ConfigFormat
+	ID                  string       `json:"id"`
+	ProjectID           string       `json:"projectID"`
+	Name                string       `json:"name"`
+	MinFluentBitVersion string       `json:"minFluentBitVersion"`
+	RawConfig           string       `json:"rawConfig"`
+	ConfigFormat        ConfigFormat `json:"configFormat"`
+	Tags                []string     `json:"tags"`
+	CreatedAt           time.Time    `json:"createdAt"`
+	UpdatedAt           time.Time    `json:"updatedAt"`
 }
 
 type CreateFleet struct {
-	ProjectID           string                 `json:"-"`
-	Name                string                 `json:"name"`
-	MinFluentBitVersion string                 `json:"minFluentBitVersion"`
-	Config              fluentbitconfig.Config `json:"config"`
-	Tags                []string               `json:"tags"`
+	ProjectID           string       `json:"-"`
+	Name                string       `json:"name"`
+	MinFluentBitVersion string       `json:"minFluentBitVersion"`
+	RawConfig           string       `json:"rawConfig"`
+	ConfigFormat        ConfigFormat `json:"configFormat"`
+	Tags                []string     `json:"tags"`
 
 	SkipConfigValidation bool `json:"skipConfigValidation"`
 }
@@ -64,10 +60,11 @@ type Fleets struct {
 }
 
 type UpdateFleet struct {
-	ID     string                  `json:"-"`
-	Name   *string                 `json:"name"`
-	Config *fluentbitconfig.Config `json:"config"`
-	Tags   *[]string               `json:"tags"`
+	ID           string        `json:"-"`
+	Name         *string       `json:"name"`
+	RawConfig    *string       `json:"rawConfig"`
+	ConfigFormat *ConfigFormat `json:"configFormat"`
+	Tags         *[]string     `json:"tags"`
 
 	SkipConfigValidation bool `json:"skipConfigValidation"`
 }
@@ -79,4 +76,8 @@ type UpdatedFleet struct {
 type DeletedFleet struct {
 	Deleted   bool       `json:"deleted"`
 	DeletedAt *time.Time `json:"deletedAt"`
+}
+
+type FleetConfigParams struct {
+	ConfigFormat *ConfigFormat
 }
