@@ -379,8 +379,17 @@ components:
         minFluentBitVersion:
           type: string
           example: v1.0.0
-        config:
-          $ref: "#/components/schemas/FluentBitConfig"
+        rawConfig:
+          type: string
+          description: |
+            The fleet fluent-bit configuration in the format defined by
+            configFormat.
+        configFormat:
+          type: string
+          enum:
+            - ini
+            - json
+            - yaml
         tags:
           type: array
           items:
@@ -397,7 +406,8 @@ components:
         - projectID
         - name
         - minFluentBitVersion
-        - config
+        - rawConfig
+        - configFormat
         - tags
         - createdAt
         - updatedAt
@@ -412,8 +422,19 @@ components:
           type: string
           description: semver
           example: v1.0.0
-        config:
-          $ref: "#/components/schemas/FluentBitConfig"
+        rawConfig:
+          type: string
+          description: |
+            The fleet fluent-bit configuration in the format defined by
+            configFormat.
+        configFormat:
+          type: string
+          enum:
+            - ini
+            - json
+            - yaml
+          nullable: true
+          default: null
         tags:
           type: array
           items:
@@ -426,7 +447,7 @@ components:
       required:
         - name
         - minFluentBitVersion
-        - config
+        - rawConfig
         - tags
         - skipConfigValidation
     CreatedFleet:
@@ -450,8 +471,19 @@ components:
           nullable: true
           default: null
           example: updated-fleet
-        config:
-          $ref: "#/components/schemas/FluentBitConfig"
+        rawConfig:
+          type: string
+          description: |
+            The fleet fluent-bit configuration in the format defined by
+            configFormat.
+          nullable: true
+          default: null
+        configFormat:
+          type: string
+          enum:
+            - ini
+            - json
+            - yaml
           nullable: true
           default: null
         tags:
@@ -488,74 +520,6 @@ components:
       required:
         - deleted
         - deletedAt
-    FluentBitConfig:
-      type: object
-      description: Fluent-bit configuration in JSON format. Shares the same structure as the YAML config format.
-      properties:
-        env:
-          type: object
-          example:
-            FOO: bar
-        includes:
-          type: array
-          items:
-            type: string
-            example: another/config.yaml
-        service:
-          type: object
-          additionalProperties: true
-          example:
-            log_level: error
-        customs:
-          type: array
-          items:
-            $ref: "#/components/schemas/PropertiesByName"
-          example:
-            - calyptia:
-                name: calyptia
-                api_key: secret
-        pipeline:
-          $ref: "#/components/schemas/FluentBitConfigPipeline"
-    PropertiesByName:
-      type: object
-      additionalProperties:
-        type: object
-      maxItems: 1
-    FluentBitConfigPipeline:
-      type: object
-      properties:
-        inputs:
-          type: array
-          items:
-            $ref: "#/components/schemas/PropertiesByName"
-          example:
-            - syslog:
-                name: syslog
-                port: 5140
-        parsers:
-          type: array
-          items:
-            $ref: "#/components/schemas/PropertiesByName"
-          example:
-            - dummy_test:
-                name: dummy_test
-                format: regex
-        filters:
-          type: array
-          items:
-            $ref: "#/components/schemas/PropertiesByName"
-          example:
-            - throttle:
-                name: throttle
-                match: syslog
-        outputs:
-          type: array
-          items:
-            $ref: "#/components/schemas/PropertiesByName"
-          example:
-            - stdout:
-                name: stdout
-                match: "*"
     AggregatorPingResponse:
       type: object
       description: Aggregator Ping Response model.
@@ -4414,7 +4378,7 @@ paths:
       tags:
         - aggregator
       summary: Aggregators (deprecated)
-      operationId: aggregatorsV1
+      operationId: aggregators
       description: Aggregators from a project (deprecated).
       security:
         - user: []
@@ -4771,7 +4735,7 @@ paths:
       tags:
         - pipeline
       summary: Pipelines (deprecated)
-      operationId: pipelinesV1
+      operationId: pipelines
       description: Pipelines from an aggregator (deprecated).
       security:
         - user: []
@@ -4869,7 +4833,7 @@ paths:
         description: Parent core instance ID.
         required: true
     get:
-      operationId: pipelines
+      operationId: pipelinesV2
       tags: [pipeline]
       summary: Pipelines
       description: Pipelines from a core instance with backward pagination.
@@ -4940,7 +4904,7 @@ paths:
       tags:
         - pipeline
       summary: Project pipelines (deprecated)
-      operationId: projectPipelinesV1
+      operationId: projectPipelines
       description: Pipelines from a project (deprecated).
       security:
         - user: []
@@ -4992,7 +4956,7 @@ paths:
         description: Parent project ID.
         required: true
     get:
-      operationId: projectPipelines
+      operationId: projectPipelinesV2
       tags: [pipeline]
       summary: Project pipelines
       description: Pipelines from a project with backward pagination.
