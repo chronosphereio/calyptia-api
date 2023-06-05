@@ -21,7 +21,7 @@ jobs:
         with:
           repository: calyptia/api
           token: ${{ secrets.ci-pat }}
-        path: api
+          path: api
 
       # Checkout calyptia/cloud under the cloud repository.
       - name: Checkout
@@ -29,7 +29,7 @@ jobs:
         with:
           repository: calyptia/cloud
           token: ${{ secrets.ci-pat }}
-        path: cloud
+          path: cloud
 
       - name: Setup
         uses: actions/setup-go@v4
@@ -44,16 +44,16 @@ jobs:
           find . -name "*.go" -exec gofumpt -w {} \;
           go mod tidy
         shell: bash
-        directory: api
+        working-directory: api
 
       - name: Add & commit latest changes
         run: |
           git add -A .
           git commit -m "Updated to calyptia/cloud API version ${{ github.event.inputs.tag }}" -as
-        directory: api
+        working-directory: api
 
       - name: Create Tag
         run: |
           git tag ${{ github.event.inputs.tag }}
           git push origin ${{ github.event.inputs.tag }}
-        directory: api
+        working-directory: api
