@@ -1,0 +1,59 @@
+---
+name: Reusable workflow to tag and release calyptia/api
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: Semver of the tag to be released
+        required: true
+        type: string
+    secrets:
+      ci-pat:
+        description: Github PAT to use
+        required: true
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # Local clone of the calyptia/api repository
+      - name: Checkout API repo
+        uses: actions/checkout@v3
+        with:
+          repository: calyptia/api
+          token: ${{ secrets.ci-pat }}
+        path: api
+
+      # Checkout calyptia/cloud under the cloud repository.
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: calyptia/cloud
+          token: ${{ secrets.ci-pat }}
+        path: cloud
+
+      - name: Setup
+        uses: actions/setup-go@v4
+
+      - name: Copy the spec and types from calyptia/cloud
+        run: |
+          cp -r ../cloud/spec ../cloud/types ../cloud/client .
+          rm -fr ../cloud/
+          go install mvdan.cc/gofumpt@latest
+          find . -type f -name "*_test.go" -delete
+          find . -type f -name '*.go' -exec sed -i -e 's,github.com/calyptia/cloud,github.com/calyptia/api,g' {} \;
+          find . -name "*.go" -exec gofumpt -w {} \;
+          go mod tidy
+        shell: bash
+        directory: api
+
+      - name: Add & commit latest changes
+        run: |
+          git add -A .
+          git commit -m "Updated to calyptia/cloud API version ${{ github.event.inputs.tag }}" -as
+        directory: api
+
+      - name: Create Tag
+        run: |
+          git tag ${{ github.event.inputs.tag }}
+          git push origin ${{ github.event.inputs.tag }}
+        directory: api

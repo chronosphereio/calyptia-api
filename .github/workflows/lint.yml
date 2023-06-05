@@ -7,22 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     name: PR - Linters
     steps:
-      - name: Setup Golang
-        uses: actions/setup-go@v4
-        with:
-          go-version: "^1.19"
-
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Go Lint
-        uses: golangci/golangci-lint-action@v3
-        with:
-          version: v1.49
-
-      - name: Run golangci lint
-        if: github.event_name == 'pull_request'
-        uses: reviewdog/action-golangci-lint@v2
 
       - name: Run Markdown lint
         uses: actionshub/markdownlint@v3.1.3
@@ -36,27 +22,3 @@ jobs:
 
       - name: PR - Shellcheck
         uses: ludeeus/action-shellcheck@master
-
-  sonarcloud:
-    runs-on: ubuntu-latest
-    name: PR - Sonarcloud
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - uses: FranzDiebold/github-env-vars-action@v2
-
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@v1.9
-        with:
-          args: >
-            -Dsonar.organization=calyptia
-            -Dsonar.projectKey=calyptia_${{ env.CI_REPOSITORY_NAME_SLUG }}
-            -Dsonar.sources=.
-            -Dsonar.exclusions=**/*_test.go
-            -Dsonar.tests=.
-            -Dsonar.test.inclusions=**/*_test.go
-            -Dsonar.go.coverage.reportPaths=coverage.out
-        env:
-          GITHUB_TOKEN: ${{ secrets.CI_PAT }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

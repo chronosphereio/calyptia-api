@@ -1,0 +1,16 @@
+name: Run integration tests workflow
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        required: true
+        description: tag to create for this release
+jobs:
+  create-release:
+    name: create a release
+    uses: ./.github/workflows/call-release.yaml
+    with:
+      tag: ${{ github.event.inputs.tag }}
+    secrets:
+      ci-pat: ${{ secrets.CI_PAT }}
