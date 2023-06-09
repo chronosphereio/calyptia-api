@@ -52,6 +52,7 @@ tags:
   - name: search
   - name: agent_error
   - name: aws_marketplace
+  - name: cluster_object_regex
 
 components:
   securitySchemes:
@@ -1071,6 +1072,97 @@ components:
         - kind
         - createdAt
         - updatedAt
+    ClusterObjectRegex:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        pipelineID:
+          type: string
+          format: uuid
+        regex:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        clusterObjects:
+          type: array
+          items:
+            $ref: "#/components/schemas/ClusterObject"
+          nullable: true
+          default: null
+          description: Will only be present on the `clusterObjectRegex` operation.
+      required:
+        - id
+        - pipelineID
+        - regex
+        - description
+        - createdAt
+        - updatedAt
+    CreateClusterObjectRegex:
+      type: object
+      properties:
+        regex:
+          type: string
+          minLength: 0
+        description:
+          type: string
+          maxLength: 100
+      required:
+        - regex
+        - description
+    CreatedClusterObjectRegex:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - createdAt
+    ClusterObjectRegexes:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ClusterObjectRegex"
+        endCursor:
+          type: string
+          nullable: true
+          default: null
+      required:
+        - items
+        - endCursor
+    UpdateClusterObjectRegex:
+      type: object
+      properties:
+        regex:
+          type: string
+          minLength: 0
+          nullable: true
+          default: null
+        description:
+          type: string
+          maxLength: 100
+          nullable: true
+          default: null
+    UpdatedClusterObjectRegex:
+      type: object
+      properties:
+        updatedAt:
+          type: string
+          format: date-time
+      required: [updatedAt]
     IngestCheck:
       type: object
       description: Core Ingest check model.
@@ -3713,6 +3805,7 @@ components:
         - resource_profile
         - pipeline
         - agent
+        - cluster_object
 
     AgentError:
       type: object
@@ -7950,4 +8043,121 @@ paths:
               $ref: "#/components/schemas/CreateAWSContractFromToken"
       responses:
         204:
+          description: No Content
+  /v1/pipelines/{pipelineID}/cluster_object_regexes:
+    parameters:
+      - name: pipelineID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      operationId: createClusterObjectRegex
+      summary: Create cluster object regex
+      description: |-
+        Create a new cluster object regex.
+      security:
+        - user: []
+        - project: []
+      tags: [cluster_object_regex]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateClusterObjectRegex"
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedClusterObjectRegex"
+    get:
+      operationId: clusterObjectRegexes
+      summary: Cluster object regexes
+      description: |-
+        List all cluster object regexes in descending order with backward pagination.
+      security:
+        - user: []
+        - project: []
+      tags: [cluster_object_regex]
+      parameters:
+        - name: last
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+          description: Last cluster object regexes.
+        - name: before
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Cluster object regexes before the given cursor.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClusterObjectRegexes"
+  /v1/cluster_object_regexes/{regexID}:
+    parameters:
+      - name: regexID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: clusterObjectRegex
+      summary: Cluster object regex
+      description: |-
+        Retrieve a single cluster object regex by ID.
+        On this endpoint, all the matching cluser objects are also returned.
+      security:
+        - user: []
+        - project: []
+      tags: [cluster_object_regex]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClusterObjectRegex"
+    patch:
+      operationId: updateClusterObjectRegex
+      summary: Update cluster object regex
+      description: |-
+        Update a cluster object regex details.
+      security:
+        - user: []
+        - project: []
+      tags: [cluster_object_regex]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateClusterObjectRegex"
+      responses:
+        "200":
+          description: Updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatedClusterObjectRegex"
+    delete:
+      operationId: deleteClusterObjectRegex
+      summary: Delete cluster object regex
+      description: |-
+        Delete a single cluster object regex by its ID.
+      security:
+        - user: []
+        - project: []
+      tags: [cluster_object_regex]
+      responses:
+        "204":
           description: No Content

@@ -25,11 +25,11 @@ func ValidClusterObjectKind(t ClusterObjectKind) bool {
 
 // ClusterObject type for core_instance cluster objects.
 type ClusterObject struct {
-	ID        string            `json:"id" yaml:"id"`
-	Name      string            `json:"name" yaml:"name"`
-	Kind      ClusterObjectKind `json:"kind" yaml:"kind"`
-	CreatedAt time.Time         `json:"createdAt" yaml:"createdAt"`
-	UpdatedAt time.Time         `json:"updatedAt" yaml:"updatedAt"`
+	ID        string            `json:"id" yaml:"id" db:"id"`
+	Name      string            `json:"name" yaml:"name" db:"name"`
+	Kind      ClusterObjectKind `json:"kind" yaml:"kind" db:"kind"`
+	CreatedAt time.Time         `json:"createdAt" yaml:"createdAt" db:"created_at"`
+	UpdatedAt time.Time         `json:"updatedAt" yaml:"updatedAt" db:"updated_at"`
 }
 
 // ClusterObjects paginated list.
