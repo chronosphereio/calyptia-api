@@ -13,6 +13,7 @@ const (
 	SearchResourceResourceProfile SearchResource = "resource_profile"
 	SearchResourcePipeline        SearchResource = "pipeline"
 	SearchResourceAgent           SearchResource = "agent"
+	SearchResourceClusterObject   SearchResource = "cluster_object"
 )
 
 type SearchResult struct {
