@@ -62,3 +62,7 @@ func (c *Client) AWSCustomerRedirect(ctx context.Context, amazonMarketplaceToken
 func (c *Client) CreateAWSContractFromToken(ctx context.Context, in types.CreateAWSContractFromToken) error {
 	return c.do(ctx, http.MethodPost, "/v1/projects/"+url.PathEscape(in.ProjectID)+"/aws-contracts", in, nil)
 }
+
+func (c *Client) PushAWSMarketplaceSubscriptionNotification(ctx context.Context, in types.AWSMarketplaceSubscriptionNotification) error {
+	return c.do(ctx, http.MethodPost, "/v1/aws-marketplace-subscription-notifications", in, nil)
+}
