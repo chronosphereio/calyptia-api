@@ -33,13 +33,19 @@ type CreatedFleet struct {
 }
 
 type FleetsParams struct {
-	ProjectID string
-	Name      *string
-	TagsQuery *string
-	Last      *uint
-	Before    *string
+	ProjectID    string
+	Name         *string
+	TagsQuery    *string
+	Last         *uint
+	Before       *string
+	ConfigFormat *ConfigFormat
 
 	tags *[]string
+}
+
+// FleetParams request payload for querying a single fleet.
+type FleetParams struct {
+	ConfigFormat *ConfigFormat
 }
 
 func (p FleetsParams) Tags() ([]string, bool) {
