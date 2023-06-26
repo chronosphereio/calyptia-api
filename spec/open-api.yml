@@ -7691,6 +7691,15 @@ paths:
           in: query
           schema:
             type: string
+        - schema:
+            type: string
+            enum:
+              - ini
+              - json
+              - yaml
+          in: query
+          name: config_format
+          description: Desired output config format.
       responses:
         "200":
           description: OK
@@ -7711,6 +7720,55 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Fleet"
+  /v1/fleets/{fleetID}/config:
+    parameters:
+      - name: fleetID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: fleetConfig
+      summary: get the configuration for a fleet ID.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - ini
+              - json
+              - yaml
+          in: query
+          name: config_format
+          description: Desired output config format.
+        - schema:
+            type: string
+            enum:
+              - ini
+              - json
+              - yaml
+          in: query
+          name: format
+          deprecated: true
+          description: Desired output config format (depreacted in favour of config_format).
+      tags: [fleet]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+            application/yaml:
+              schema:
+                type: string
+            text/plain:
+              schema:
+                type: string
+
   /v1/fleets/{fleetID}:
     parameters:
       - name: fleetID
@@ -7728,6 +7786,16 @@ paths:
         - user: []
         - project: []
       tags: [fleet]
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - ini
+              - json
+              - yaml
+          in: query
+          name: config_format
+          description: Desired output config format.
       responses:
         "200":
           description: OK
