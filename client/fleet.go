@@ -39,14 +39,14 @@ func (c *Client) Fleets(ctx context.Context, params types.FleetsParams) (types.F
 	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }
 
-func (c *Client) Fleet(ctx context.Context, fleetID string, params types.FleetParams) (types.Fleet, error) {
+func (c *Client) Fleet(ctx context.Context, in types.FleetParams) (types.Fleet, error) {
 	var out types.Fleet
 	q := url.Values{}
-	if params.ConfigFormat != nil {
-		q.Set("config_format", string(*params.ConfigFormat))
+	if in.ConfigFormat != nil {
+		q.Set("config_format", string(*in.ConfigFormat))
 	}
 
-	path := "/v1/fleets/" + url.PathEscape(fleetID) + "?" + q.Encode()
+	path := "/v1/fleets/" + url.PathEscape(in.FleetID) + "?" + q.Encode()
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }
 
