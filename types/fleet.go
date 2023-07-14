@@ -5,15 +5,22 @@ import (
 )
 
 type Fleet struct {
-	ID                  string       `json:"id"`
-	ProjectID           string       `json:"projectID"`
-	Name                string       `json:"name"`
-	MinFluentBitVersion string       `json:"minFluentBitVersion"`
-	RawConfig           string       `json:"rawConfig"`
-	ConfigFormat        ConfigFormat `json:"configFormat"`
-	Tags                []string     `json:"tags"`
-	CreatedAt           time.Time    `json:"createdAt"`
-	UpdatedAt           time.Time    `json:"updatedAt"`
+	ID                  string           `json:"id" yaml:"id"`
+	ProjectID           string           `json:"projectID" yaml:"projectID"`
+	Name                string           `json:"name" yaml:"name"`
+	MinFluentBitVersion string           `json:"minFluentBitVersion" yaml:"minFluentBitVersion"`
+	RawConfig           string           `json:"rawConfig" yaml:"rawConfig"`
+	ConfigFormat        ConfigFormat     `json:"configFormat" yaml:"configFormat"`
+	Tags                []string         `json:"tags" yaml:"tags"`
+	AgentsCount         FleetAgentsCount `json:"agentsCount" yaml:"agentsCount"`
+	CreatedAt           time.Time        `json:"createdAt" yaml:"createdAt"`
+	UpdatedAt           time.Time        `json:"updatedAt" yaml:"updatedAt"`
+}
+
+type FleetAgentsCount struct {
+	Active     uint `json:"active" yaml:"active"`
+	Inactive   uint `json:"inactive" yaml:"inactive"`
+	WithErrors uint `json:"errors" yaml:"withErrors"`
 }
 
 type CreateFleet struct {
@@ -28,8 +35,8 @@ type CreateFleet struct {
 }
 
 type CreatedFleet struct {
-	ID        string    `json:"id"`
-	CreatedAt time.Time `json:"createdAt"`
+	ID        string    `json:"id" yaml:"id"`
+	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
 }
 
 type FleetsParams struct {
@@ -45,6 +52,7 @@ type FleetsParams struct {
 
 // FleetParams request payload for querying a single fleet.
 type FleetParams struct {
+	FleetID      string
 	ConfigFormat *ConfigFormat
 }
 
@@ -61,8 +69,8 @@ func (p *FleetsParams) SetTags(tt []string) {
 }
 
 type Fleets struct {
-	Items     []Fleet `json:"items"`
-	EndCursor *string `json:"endCursor"`
+	Items     []Fleet `json:"items" yaml:"items"`
+	EndCursor *string `json:"endCursor" yaml:"endCursor"`
 }
 
 type UpdateFleet struct {
@@ -76,12 +84,12 @@ type UpdateFleet struct {
 }
 
 type UpdatedFleet struct {
-	UpdatedAt time.Time `json:"updatedAt"`
+	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
 
 type DeletedFleet struct {
-	Deleted   bool       `json:"deleted"`
-	DeletedAt *time.Time `json:"deletedAt"`
+	Deleted   bool       `json:"deleted" yaml:"deleted"`
+	DeletedAt *time.Time `json:"deletedAt" yaml:"deletedAt"`
 }
 
 type FleetConfigParams struct {

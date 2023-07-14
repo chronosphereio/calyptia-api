@@ -53,6 +53,7 @@ tags:
   - name: agent_error
   - name: aws_marketplace
   - name: cluster_object_regex
+  - name: processing_rule_template
 
 components:
   securitySchemes:
@@ -396,6 +397,8 @@ components:
           items:
             type: string
             example: dev
+        agentsCount:
+          $ref: "#/components/schemas/FleetAgentsCount"
         createdAt:
           type: string
           format: date-time
@@ -410,8 +413,35 @@ components:
         - rawConfig
         - configFormat
         - tags
+        - agentsCount
         - createdAt
         - updatedAt
+
+    FleetAgentsCount:
+      type: object
+      description: |-
+        Both active and inactive can sum up to the total count
+        of agents that the fleet has.
+        `withErrors` is the count of particular agents that have
+        some errors that have not been dismissed yet.
+      properties:
+        active:
+          type: number
+          format: int32
+          minimum: 0
+        inactive:
+          type: number
+          format: int32
+          minimum: 0
+        withErrors:
+          type: number
+          format: int32
+          minimum: 0
+      required:
+        - active
+        - inactive
+        - withErrors
+
     CreateFleet:
       type: object
       properties:
@@ -3804,6 +3834,7 @@ components:
         - core_instance
         - resource_profile
         - pipeline
+        - fleet
         - agent
         - cluster_object
 
@@ -3899,6 +3930,155 @@ components:
           type: string
           minLength: 1
       required: [amazonMarketplaceToken]
+
+    ProcessingRuleTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        projectID:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "My template"
+        definition:
+          $ref: "#/components/schemas/ProcessingRuleDef"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateProcessingRuleTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "My template"
+          minLength: 1
+          maxLength: 30
+        definition:
+          $ref: "#/components/schemas/ProcessingRuleDef"
+      required:
+        - name
+        - definition
+
+    CreatedProcessingRuleTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - createdAt
+
+    ProcessingRuleTemplates:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProcessingRuleTemplate"
+        endCursor:
+          type: string
+          format: uuid
+          nullable: true
+          default: null
+        count:
+          type: number
+          format: int32
+          minimum: 0
+        static:
+          type: array
+          items:
+            $ref: "#/components/schemas/StaticProcessingRuleTemplate"
+      required:
+        - items
+        - endCursor
+        - count
+        - static
+
+    UpdateProcessingRuleTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "My template"
+          minLength: 1
+          maxLength: 30
+          nullable: true
+          default: null
+        definition:
+          $ref: "#/components/schemas/ProcessingRuleDef"
+          nullable: true
+          default: null
+
+    UpdatedProcessingRuleTemplate:
+      type: object
+      properties:
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - updatedAt
+
+    DeletedProcessingRuleTemplate:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+          default: false
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+          default: null
+      required:
+        - deleted
+        - deletedAt
+
+    ProcessingRuleDef:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "lua"
+          minLength: 1
+          pattern: "^lua$"
+        match:
+          type: string
+          example: "*"
+          minLength: 1
+        code:
+          type: string
+          example: |-
+            function filter(tag, timestamp, record)
+              return 1, timestamp, record
+            end
+          minLength: 1
+        call:
+          type: string
+          example: filter
+          minLength: 1
+
+    StaticProcessingRuleTemplate:
+      description: |
+        A static processing rule template is a template that is not editable.
+        It's a template that is provided by Calyptia.
+      type: object
+      properties:
+        name:
+          type: string
+          example: "By Calyptia"
+        definition:
+          $ref: "#/components/schemas/ProcessingRuleDef"
 
 paths:
   /v1/verification_email:
@@ -8229,3 +8409,117 @@ paths:
       responses:
         "204":
           description: No Content
+
+  /v1/projects/{projectID}/processing_rule_templates:
+    parameters:
+      - name: projectID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      operationId: createProcessingRuleTemplate
+      summary: Create processing rule template
+      description: |-
+        Create a new processing rule template.
+      security:
+        - user: []
+        - project: []
+      tags: [processing_rule_template]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProcessingRuleTemplate"
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedProcessingRuleTemplate"
+    get:
+      operationId: processingRuleTemplates
+      summary: Processing rule templates
+      description: |-
+        List all processing rule templates in descending order with backward pagination.
+      security:
+        - user: []
+        - project: []
+      tags: [processing_rule_template]
+      parameters:
+        - name: last
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+          description: Last processing rule templates.
+        - name: before
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Processing rule templates before the given cursor.
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 30
+          description: Filter processing rule templates by name.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcessingRuleTemplates"
+
+  /v1/processing_rule_templates/{templateID}:
+    parameters:
+      - name: templateID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      operationId: updateProcessingRuleTemplate
+      summary: Update processing rule template
+      description: |-
+        Update a processing rule template details.
+      security:
+        - user: []
+        - project: []
+      tags: [processing_rule_template]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProcessingRuleTemplate"
+      responses:
+        "200":
+          description: Updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatedProcessingRuleTemplate"
+    delete:
+      operationId: deleteProcessingRuleTemplate
+      summary: Delete processing rule template
+      description: |-
+        Delete a single processing rule template by its ID.
+      security:
+        - user: []
+        - project: []
+      tags: [processing_rule_template]
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeletedProcessingRuleTemplate"

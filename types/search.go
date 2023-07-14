@@ -12,6 +12,7 @@ const (
 	SearchResourceCoreInstance    SearchResource = "core_instance"
 	SearchResourceResourceProfile SearchResource = "resource_profile"
 	SearchResourcePipeline        SearchResource = "pipeline"
+	SearchResourceFleet           SearchResource = "fleet"
 	SearchResourceAgent           SearchResource = "agent"
 	SearchResourceClusterObject   SearchResource = "cluster_object"
 )
