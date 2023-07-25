@@ -35,6 +35,9 @@ func (c *Client) Agents(ctx context.Context, projectID string, params types.Agen
 	if params.EnvironmentID != nil {
 		q.Set("environment_id", *params.EnvironmentID)
 	}
+	if params.FleetID != nil {
+		q.Set("fleet_id", *params.FleetID)
+	}
 
 	var out types.Agents
 	path := "/v1/projects/" + url.PathEscape(projectID) + "/agents?" + q.Encode()
