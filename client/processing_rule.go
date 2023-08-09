@@ -32,8 +32,8 @@ func (c *Client) ProcessingRule(ctx context.Context, processingRuleID string) (t
 	return out, c.do(ctx, http.MethodGet, "/v1/processing_rules/"+url.PathEscape(processingRuleID), nil, &out)
 }
 
-func (c *Client) UpdateProcessingRule(ctx context.Context, in types.UpdateProcessingRule) (types.UpdatedProcessingRule, error) {
-	var out types.UpdatedProcessingRule
+func (c *Client) UpdateProcessingRule(ctx context.Context, in types.UpdateProcessingRule) (types.Updated, error) {
+	var out types.Updated
 	return out, c.do(ctx, http.MethodPatch, "/v1/processing_rules/"+url.PathEscape(in.ProcessingRuleID), in, &out)
 }
 

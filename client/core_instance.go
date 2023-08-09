@@ -29,8 +29,8 @@ func (c *Client) CoreInstances(ctx context.Context, projectID string, params typ
 	if params.Name != nil {
 		q.Set("name", *params.Name)
 	}
-	if params.Tags != nil {
-		q.Set("tags_query", *params.Tags)
+	if params.TagsQuery != nil {
+		q.Set("tags_query", *params.TagsQuery)
 	}
 	if params.EnvironmentID != nil {
 		q.Set("environment_id", *params.EnvironmentID)

@@ -49,13 +49,6 @@ type CreateConfigSection struct {
 	PipelineClusterObjectSetID *string           `json:"-"`
 }
 
-// CreatedConfigSection response payload after creating
-// a fluent-bit config section successfully.
-type CreatedConfigSection struct {
-	ID        string    `json:"id" yaml:"id"`
-	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
-}
-
 // ConfigSectionsParams request payload for querying
 // the fluent-bit config sections.
 type ConfigSectionsParams struct {
@@ -74,10 +67,4 @@ type ConfigSections struct {
 // fluent-bit config section on a project.
 type UpdateConfigSection struct {
 	Properties *Pairs `json:"properties"`
-}
-
-// UpdatedConfigSection response payload after updating
-// a fluent-bit config section successfully.
-type UpdatedConfigSection struct {
-	UpdatedAt time.Time `json:"updatedAt"`
 }

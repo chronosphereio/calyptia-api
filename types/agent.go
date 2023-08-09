@@ -56,9 +56,9 @@ const (
 
 // RegisterAgent request payload for registering a new agent.
 type RegisterAgent struct {
-	Name          string           `json:"name"`
 	EnvironmentID string           `json:"environmentID"`
 	FleetID       *string          `json:"fleetID"`
+	Name          string           `json:"name"`
 	MachineID     string           `json:"machineID"`
 	Type          AgentType        `json:"type"`
 	Version       string           `json:"version"`
@@ -67,6 +67,34 @@ type RegisterAgent struct {
 	RawConfig     string           `json:"rawConfig"`
 	Metadata      *json.RawMessage `json:"metadata"`
 	Tags          []string         `json:"tags"`
+
+	id         string
+	signingKey []byte
+	token      string
+}
+
+func (in *RegisterAgent) SetID(id string) {
+	in.id = id
+}
+
+func (in *RegisterAgent) SetSigningKey(signingKey []byte) {
+	in.signingKey = signingKey
+}
+
+func (in *RegisterAgent) SetToken(token string) {
+	in.token = token
+}
+
+func (in RegisterAgent) ID() string {
+	return in.id
+}
+
+func (in RegisterAgent) SigningKey() []byte {
+	return in.signingKey
+}
+
+func (in RegisterAgent) Token() string {
+	return in.token
 }
 
 // RegisteredAgent response payload after registering an agent successfully.
@@ -83,9 +111,18 @@ type AgentsParams struct {
 	Last          *uint
 	Before        *string
 	Name          *string
-	Tags          *string
 	FleetID       *string
 	EnvironmentID *string
+	TagsQuery     *string
+	tags          []string
+}
+
+func (in *AgentsParams) SetTags(tags []string) {
+	in.tags = tags
+}
+
+func (in AgentsParams) Tags() []string {
+	return in.tags
 }
 
 // UpdateAgent request payload for updating an agent.
@@ -98,4 +135,32 @@ type UpdateAgent struct {
 	Flags         *[]string        `json:"flags"`
 	RawConfig     *string          `json:"rawConfig"`
 	Metadata      *json.RawMessage `json:"metadata"`
+
+	firstMetricsAddedAt *time.Time
+	lastMetricsAddedAt  *time.Time
+	newMetricsCount     *uint
+}
+
+func (in *UpdateAgent) SetFirstMetricsAddedAt(firstMetricsAddedAt *time.Time) {
+	in.firstMetricsAddedAt = firstMetricsAddedAt
+}
+
+func (in *UpdateAgent) SetLastMetricsAddedAt(lastMetricsAddedAt *time.Time) {
+	in.lastMetricsAddedAt = lastMetricsAddedAt
+}
+
+func (in *UpdateAgent) SetNewMetricsCount(newMetricsCount *uint) {
+	in.newMetricsCount = newMetricsCount
+}
+
+func (in UpdateAgent) FirstMetricsAddedAt() *time.Time {
+	return in.firstMetricsAddedAt
+}
+
+func (in UpdateAgent) LastMetricsAddedAt() *time.Time {
+	return in.lastMetricsAddedAt
+}
+
+func (in UpdateAgent) NewMetricsCount() *uint {
+	return in.newMetricsCount
 }

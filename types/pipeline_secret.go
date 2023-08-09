@@ -23,12 +23,6 @@ type CreatePipelineSecret struct {
 	Value []byte `json:"value"`
 }
 
-// CreatedPipelineSecret response payload after creating a pipeline secret successfully.
-type CreatedPipelineSecret struct {
-	ID        string    `json:"id"`
-	CreatedAt time.Time `json:"createdAt"`
-}
-
 // PipelineSecretsParams request payload for querying the pipeline secrets.
 type PipelineSecretsParams struct {
 	Last   *uint

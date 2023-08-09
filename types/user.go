@@ -37,3 +37,9 @@ func (u *User) RedactEmail() string {
 
 	return prefix + u.Email[atIndex:]
 }
+
+type UpsertUser struct {
+	Email     string
+	Name      string
+	AvatarURL *string
+}

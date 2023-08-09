@@ -9,14 +9,6 @@ const (
 	PipelineEventSourcePod        PipelineEventSource = "k8s:pod"
 )
 
-// PipelineEvent model.
-type PipelineEvent struct {
-	Source   PipelineEventSource `json:"source" yaml:"source"`
-	Reason   string              `json:"reason" yaml:"reason"`
-	Message  string              `json:"message" yaml:"message"`
-	LoggedAt time.Time           `json:"loggedAt" yaml:"loggedAt"`
-}
-
 // PipelineStatus model.
 type PipelineStatus struct {
 	ID        string             `json:"id" yaml:"id"`
@@ -24,12 +16,6 @@ type PipelineStatus struct {
 	Status    PipelineStatusKind `json:"status" yaml:"status"`
 	Events    []PipelineEvent    `json:"events" yaml:"events"`
 	CreatedAt time.Time          `json:"createdAt" yaml:"createdAt"`
-}
-
-// PipelineStatusHistory paginated list.
-type PipelineStatusHistory struct {
-	Items     []PipelineStatus
-	EndCursor *string
 }
 
 // PipelineStatusKind enum.
@@ -54,10 +40,28 @@ const (
 	PipelineStatusChecksFailed PipelineStatusKind = "CHECKS_FAILED"
 )
 
+// PipelineEvent model.
+type PipelineEvent struct {
+	Source   PipelineEventSource `json:"source" yaml:"source"`
+	Reason   string              `json:"reason" yaml:"reason"`
+	Message  string              `json:"message" yaml:"message"`
+	LoggedAt time.Time           `json:"loggedAt" yaml:"loggedAt"`
+}
+
+type CreatePipelineStatus struct {
+	Status PipelineStatusKind `json:"status"`
+}
+
 // PipelineStatusHistoryParams request payload for querying the pipeline status history.
 type PipelineStatusHistoryParams struct {
 	Last         *uint
 	Before       *string
 	Status       *PipelineStatusKind
 	ConfigFormat *ConfigFormat
+}
+
+// PipelineStatusHistory paginated list.
+type PipelineStatusHistory struct {
+	Items     []PipelineStatus
+	EndCursor *string
 }

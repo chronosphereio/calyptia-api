@@ -46,20 +46,14 @@ type ClusterObjectParams struct {
 	Before *string
 }
 
-// UpdateClusterObject request payload for updating a core_instance cluster object.
-type UpdateClusterObject struct {
-	Name *string            `json:"name" yaml:"name"`
-	Kind *ClusterObjectKind `json:"kind" yaml:"kind"`
-}
-
 // CreateClusterObject request payload for creating a core_instance cluster object.
 type CreateClusterObject struct {
 	Name string            `json:"name" yaml:"name"`
 	Kind ClusterObjectKind `json:"kind" yaml:"kind"`
 }
 
-// CreatedClusterObject response payload after creating a core_instance cluster object.
-type CreatedClusterObject struct {
-	ID        string    `json:"id"`
-	CreatedAt time.Time `json:"createdAt"`
+// UpdateClusterObject request payload for updating a core_instance cluster object.
+type UpdateClusterObject struct {
+	Name *string            `json:"name" yaml:"name"`
+	Kind *ClusterObjectKind `json:"kind" yaml:"kind"`
 }

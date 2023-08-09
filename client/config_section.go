@@ -9,8 +9,8 @@ import (
 	"github.com/calyptia/api/types"
 )
 
-func (c *Client) CreateConfigSection(ctx context.Context, projectID string, in types.CreateConfigSection) (types.CreatedConfigSection, error) {
-	var out types.CreatedConfigSection
+func (c *Client) CreateConfigSection(ctx context.Context, projectID string, in types.CreateConfigSection) (types.Created, error) {
+	var out types.Created
 	return out, c.do(ctx, http.MethodPost, "/v1/projects/"+url.PathEscape(projectID)+"/config_sections", in, &out)
 }
 
@@ -52,8 +52,8 @@ func (c *Client) ConfigSection(ctx context.Context, configSectionID string) (typ
 	return out, nil
 }
 
-func (c *Client) UpdateConfigSection(ctx context.Context, configSectionID string, in types.UpdateConfigSection) (types.UpdatedConfigSection, error) {
-	var out types.UpdatedConfigSection
+func (c *Client) UpdateConfigSection(ctx context.Context, configSectionID string, in types.UpdateConfigSection) (types.Updated, error) {
+	var out types.Updated
 	return out, c.do(ctx, http.MethodPatch, "/v1/config_sections/"+url.PathEscape(configSectionID), in, &out)
 }
 

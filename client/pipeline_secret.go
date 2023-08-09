@@ -16,8 +16,8 @@ import (
 // The given name is unique within the pipeline.
 // These secrets can be referenced by their name within a fluentbit configuration file like so `{{secrets.thename}}`.
 // Use them to hide sensible values from your config file.
-func (c *Client) CreatePipelineSecret(ctx context.Context, pipelineID string, payload types.CreatePipelineSecret) (types.CreatedPipelineSecret, error) {
-	var out types.CreatedPipelineSecret
+func (c *Client) CreatePipelineSecret(ctx context.Context, pipelineID string, payload types.CreatePipelineSecret) (types.Created, error) {
+	var out types.Created
 
 	return out, c.do(ctx, http.MethodPost, "/v1/aggregator_pipelines/"+url.PathEscape(pipelineID)+"/secrets", payload, &out)
 }

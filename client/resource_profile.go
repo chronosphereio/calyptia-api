@@ -18,8 +18,8 @@ import (
 // - high-performance-guaranteed-delivery.
 // - high-performance-optimal-throughput.
 // - best-effort-low-resource.
-func (c *Client) CreateResourceProfile(ctx context.Context, instanceID string, payload types.CreateResourceProfile) (types.CreatedResourceProfile, error) {
-	var out types.CreatedResourceProfile
+func (c *Client) CreateResourceProfile(ctx context.Context, instanceID string, payload types.CreateResourceProfile) (types.Created, error) {
+	var out types.Created
 	return out, c.do(ctx, http.MethodPost, "/v1/aggregators/"+url.PathEscape(instanceID)+"/resource_profiles", payload, &out)
 }
 

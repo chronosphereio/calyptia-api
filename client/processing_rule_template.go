@@ -9,8 +9,8 @@ import (
 	"github.com/calyptia/api/types"
 )
 
-func (c *Client) CreateProcessingRuleTemplate(ctx context.Context, in types.CreateProcessingRuleTemplate) (types.CreatedProcessingRuleTemplate, error) {
-	var out types.CreatedProcessingRuleTemplate
+func (c *Client) CreateProcessingRuleTemplate(ctx context.Context, in types.CreateProcessingRuleTemplate) (types.Created, error) {
+	var out types.Created
 	path := "/v1/projects/" + url.PathEscape(in.ProjectID) + "/processing_rule_templates"
 	return out, c.do(ctx, http.MethodPost, path, in, &out)
 }
@@ -32,14 +32,14 @@ func (c *Client) ProcessingRuleTemplates(ctx context.Context, in types.ListProce
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }
 
-func (c *Client) UpdateProcessingRuleTemplate(ctx context.Context, in types.UpdateProcessingRuleTemplate) (types.UpdatedProcessingRuleTemplate, error) {
-	var out types.UpdatedProcessingRuleTemplate
+func (c *Client) UpdateProcessingRuleTemplate(ctx context.Context, in types.UpdateProcessingRuleTemplate) (types.Updated, error) {
+	var out types.Updated
 	path := "/v1/processing_rule_templates/" + url.PathEscape(in.TemplateID)
 	return out, c.do(ctx, http.MethodPatch, path, in, &out)
 }
 
-func (c *Client) DeleteProcessingRuleTemplate(ctx context.Context, templateID string) (types.DeletedProcessingRuleTemplate, error) {
-	var out types.DeletedProcessingRuleTemplate
+func (c *Client) DeleteProcessingRuleTemplate(ctx context.Context, templateID string) (types.Deleted, error) {
+	var out types.Deleted
 	path := "/v1/processing_rule_templates/" + url.PathEscape(templateID)
 	return out, c.do(ctx, http.MethodDelete, path, nil, &out)
 }

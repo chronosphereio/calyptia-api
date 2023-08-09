@@ -35,11 +35,6 @@ type CreateAgentError struct {
 	Error   string `json:"error"`
 }
 
-type CreatedAgentError struct {
-	ID        string    `json:"id" yaml:"id"`
-	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
-}
-
 type DismissAgentError struct {
 	AgentErrorID string `json:"-"`
 	Reason       string `json:"reason"`

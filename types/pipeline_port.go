@@ -42,6 +42,41 @@ type CreatePipelinePort struct {
 	FrontendPort uint   `json:"frontendPort"`
 	BackendPort  uint   `json:"backendPort"`
 	Endpoint     string `json:"endpoint"`
+
+	pluginID    *string
+	pluginName  *string
+	pluginAlias *string
+}
+
+func CreatePipelinePortWithOpts(base CreatePipelinePort, pluginID, pluginName, pluginAlias *string) CreatePipelinePort {
+	base.pluginID = pluginID
+	base.pluginName = pluginName
+	base.pluginAlias = pluginAlias
+	return base
+}
+
+func (in *CreatePipelinePort) SetPluginID(pluginID string) {
+	in.pluginID = &pluginID
+}
+
+func (in *CreatePipelinePort) SetPluginName(pluginName string) {
+	in.pluginName = &pluginName
+}
+
+func (in *CreatePipelinePort) SetPluginAlias(pluginAlias string) {
+	in.pluginAlias = &pluginAlias
+}
+
+func (in CreatePipelinePort) PluginID() *string {
+	return in.pluginID
+}
+
+func (in CreatePipelinePort) PluginName() *string {
+	return in.pluginName
+}
+
+func (in CreatePipelinePort) PluginAlias() *string {
+	return in.pluginAlias
 }
 
 // CreatedPipelinePort response payload after creating a pipeline port successfully.

@@ -10,8 +10,8 @@ import (
 	"github.com/calyptia/api/types"
 )
 
-func (c *Client) CreateAgentError(ctx context.Context, in types.CreateAgentError) (types.CreatedAgentError, error) {
-	var out types.CreatedAgentError
+func (c *Client) CreateAgentError(ctx context.Context, in types.CreateAgentError) (types.Created, error) {
+	var out types.Created
 	return out, c.do(ctx, http.MethodPost, "/v1/agents/"+in.AgentID+"/errors", in, &out)
 }
 

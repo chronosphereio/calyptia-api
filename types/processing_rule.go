@@ -138,11 +138,6 @@ type UpdateProcessingRule struct {
 	Actions          *[]RuleAction           `json:"actions,omitempty"`
 }
 
-// UpdatedProcessingRule response payload.
-type UpdatedProcessingRule struct {
-	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
-}
-
 // PreviewProcessingRule request payload to run and preview the input/output of
 // a processing rule.
 // Given some sample logs, and some actions, it shows the output log records.

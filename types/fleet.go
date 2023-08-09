@@ -34,11 +34,6 @@ type CreateFleet struct {
 	SkipConfigValidation bool `json:"skipConfigValidation"`
 }
 
-type CreatedFleet struct {
-	ID        string    `json:"id" yaml:"id"`
-	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
-}
-
 type FleetsParams struct {
 	ProjectID    string
 	Name         *string
@@ -81,15 +76,6 @@ type UpdateFleet struct {
 	Tags         *[]string     `json:"tags"`
 
 	SkipConfigValidation bool `json:"skipConfigValidation"`
-}
-
-type UpdatedFleet struct {
-	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
-}
-
-type DeletedFleet struct {
-	Deleted   bool       `json:"deleted" yaml:"deleted"`
-	DeletedAt *time.Time `json:"deletedAt" yaml:"deletedAt"`
 }
 
 type FleetConfigParams struct {

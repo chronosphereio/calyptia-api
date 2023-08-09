@@ -15,8 +15,8 @@ import (
 // Only one trace session can be active at a time
 // you can either terminate it and create a new one, or update the existing one
 // and extend its lifespan.
-func (c *Client) CreateTraceSession(ctx context.Context, pipelineID string, in types.CreateTraceSession) (types.CreatedTraceSession, error) {
-	var out types.CreatedTraceSession
+func (c *Client) CreateTraceSession(ctx context.Context, pipelineID string, in types.CreateTraceSession) (types.Created, error) {
+	var out types.Created
 	return out, c.do(ctx, http.MethodPost, "/v1/pipelines/"+url.PathEscape(pipelineID)+"/trace_sessions", in, &out)
 }
 
@@ -50,8 +50,8 @@ func (c *Client) ActiveTraceSession(ctx context.Context, pipelineID string) (typ
 
 // UpdateTraceSession list of plugins to trace and/or lifespan.
 // The session must still be active.
-func (c *Client) UpdateTraceSession(ctx context.Context, sessionID string, in types.UpdateTraceSession) (types.UpdatedTraceSession, error) {
-	var out types.UpdatedTraceSession
+func (c *Client) UpdateTraceSession(ctx context.Context, sessionID string, in types.UpdateTraceSession) (types.Updated, error) {
+	var out types.Updated
 	return out, c.do(ctx, http.MethodPatch, "/v1/trace_sessions/"+url.PathEscape(sessionID), in, &out)
 }
 
