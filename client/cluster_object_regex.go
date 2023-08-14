@@ -9,8 +9,8 @@ import (
 	"github.com/calyptia/api/types"
 )
 
-func (c *Client) CreateClusterObjectRegex(ctx context.Context, in types.CreateClusterObjectRegex) (types.CreatedClusterObjectRegex, error) {
-	var out types.CreatedClusterObjectRegex
+func (c *Client) CreateClusterObjectRegex(ctx context.Context, in types.CreateClusterObjectRegex) (types.Created, error) {
+	var out types.Created
 	return out, c.do(ctx, http.MethodPost, "/v1/pipelines/"+url.PathEscape(in.PipelineID)+"/cluster_object_regexes", in, &out)
 }
 
@@ -35,8 +35,8 @@ func (c *Client) ClusterObjectRegex(ctx context.Context, regexID string) (types.
 	return out, c.do(ctx, http.MethodGet, "/v1/cluster_object_regexes/"+url.PathEscape(regexID), nil, &out)
 }
 
-func (c *Client) UpdateClusterObjectRegex(ctx context.Context, in types.UpdateClusterObjectRegex) (types.UpdatedClusterObjectRegex, error) {
-	var out types.UpdatedClusterObjectRegex
+func (c *Client) UpdateClusterObjectRegex(ctx context.Context, in types.UpdateClusterObjectRegex) (types.Updated, error) {
+	var out types.Updated
 	return out, c.do(ctx, http.MethodPatch, "/v1/cluster_object_regexes/"+url.PathEscape(in.RegexID), in, &out)
 }
 

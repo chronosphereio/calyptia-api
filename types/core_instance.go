@@ -38,6 +38,25 @@ const (
 	CoreInstanceStatusUnreachable CoreInstanceStatus = "unreachable"
 )
 
+// ApplyStatus based on its last ping timestamp.
+// If time since last ping = nil, wantedCoreInstanceStatus = waiting
+// If time since last ping <= CoreInstanceNextPingTimeout wantedCoreInstanceStatus = running
+// If time since last ping > CoreInstanceNextPingTimeout wantedCoreInstanceStatus = unreachable.
+func (in *CoreInstance) ApplyStatus(lastPing *time.Time) {
+	if in == nil {
+		return
+	}
+
+	switch {
+	case lastPing == nil:
+		in.Status = CoreInstanceStatusWaiting
+	case time.Since(*lastPing) <= CoreInstanceNextPingTimeout:
+		in.Status = CoreInstanceStatusRunning
+	default:
+		in.Status = CoreInstanceStatusUnreachable
+	}
+}
+
 // CoreInstance ping constants.
 const (
 	// CoreInstanceNextPing is the time between pings to a core instance.
@@ -147,6 +166,43 @@ type CreateCoreInstance struct {
 	Metadata                CoreInstanceMetadata `json:"metadata"`
 	EnvironmentID           string               `json:"environmentID"`
 	SkipServiceCreation     bool                 `json:"skipServiceCreation"`
+
+	id           string
+	signingKey   []byte
+	publicRSAKey []byte
+	token        string
+}
+
+func (in *CreateCoreInstance) SetID(id string) {
+	in.id = id
+}
+
+func (in *CreateCoreInstance) SetSigningKey(signingKey []byte) {
+	in.signingKey = signingKey
+}
+
+func (in *CreateCoreInstance) SetPublicRSAKey(publicRSAKey []byte) {
+	in.publicRSAKey = publicRSAKey
+}
+
+func (in *CreateCoreInstance) SetToken(token string) {
+	in.token = token
+}
+
+func (in CreateCoreInstance) ID() string {
+	return in.id
+}
+
+func (in CreateCoreInstance) SigningKey() []byte {
+	return in.signingKey
+}
+
+func (in CreateCoreInstance) PublicRSAKey() []byte {
+	return in.publicRSAKey
+}
+
+func (in CreateCoreInstance) Token() string {
+	return in.token
 }
 
 // CreatedCoreInstance response payload after creating a core instance successfully.
@@ -172,8 +228,18 @@ type CoreInstancesParams struct {
 	Last          *uint
 	Before        *string
 	Name          *string
-	Tags          *string
+	TagsQuery     *string
 	EnvironmentID *string
+
+	tags []string
+}
+
+func (in *CoreInstancesParams) SetTags(tags []string) {
+	in.tags = tags
+}
+
+func (in CoreInstancesParams) Tags() []string {
+	return in.tags
 }
 
 // UpdateCoreInstance request payload for updating a core instance.
@@ -186,4 +252,14 @@ type UpdateCoreInstance struct {
 	Metadata            *CoreInstanceMetadata `json:"metadata"`
 	SkipServiceCreation *bool                 `json:"skipServiceCreation"`
 	Image               *string               `json:"image"`
+
+	lastPing *time.Time
+}
+
+func (in *UpdateCoreInstance) SetLastPing(lastPing *time.Time) {
+	in.lastPing = lastPing
+}
+
+func (in UpdateCoreInstance) LastPing() *time.Time {
+	return in.lastPing
 }

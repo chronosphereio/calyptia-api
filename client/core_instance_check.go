@@ -13,8 +13,8 @@ import (
 )
 
 // CreateCoreInstanceCheck within a core_instance.
-func (c *Client) CreateCoreInstanceCheck(ctx context.Context, coreInstanceID string, payload types.CreateCoreInstanceCheck) (types.CreatedCoreInstanceCheck, error) {
-	var out types.CreatedCoreInstanceCheck
+func (c *Client) CreateCoreInstanceCheck(ctx context.Context, coreInstanceID string, payload types.CreateCoreInstanceCheck) (types.Created, error) {
+	var out types.Created
 	return out, c.do(ctx, http.MethodPost, "/v1/core_instances/"+url.PathEscape(coreInstanceID)+"/checks", payload, &out)
 }
 

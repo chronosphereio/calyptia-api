@@ -7,20 +7,11 @@ import (
 	"time"
 
 	"golang.org/x/exp/slices"
+
+	fluentbitconfig "github.com/calyptia/go-fluentbit-config/v2"
 )
 
-type PipelineKind string
-
-const (
-	PipelineKindDaemonSet  PipelineKind = "daemonSet"
-	PipelineKindDeployment PipelineKind = "deployment"
-)
-
-// AllPipelineKindTypes all valid pipeline kinds.
-var AllPipelineKindTypes = [...]PipelineKind{
-	PipelineKindDaemonSet,
-	PipelineKindDeployment,
-}
+const DefaultHealthCheckPipelinePort = 2020
 
 // Pipeline model.
 type Pipeline struct {
@@ -47,11 +38,43 @@ type Pipeline struct {
 	Secrets                      []PipelineSecret `json:"secrets,omitempty" yaml:"secrets,omitempty"`
 }
 
-// Pipelines paginated list.
-type Pipelines struct {
-	Items     []Pipeline `json:"items"`
-	EndCursor *string    `json:"endCursor"`
-	Count     int        `json:"count"`
+func (p *Pipeline) ApplyConfigSections() error {
+	if len(p.ConfigSections) == 0 {
+		return nil
+	}
+
+	format := fluentbitconfig.Format(p.Config.ConfigFormat)
+	c, err := fluentbitconfig.ParseAs(p.Config.RawConfig, format)
+	if err != nil {
+		return err
+	}
+
+	for _, section := range p.ConfigSections {
+		c.AddSection(fluentbitconfig.SectionKind(section.Kind), section.Properties.AsProperties())
+	}
+
+	raw, err := c.DumpAs(format)
+	if err != nil {
+		return err
+	}
+
+	p.Config.RawConfig = raw
+	p.Status.Config.RawConfig = raw
+
+	return nil
+}
+
+type PipelineKind string
+
+const (
+	PipelineKindDaemonSet  PipelineKind = "daemonSet"
+	PipelineKindDeployment PipelineKind = "deployment"
+)
+
+// AllPipelineKindTypes all valid pipeline kinds.
+var AllPipelineKindTypes = [...]PipelineKind{
+	PipelineKindDaemonSet,
+	PipelineKindDeployment,
 }
 
 // CreatePipeline request payload for creating a new pipeline.
@@ -100,6 +123,40 @@ type CreatePipeline struct {
 	// the pipeline will be switched to CHECKS_FAILED and the deployment of the pipeline
 	// will be executed.
 	WaitForChecksBeforeDeploying bool `json:"waitForChecksBeforeDeploying"`
+
+	status PipelineStatusKind
+	// Internal denotes that this pipeline was created by the system.
+	// That's the case for the "health-check-*" automated pipeline
+	// with each new core instance.
+	// We use it to not take these into account for project quotas.
+	internal bool
+	// ClusterLogging denotes that this pipeline is internal.
+	// There should be only one cluster-logging pipeline in the system.
+	clusterLogging bool
+}
+
+func (in *CreatePipeline) SetStatus(status PipelineStatusKind) {
+	in.status = status
+}
+
+func (in *CreatePipeline) SetInternal(internal bool) {
+	in.internal = internal
+}
+
+func (in *CreatePipeline) SetClusterLogging(clusterLogging bool) {
+	in.clusterLogging = clusterLogging
+}
+
+func (in CreatePipeline) Status() PipelineStatusKind {
+	return in.status
+}
+
+func (in CreatePipeline) Internal() bool {
+	return in.internal
+}
+
+func (in CreatePipeline) ClusterLogging() bool {
+	return in.clusterLogging
 }
 
 // CreatedPipeline response payload after creating a pipeline successfully.
@@ -116,36 +173,6 @@ type CreatedPipeline struct {
 	ReplicasCount                uint             `json:"replicasCount"`
 	WaitForChecksBeforeDeploying bool             `json:"waitForChecksBeforeDeploying"`
 	CreatedAt                    time.Time        `json:"createdAt"`
-}
-
-// UpdatePipeline request payload for updating a pipeline.
-type UpdatePipeline struct {
-	Name            *string             `json:"name"`
-	Kind            *PipelineKind       `json:"kind"`
-	Status          *PipelineStatusKind `json:"status"`
-	ConfigFormat    *ConfigFormat       `json:"configFormat"`
-	ReplicasCount   *uint               `json:"replicasCount"`
-	RawConfig       *string             `json:"rawConfig"`
-	ResourceProfile *string             `json:"resourceProfile"`
-	Image           *string             `json:"image"`
-	// Deprecated: in favor of NoAutoCreateEndpointsFromConfig
-	AutoCreatePortsFromConfig *bool `json:"autoCreatePortsFromConfig"`
-	// Deprecated: in favor of NoAutoCreateChecksFromConfig
-	AutoCreateChecksFromConfig *bool `json:"autoCreateChecksFromConfig"`
-
-	// no automatically create endpoints from config
-	NoAutoCreateEndpointsFromConfig bool `json:"noAutoCreateEndpointsFromConfig"`
-	// no automatically create checks based on the output configuration.
-	NoAutoCreateChecksFromConfig bool `json:"noAutoCreateChecksFromConfig"`
-
-	// this defines behavior; await for checks to complete before reporting the status back.
-	WaitForChecksBeforeDeploying *bool `json:"waitForChecksBeforeDeploying"`
-
-	SkipConfigValidation bool                   `json:"skipConfigValidation"`
-	Metadata             *json.RawMessage       `json:"metadata"`
-	Secrets              []UpdatePipelineSecret `json:"secrets"`
-	Files                []UpdatePipelineFile   `json:"files"`
-	Events               []PipelineEvent        `json:"events"`
 }
 
 // PipelinesParams represents the request payload for querying pipelines.
@@ -189,6 +216,62 @@ func NewPipelineObjectsParams(r *http.Request) *PipelineObjectsParams {
 		Secrets: slices.Contains(include, "secrets"),
 		Ports:   slices.Contains(include, "ports"),
 	}
+}
+
+// Pipelines paginated list.
+type Pipelines struct {
+	Items     []Pipeline `json:"items"`
+	EndCursor *string    `json:"endCursor"`
+	Count     int        `json:"count"`
+}
+
+// UpdatePipeline request payload for updating a pipeline.
+type UpdatePipeline struct {
+	Name            *string             `json:"name"`
+	Kind            *PipelineKind       `json:"kind"`
+	Status          *PipelineStatusKind `json:"status"`
+	ConfigFormat    *ConfigFormat       `json:"configFormat"`
+	ReplicasCount   *uint               `json:"replicasCount"`
+	RawConfig       *string             `json:"rawConfig"`
+	ResourceProfile *string             `json:"resourceProfile"`
+	Image           *string             `json:"image"`
+	// Deprecated: in favor of NoAutoCreateEndpointsFromConfig
+	AutoCreatePortsFromConfig *bool `json:"autoCreatePortsFromConfig"`
+	// Deprecated: in favor of NoAutoCreateChecksFromConfig
+	AutoCreateChecksFromConfig *bool `json:"autoCreateChecksFromConfig"`
+
+	// no automatically create endpoints from config
+	NoAutoCreateEndpointsFromConfig bool `json:"noAutoCreateEndpointsFromConfig"`
+	// no automatically create checks based on the output configuration.
+	NoAutoCreateChecksFromConfig bool `json:"noAutoCreateChecksFromConfig"`
+
+	// this defines behavior; await for checks to complete before reporting the status back.
+	WaitForChecksBeforeDeploying *bool `json:"waitForChecksBeforeDeploying"`
+
+	SkipConfigValidation bool                   `json:"skipConfigValidation"`
+	Metadata             *json.RawMessage       `json:"metadata"`
+	Secrets              []UpdatePipelineSecret `json:"secrets"`
+	Files                []UpdatePipelineFile   `json:"files"`
+	Events               []PipelineEvent        `json:"events"`
+
+	clusterLogging    *bool
+	resourceProfileID *string
+}
+
+func (in *UpdatePipeline) SetClusterLogging(clusterLogging bool) {
+	in.clusterLogging = &clusterLogging
+}
+
+func (in *UpdatePipeline) SetResourceProfileID(resourceProfileID string) {
+	in.resourceProfileID = &resourceProfileID
+}
+
+func (in UpdatePipeline) ClusterLogging() *bool {
+	return in.clusterLogging
+}
+
+func (in UpdatePipeline) ResourceProfileID() *string {
+	return in.resourceProfileID
 }
 
 // PipelineParams request payload for querying a single pipeline.

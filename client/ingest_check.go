@@ -13,8 +13,8 @@ import (
 )
 
 // CreateIngestCheck within a core_instance.
-func (c *Client) CreateIngestCheck(ctx context.Context, coreInstanceID string, payload types.CreateIngestCheck) (types.CreatedIngestCheck, error) {
-	var out types.CreatedIngestCheck
+func (c *Client) CreateIngestCheck(ctx context.Context, coreInstanceID string, payload types.CreateIngestCheck) (types.Created, error) {
+	var out types.Created
 	return out, c.do(ctx, http.MethodPost, "/v1/core_instances/"+url.PathEscape(coreInstanceID)+"/ingest_checks", payload, &out)
 }
 

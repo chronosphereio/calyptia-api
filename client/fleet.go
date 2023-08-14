@@ -10,8 +10,8 @@ import (
 	fluentbitconfig "github.com/calyptia/go-fluentbit-config/v2"
 )
 
-func (c *Client) CreateFleet(ctx context.Context, in types.CreateFleet) (types.CreatedFleet, error) {
-	var out types.CreatedFleet
+func (c *Client) CreateFleet(ctx context.Context, in types.CreateFleet) (types.Created, error) {
+	var out types.Created
 	return out, c.do(ctx, http.MethodPost, "/v1/projects/"+url.PathEscape(in.ProjectID)+"/fleets", in, &out)
 }
 
@@ -79,12 +79,12 @@ func (c *Client) FleetConfig(ctx context.Context, fleetID string, params types.F
 	return nil, nil
 }
 
-func (c *Client) UpdateFleet(ctx context.Context, in types.UpdateFleet) (types.UpdatedFleet, error) {
-	var out types.UpdatedFleet
+func (c *Client) UpdateFleet(ctx context.Context, in types.UpdateFleet) (types.Updated, error) {
+	var out types.Updated
 	return out, c.do(ctx, http.MethodPatch, "/v1/fleets/"+url.PathEscape(in.ID), in, &out)
 }
 
-func (c *Client) DeleteFleet(ctx context.Context, fleetID string) (types.DeletedFleet, error) {
-	var out types.DeletedFleet
+func (c *Client) DeleteFleet(ctx context.Context, fleetID string) (types.Deleted, error) {
+	var out types.Deleted
 	return out, c.do(ctx, http.MethodDelete, "/v1/fleets/"+url.PathEscape(fleetID), nil, &out)
 }

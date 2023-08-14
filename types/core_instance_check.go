@@ -34,10 +34,4 @@ type UpdateCoreInstanceCheck struct {
 }
 
 // CreateCoreInstanceCheck request payload for creating a core_instance check.
-type CreateCoreInstanceCheck Check
-
-// CreatedCoreInstanceCheck response payload after creating an aggregator successfully.
-type CreatedCoreInstanceCheck struct {
-	ID        string    `json:"id"`
-	CreatedAt time.Time `json:"createdAt"`
-}
+type CreateCoreInstanceCheck = Check

@@ -19,11 +19,6 @@ type CreateClusterObjectRegex struct {
 	Description string `json:"description"`
 }
 
-type CreatedClusterObjectRegex struct {
-	ID        string    `json:"id" yaml:"id"`
-	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
-}
-
 type ListClusterObjectRegexes struct {
 	PipelineID string
 	Last       *uint
@@ -39,8 +34,4 @@ type UpdateClusterObjectRegex struct {
 	RegexID     string  `json:"-"`
 	Regex       *string `json:"regex"`
 	Description *string `json:"description"`
-}
-
-type UpdatedClusterObjectRegex struct {
-	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
 }

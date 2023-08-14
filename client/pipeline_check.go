@@ -13,8 +13,8 @@ import (
 )
 
 // CreatePipelineCheck within a pipeline.
-func (c *Client) CreatePipelineCheck(ctx context.Context, pipelineID string, payload types.CreatePipelineCheck) (types.CreatedPipelineCheck, error) {
-	var out types.CreatedPipelineCheck
+func (c *Client) CreatePipelineCheck(ctx context.Context, pipelineID string, payload types.CreatePipelineCheck) (types.Created, error) {
+	var out types.Created
 	return out, c.do(ctx, http.MethodPost, "/v1/pipelines/"+url.PathEscape(pipelineID)+"/checks", payload, &out)
 }
 

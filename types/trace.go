@@ -34,12 +34,6 @@ type CreateTraceSession struct {
 	Lifespan Duration `json:"lifespan"`
 }
 
-// CreatedTraceSession response payload after creating a trace session successfully.
-type CreatedTraceSession struct {
-	ID        string    `json:"id" yaml:"id"`
-	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
-}
-
 // TraceSessionsParams request payload for querying trace sessions.
 type TraceSessionsParams struct {
 	Last   *uint
@@ -56,11 +50,6 @@ type TraceSessions struct {
 type UpdateTraceSession struct {
 	Plugins  *[]string `json:"plugins"`
 	Lifespan *Duration `json:"lifespan"`
-}
-
-// UpdatedTraceSession response payload after updating a trace session successfully.
-type UpdatedTraceSession struct {
-	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
 
 // TerminatedTraceSession response payload after terminating the active trace session successfully.

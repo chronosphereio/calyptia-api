@@ -16,8 +16,8 @@ import (
 // The given name is unique within the pipeline.
 // These files can be referenced by their name within a fluentbit configuration file like so `{{files.thename}}`.
 // Use them to share common stuff like parsers.
-func (c *Client) CreatePipelineFile(ctx context.Context, pipelineID string, payload types.CreatePipelineFile) (types.CreatedPipelineFile, error) {
-	var out types.CreatedPipelineFile
+func (c *Client) CreatePipelineFile(ctx context.Context, pipelineID string, payload types.CreatePipelineFile) (types.Created, error) {
+	var out types.Created
 	return out, c.do(ctx, http.MethodPost, "/v1/aggregator_pipelines/"+url.PathEscape(pipelineID)+"/files", payload, &out)
 }
 

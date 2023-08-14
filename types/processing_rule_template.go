@@ -29,11 +29,6 @@ type CreateProcessingRuleTemplate struct {
 	Definition ProcessingRuleDef `json:"definition"`
 }
 
-type CreatedProcessingRuleTemplate struct {
-	ID        string    `json:"id" yaml:"id"`
-	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
-}
-
 type ListProcessingRuleTemplates struct {
 	ProjectID string
 	Last      *uint
@@ -52,13 +47,4 @@ type UpdateProcessingRuleTemplate struct {
 	TemplateID string             `json:"-"`
 	Name       *string            `json:"name"`
 	Definition *ProcessingRuleDef `json:"definition"`
-}
-
-type UpdatedProcessingRuleTemplate struct {
-	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
-}
-
-type DeletedProcessingRuleTemplate struct {
-	Deleted   bool       `json:"deleted" yaml:"deleted"`
-	DeletedAt *time.Time `json:"deletedAt" yaml:"deletedAt"`
 }

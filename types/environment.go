@@ -11,7 +11,16 @@ type Environment struct {
 }
 
 type CreateEnvironment struct {
-	Name string `json:"name"`
+	Name     string `json:"name"`
+	internal bool
+}
+
+func (in *CreateEnvironment) SetInternal(internal bool) {
+	in.internal = internal
+}
+
+func (in CreateEnvironment) Internal() bool {
+	return in.internal
 }
 
 type CreatedEnvironment struct {

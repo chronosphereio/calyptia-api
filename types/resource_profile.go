@@ -53,12 +53,6 @@ type CreateResourceProfile struct {
 	MemoryRequest          string `json:"memoryRequest"`
 }
 
-// CreatedResourceProfile response payload after creating a resource profile successfully.
-type CreatedResourceProfile struct {
-	ID        string    `json:"id"`
-	CreatedAt time.Time `json:"createdAt"`
-}
-
 // ResourceProfilesParams request payload for querying resource profiles.
 type ResourceProfilesParams struct {
 	Last   *uint

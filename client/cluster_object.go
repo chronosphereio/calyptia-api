@@ -11,8 +11,8 @@ import (
 )
 
 // CreateClusterObject within a core_instance.
-func (c *Client) CreateClusterObject(ctx context.Context, coreInstanceID string, payload types.CreateClusterObject) (types.CreatedClusterObject, error) {
-	var out types.CreatedClusterObject
+func (c *Client) CreateClusterObject(ctx context.Context, coreInstanceID string, payload types.CreateClusterObject) (types.Created, error) {
+	var out types.Created
 	return out, c.do(ctx, http.MethodPost, "/v1/core_instances/"+url.PathEscape(coreInstanceID)+"/cluster_objects", payload, &out)
 }
 
