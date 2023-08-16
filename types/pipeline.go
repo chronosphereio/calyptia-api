@@ -3,10 +3,9 @@ package types
 import (
 	"encoding/json"
 	"net/http"
+	"slices"
 	"strings"
 	"time"
-
-	"golang.org/x/exp/slices"
 
 	fluentbitconfig "github.com/calyptia/go-fluentbit-config/v2"
 )
@@ -182,6 +181,7 @@ type PipelinesParams struct {
 
 	Last                     *uint
 	Before                   *string
+	Kind                     *PipelineKind
 	Name                     *string
 	TagsQuery                *string
 	ConfigFormat             *ConfigFormat

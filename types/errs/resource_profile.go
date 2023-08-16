@@ -7,3 +7,7 @@ const (
 	ResourceProfileAlreadyExists = ConflictError("resource profile name already exists")
 	ResourceProfileNotFound      = NotFoundError("resource profile not found")
 )
+
+func NewResourceProfileSpecError(s string) *DetailedError {
+	return &DetailedError{Msg: "invalid resource profile spec", Detail: &s, Parent: InvalidArgument}
+}

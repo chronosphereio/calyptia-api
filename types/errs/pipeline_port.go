@@ -14,3 +14,8 @@ const (
 func NewPipelinePortInUseError(protocol string, port uint) error {
 	return NewDetailedError(PipelinePortInUse, fmt.Sprintf("pipeline port already in use: protocol %s, port %d", protocol, port))
 }
+
+func NewPipelinePortAlreadyInUseError(protocol string, port uint) *DetailedError {
+	detail := fmt.Sprintf("protocol %s, port %d", protocol, port)
+	return &DetailedError{Msg: "pipeline port already in use", Detail: &detail, Parent: Conflict}
+}

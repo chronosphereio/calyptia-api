@@ -29,6 +29,9 @@ func (c *Client) Pipelines(ctx context.Context, in types.PipelinesParams) (types
 	if in.Before != nil {
 		q.Set("before", *in.Before)
 	}
+	if in.Kind != nil {
+		q.Set("kind", string(*in.Kind))
+	}
 	if in.Name != nil {
 		q.Set("name", *in.Name)
 	}

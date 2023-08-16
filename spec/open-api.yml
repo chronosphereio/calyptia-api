@@ -865,6 +865,10 @@ components:
         - metadata
         - createdAt
         - updatedAt
+    PipelineKind:
+      type: string
+      default: deployment
+      enum: [deployment, daemonSet]
     Pipelines:
       type: object
       properties:
@@ -5125,6 +5129,11 @@ paths:
             type: string
           in: query
           description: Paginate pipelines before the given cursor.
+        - name: kind
+          schema:
+            $ref: "#/components/schemas/PipelineKind"
+          in: query
+          description: Filter pipelines by kind.
         - name: name
           schema:
             type: string
@@ -5248,6 +5257,11 @@ paths:
             type: string
           in: query
           description: Paginate pipelines before the given cursor.
+        - name: kind
+          schema:
+            $ref: "#/components/schemas/PipelineKind"
+          in: query
+          description: Filter pipelines by kind.
         - name: name
           schema:
             type: string
