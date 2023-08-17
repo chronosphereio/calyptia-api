@@ -8,3 +8,7 @@ const (
 	PipelineSecretsQuotaExceeded = PermissionDeniedError("pipeline secrets quota exceeded")
 	PipelineSecretSizeExceeded   = InvalidArgumentError("pipeline secret size exceeded")
 )
+
+func NewUndefinedPipelineSecretError(s string) *DetailedError {
+	return &DetailedError{Msg: "undefined pipeline secret", Detail: &s, Parent: NotFound}
+}
