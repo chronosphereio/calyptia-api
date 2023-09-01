@@ -65,6 +65,19 @@ components:
       type: apiKey
       in: header
   schemas:
+    UpdatePipelineMetadata:
+      type: object
+      properties:
+        key:
+          type: string
+          nullable: false
+          description: metadata key to use
+        value:
+          type: object
+          additionalProperties: true
+          description: json object to use as value
+          example: |
+             {"value": "1"}
     UpdatePipelineClusterObjects:
       type: object
       properties:
@@ -102,6 +115,9 @@ components:
         updatedAt:
           type: string
           format: date-time
+    PipelineMetadata:
+      type: object
+      additionalProperties: true
     User:
       type: object
       description: User model.
@@ -824,11 +840,7 @@ components:
           type: object
           nullable: true
           default: null
-          properties:
-            nodeSelector:
-              type: object
-              nullable: true
-              default: null
+          additionalProperties: true
         secrets:
           type: array
           nullable: true
@@ -2079,11 +2091,7 @@ components:
           type: object
           nullable: true
           default: null
-          properties:
-            nodeSelector:
-              type: object
-              nullable: true
-              default: null
+          additionalProperties: true
       required:
         - name
         - replicasCount
@@ -2213,11 +2221,7 @@ components:
           type: object
           nullable: true
           default: null
-          properties:
-            nodeSelector:
-              type: object
-              nullable: true
-              default: null
+          additionalProperties: true
     CreatePipelineCheck:
       description: Create pipeline check request body.
       type: object
@@ -6041,6 +6045,59 @@ paths:
       responses:
         "204":
           description: Deleted
+
+  "/v1/pipelines/{pipelineID}/metadata":
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: pipelineID
+        in: path
+        required: true
+    get:
+      tags:
+        - pipeline_metadata
+      summary: Get the metadata associated to a pipeline, keys can be provided or the full metadata will be returned (if none).
+      operationId: pipelineMetadata
+      security:
+        - user: []
+        - project: []
+      description: |-
+        Get the metadata associated to a pipeline
+      parameters:
+        - schema:
+            type: array
+            items:
+              type: string
+          in: query
+          name: key
+          required: false
+          description: List of metadata keys to retrieve.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PipelineMetadata"
+    patch:
+      tags:
+        - pipeline_metadata
+      summary: Updates or creates a new metadata key on the pipeline's metadata
+      operationId: updatePipelineMetadata
+      description: |-
+        Updates a pipeline metadata item by setting the key to a given json object value.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePipelineMetadata"
+      responses:
+        "204":
+          description: No Content
 
   "/v1/aggregator_pipelines/{pipelineID}/secrets":
     parameters:

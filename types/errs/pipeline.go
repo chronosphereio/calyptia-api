@@ -5,6 +5,8 @@ const (
 	InvalidPipelineID                   = InvalidArgumentError("invalid pipeline ID")
 	InvalidPipelineName                 = InvalidArgumentError("invalid pipeline name")
 	InvalidPipelineMetadata             = InvalidArgumentError("invalid pipeline metadata")
+	InvalidPipelineMetadataKey          = InvalidArgumentError("invalid pipeline metadata key")
+	InvalidPipelineMetadataValue        = InvalidArgumentError("invalid pipeline metadata value")
 	InvalidPipelineImage                = InvalidArgumentError("invalid pipeline image")
 	PipelineNameAlreadyExists           = ConflictError("pipeline name already exists")
 	CannotUpdatePipelineKind            = ConflictError("pipeline kind cannot be updated")
