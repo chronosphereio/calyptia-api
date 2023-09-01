@@ -138,3 +138,44 @@ func (c *Client) PipelineClusterObjects(ctx context.Context, pipelineID string, 
 	path := "/v1/pipelines/" + url.PathEscape(pipelineID) + "/cluster_objects?" + q.Encode()
 	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }
+
+// UpdatePipelineMetadata modifies the metadata associated with a specific pipeline.
+//
+// Parameters:
+// - `ctx`: The context for executing the HTTP request.
+// - `pipelineID`: The unique identifier for the target pipeline.
+// - `opts`: A struct containing the key-value pair(s) to update or add to the pipeline's metadata.
+//
+// Returns:
+// - An error if the request fails, if the pipeline with the given ID is not found, or if the provided metadata is invalid.
+//
+// The function constructs a request URL using the provided pipelineID and then sends a PATCH request
+// to update the pipeline's metadata with the key-value pairs specified in the `opts` parameter.
+// If a metadata key already exists, its value will be updated; if the key does not exist, it will be added.
+func (c *Client) UpdatePipelineMetadata(ctx context.Context, pipelineID string, opts types.UpdatePipelineMetadata) error {
+	return c.do(ctx, http.MethodPatch, "/v1/pipelines/"+url.PathEscape(pipelineID)+"/metadata", opts, nil)
+}
+
+// PipelineMetadata retrieves the metadata associated with a given pipeline.
+//
+// Parameters:
+//   - `ctx`: The context for executing the HTTP request.
+//   - `pipelineID`: The unique identifier for the desired pipeline.
+//   - `keys`: An optional list of specific metadata keys to retrieve. If no keys are provided,
+//     all metadata for the pipeline will be returned.
+//
+// Returns:
+// - A `types.PipelineMetadata` containing the requested metadata.
+// - An error if the request fails or if the pipeline with the given ID is not found.
+//
+// The function constructs a request URL by appending the provided pipelineID and any specified keys
+// as query parameters. It then performs a GET request to fetch the metadata.
+func (c *Client) PipelineMetadata(ctx context.Context, pipelineID string, keys ...string) (types.PipelineMetadata, error) {
+	q := url.Values{}
+	for _, key := range keys {
+		q.Add("key", key)
+	}
+	var out types.PipelineMetadata
+	path := "/v1/pipelines/" + url.PathEscape(pipelineID) + "/metadata?" + q.Encode()
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+}

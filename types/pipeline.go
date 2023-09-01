@@ -300,3 +300,17 @@ type PipelineClusterObjectsParams struct {
 	Last   *uint
 	Before *string
 }
+
+// PipelineMetadata is the default metadata format for a pipeline.
+type PipelineMetadata map[string]any
+
+// UpdatePipelineMetadata request payload to store a key on the metadata field with the given value (json serializable).
+type UpdatePipelineMetadata struct {
+	Key   *string          `json:"key"`
+	Value *json.RawMessage `json:"value"`
+}
+
+// PipelineMetadataParams request payload for listing metadata from keys.
+type PipelineMetadataParams struct {
+	Keys *[]string
+}
