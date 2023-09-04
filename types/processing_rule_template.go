@@ -3,12 +3,15 @@ package types
 import "time"
 
 type ProcessingRuleTemplate struct {
-	ID         string            `json:"id" yaml:"id" db:"id"`
-	ProjectID  string            `json:"projectID" yaml:"projectID" db:"project_id"`
-	Name       string            `json:"name" yaml:"name" db:"name"`
-	Definition ProcessingRuleDef `json:"definition" yaml:"definition" db:"definition"`
-	CreatedAt  time.Time         `json:"createdAt" yaml:"createdAt" db:"created_at"`
-	UpdatedAt  time.Time         `json:"updatedAt" yaml:"updatedAt" db:"updated_at"`
+	ID              string            `json:"id" yaml:"id" db:"id"`
+	ProjectID       string            `json:"projectID" yaml:"projectID" db:"project_id"`
+	Name            string            `json:"name" yaml:"name" db:"name"`
+	Definition      ProcessingRuleDef `json:"definition" yaml:"definition" db:"definition"`
+	PipelineVersion string            `json:"pipelineVersion" yaml:"pipelineVersion" db:"pipeline_version"`
+	Input           string            `json:"input" yaml:"input" db:"input"`
+	IsRawInput      bool              `json:"isRawInput" yaml:"isRawInput" db:"is_raw_input"`
+	CreatedAt       time.Time         `json:"createdAt" yaml:"createdAt" db:"created_at"`
+	UpdatedAt       time.Time         `json:"updatedAt" yaml:"updatedAt" db:"updated_at"`
 }
 
 type ProcessingRuleDef struct {
@@ -24,9 +27,12 @@ type StaticProcessingRuleTemplate struct {
 }
 
 type CreateProcessingRuleTemplate struct {
-	ProjectID  string            `json:"-"`
-	Name       string            `json:"name"`
-	Definition ProcessingRuleDef `json:"definition"`
+	ProjectID       string            `json:"-"`
+	Name            string            `json:"name"`
+	Definition      ProcessingRuleDef `json:"definition"`
+	PipelineVersion string            `json:"pipelineVersion"`
+	Input           string            `json:"input"`
+	IsRawInput      bool              `json:"isRawInput"`
 }
 
 type ListProcessingRuleTemplates struct {
@@ -44,7 +50,10 @@ type ProcessingRuleTemplates struct {
 }
 
 type UpdateProcessingRuleTemplate struct {
-	TemplateID string             `json:"-"`
-	Name       *string            `json:"name"`
-	Definition *ProcessingRuleDef `json:"definition"`
+	TemplateID      string             `json:"-"`
+	Name            *string            `json:"name"`
+	Definition      *ProcessingRuleDef `json:"definition"`
+	PipelineVersion *string            `json:"pipelineVersion"`
+	Input           *string            `json:"input"`
+	IsRawInput      *bool              `json:"isRawInput"`
 }
