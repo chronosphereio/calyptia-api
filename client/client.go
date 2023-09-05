@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 
 	"github.com/peterhellberg/link"
 	"gopkg.in/yaml.v2"
@@ -18,8 +19,11 @@ import (
 
 const (
 	// DefaultBaseURL of the API.
-	DefaultBaseURL = "https://cloud-api.calyptia.com"
-	uintBase       = 10
+	DefaultBaseURL    = "https://cloud-api.calyptia.com"
+	uintBase          = 10
+	CalyptiaEnvAPIURL = "CALYPTIA_API_URL"
+	//nolint: gosec // no credential leaks just a variable.
+	CalyptiaEnvAPIToken = "CALYPTIA_API_TOKEN"
 )
 
 // Client is the client over the REST HTTP API of Calyptia Cloud.
@@ -39,6 +43,22 @@ func New() *Client {
 		BaseURL: DefaultBaseURL,
 		Client:  http.DefaultClient,
 	}
+}
+
+// NewFromEnv creates a new client using default environment variables.
+func NewFromEnv() *Client {
+	c := New()
+
+	// Update the BaseURL if environment variable is set
+	if apiURL := os.Getenv(CalyptiaEnvAPIURL); apiURL != "" {
+		c.BaseURL = apiURL
+	}
+
+	// Set the ProjectToken if environment variable is set
+	if token := os.Getenv(CalyptiaEnvAPIToken); token != "" {
+		c.SetProjectToken(token)
+	}
+	return c
 }
 
 // SetUserAgent sets the "User-Agent" header of the client.
