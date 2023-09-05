@@ -3953,6 +3953,19 @@ components:
           example: "My template"
         definition:
           $ref: "#/components/schemas/ProcessingRuleDef"
+        pipelineVersion:
+          type: string
+          example: v1.3.5
+          description: semver version of core-fluent-bit is running
+        input:
+          type: string
+          example: {"log": "line 2"}
+          maxLength: 1048576
+          minimum: 1
+          description: input to use as an example for the processing rule template
+        isRawInput:
+          type: boolean
+          description: define if the input parameter is in raw or json format (false)
         createdAt:
           type: string
           format: date-time
