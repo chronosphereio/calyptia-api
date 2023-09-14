@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/calyptia/api/types"
+	"github.com/calyptia/api/types/cmetrics/msgpack05x"
 )
 
 // ProjectMetricsV1 contains an overview of the aggregated metrics for a project.
@@ -222,4 +223,17 @@ func (c *Client) AgentMetricsOverTimeByPlugin(ctx context.Context, agentID strin
 	var out types.MetricsOverTimeByPlugin
 	path := "/v1/agents/" + url.PathEscape(agentID) + "/metrics_over_time_by_plugin?" + q.Encode()
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+}
+
+// AddAgentMetricsV1 ingests agent metrics via the metrics API.
+func (c *Client) AddAgentMetricsV1(ctx context.Context, agentID string, metrics []types.Metric) (types.MetricsOverTimeByPlugin, error) {
+	var out types.MetricsOverTimeByPlugin
+	path := "/v1/agents/" + url.PathEscape(agentID) + "/metrics"
+
+	data, err := msgpack05x.Encode(metrics)
+	if err != nil {
+		return out, err
+	}
+
+	return out, c.do(ctx, http.MethodPost, path, data, &out)
 }
