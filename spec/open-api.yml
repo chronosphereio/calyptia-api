@@ -799,6 +799,14 @@ components:
           enum:
             - daemonSet
             - deployment
+        deploymentStrategy:
+          type: string
+          description: |
+            The deployment strategy to use when creating or updating changes to this pipeline.
+          default: recreate
+          enum:
+            - recreate
+            - hotReload
         config:
           $ref: "#/components/schemas/PipelineConfig"
         configSections:
@@ -2118,6 +2126,14 @@ components:
           enum:
             - daemonSet
             - deployment
+        deploymentStrategy:
+          type: string
+          description: |
+            The deployment strategy to use when creating or updating changes to this pipeline.
+          default: recreate
+          enum:
+            - recreate
+            - hotReload
         replicasCount:
           type: integer
           minimum: 0

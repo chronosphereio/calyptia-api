@@ -12,29 +12,45 @@ import (
 
 const DefaultHealthCheckPipelinePort = 2020
 
+type DeploymentStrategy string
+
+const (
+	DeploymentStrategyRecreate  DeploymentStrategy = "recreate"
+	DeploymentStrategyHotReload DeploymentStrategy = "hotReload"
+)
+
+var (
+	DefaultDeploymentStrategy    = DeploymentStrategyRecreate
+	AllValidDeploymentStrategies = [...]DeploymentStrategy{
+		DeploymentStrategyRecreate,
+		DeploymentStrategyHotReload,
+	}
+)
+
 // Pipeline model.
 type Pipeline struct {
-	ID                           string           `json:"id" yaml:"id"`
-	Name                         string           `json:"name" yaml:"name"`
-	Kind                         PipelineKind     `json:"kind" yaml:"kind"`
-	Config                       PipelineConfig   `json:"config" yaml:"config"`
-	ConfigSections               []ConfigSection  `json:"configSections" yaml:"configSections"`
-	Image                        *string          `json:"image" yaml:"image"`
-	Status                       PipelineStatus   `json:"status" yaml:"status"`
-	ResourceProfile              ResourceProfile  `json:"resourceProfile" yaml:"resourceProfile"`
-	TracingEnabled               bool             `json:"tracingEnabled" yaml:"tracingEnabled"`
-	WaitForChecksBeforeDeploying bool             `json:"waitForChecksBeforeDeploying" yaml:"waitForChecksBeforeDeploying"`
-	ReplicasCount                uint             `json:"replicasCount" yaml:"replicasCount"`
-	Tags                         []string         `json:"tags" yaml:"tags"`
-	Metadata                     *json.RawMessage `json:"metadata" yaml:"metadata"`
-	ChecksTotal                  uint             `json:"checksTotal" yaml:"checksTotal"`
-	ChecksOK                     uint             `json:"checksOK" yaml:"checksOK"`
-	ChecksRunning                uint             `json:"checksRunning" yaml:"checksRunning"`
-	CreatedAt                    time.Time        `json:"createdAt" yaml:"createdAt"`
-	UpdatedAt                    time.Time        `json:"updatedAt" yaml:"updatedAt"`
-	Ports                        []PipelinePort   `json:"ports,omitempty" yaml:"ports,omitempty"`
-	Files                        []PipelineFile   `json:"files,omitempty" yaml:"files,omitempty"`
-	Secrets                      []PipelineSecret `json:"secrets,omitempty" yaml:"secrets,omitempty"`
+	ID                           string             `json:"id" yaml:"id"`
+	Name                         string             `json:"name" yaml:"name"`
+	Kind                         PipelineKind       `json:"kind" yaml:"kind"`
+	Config                       PipelineConfig     `json:"config" yaml:"config"`
+	ConfigSections               []ConfigSection    `json:"configSections" yaml:"configSections"`
+	Image                        *string            `json:"image" yaml:"image"`
+	Status                       PipelineStatus     `json:"status" yaml:"status"`
+	ResourceProfile              ResourceProfile    `json:"resourceProfile" yaml:"resourceProfile"`
+	DeploymentStrategy           DeploymentStrategy `json:"deploymentStrategy,omitempty" yaml:"deploymentStrategy,omitempty"`
+	TracingEnabled               bool               `json:"tracingEnabled" yaml:"tracingEnabled"`
+	WaitForChecksBeforeDeploying bool               `json:"waitForChecksBeforeDeploying" yaml:"waitForChecksBeforeDeploying"`
+	ReplicasCount                uint               `json:"replicasCount" yaml:"replicasCount"`
+	Tags                         []string           `json:"tags" yaml:"tags"`
+	Metadata                     *json.RawMessage   `json:"metadata" yaml:"metadata"`
+	ChecksTotal                  uint               `json:"checksTotal" yaml:"checksTotal"`
+	ChecksOK                     uint               `json:"checksOK" yaml:"checksOK"`
+	ChecksRunning                uint               `json:"checksRunning" yaml:"checksRunning"`
+	CreatedAt                    time.Time          `json:"createdAt" yaml:"createdAt"`
+	UpdatedAt                    time.Time          `json:"updatedAt" yaml:"updatedAt"`
+	Ports                        []PipelinePort     `json:"ports,omitempty" yaml:"ports,omitempty"`
+	Files                        []PipelineFile     `json:"files,omitempty" yaml:"files,omitempty"`
+	Secrets                      []PipelineSecret   `json:"secrets,omitempty" yaml:"secrets,omitempty"`
 }
 
 func (p *Pipeline) ApplyConfigSections() error {
@@ -83,6 +99,7 @@ type CreatePipeline struct {
 	ReplicasCount        uint                   `json:"replicasCount"`
 	RawConfig            string                 `json:"rawConfig"`
 	ConfigFormat         ConfigFormat           `json:"configFormat"`
+	DeploymentStrategy   DeploymentStrategy     `json:"deploymentStrategy"`
 	Secrets              []CreatePipelineSecret `json:"secrets"`
 	Files                []CreatePipelineFile   `json:"files"`
 	ResourceProfileName  string                 `json:"resourceProfile"`
@@ -160,18 +177,19 @@ func (in CreatePipeline) ClusterLogging() bool {
 
 // CreatedPipeline response payload after creating a pipeline successfully.
 type CreatedPipeline struct {
-	ID                           string           `json:"id"`
-	Name                         string           `json:"name"`
-	Kind                         PipelineKind     `json:"kind"`
-	Config                       PipelineConfig   `json:"config"`
-	Secrets                      []PipelineSecret `json:"secrets"`
-	Files                        []PipelineFile   `json:"files"`
-	Status                       PipelineStatus   `json:"status"`
-	ResourceProfile              ResourceProfile  `json:"resourceProfile"`
-	Checks                       []PipelineCheck  `json:"checks"`
-	ReplicasCount                uint             `json:"replicasCount"`
-	WaitForChecksBeforeDeploying bool             `json:"waitForChecksBeforeDeploying"`
-	CreatedAt                    time.Time        `json:"createdAt"`
+	ID                           string             `json:"id"`
+	Name                         string             `json:"name"`
+	Kind                         PipelineKind       `json:"kind"`
+	Config                       PipelineConfig     `json:"config"`
+	DeploymentStrategy           DeploymentStrategy `json:"deploymentStrategy"`
+	Secrets                      []PipelineSecret   `json:"secrets"`
+	Files                        []PipelineFile     `json:"files"`
+	Status                       PipelineStatus     `json:"status"`
+	ResourceProfile              ResourceProfile    `json:"resourceProfile"`
+	Checks                       []PipelineCheck    `json:"checks"`
+	ReplicasCount                uint               `json:"replicasCount"`
+	WaitForChecksBeforeDeploying bool               `json:"waitForChecksBeforeDeploying"`
+	CreatedAt                    time.Time          `json:"createdAt"`
 }
 
 // PipelinesParams represents the request payload for querying pipelines.
@@ -227,14 +245,15 @@ type Pipelines struct {
 
 // UpdatePipeline request payload for updating a pipeline.
 type UpdatePipeline struct {
-	Name            *string             `json:"name"`
-	Kind            *PipelineKind       `json:"kind"`
-	Status          *PipelineStatusKind `json:"status"`
-	ConfigFormat    *ConfigFormat       `json:"configFormat"`
-	ReplicasCount   *uint               `json:"replicasCount"`
-	RawConfig       *string             `json:"rawConfig"`
-	ResourceProfile *string             `json:"resourceProfile"`
-	Image           *string             `json:"image"`
+	Name               *string             `json:"name"`
+	Kind               *PipelineKind       `json:"kind"`
+	Status             *PipelineStatusKind `json:"status"`
+	ConfigFormat       *ConfigFormat       `json:"configFormat"`
+	DeploymentStrategy *DeploymentStrategy `json:"deploymentStrategy"`
+	ReplicasCount      *uint               `json:"replicasCount"`
+	RawConfig          *string             `json:"rawConfig"`
+	ResourceProfile    *string             `json:"resourceProfile"`
+	Image              *string             `json:"image"`
 	// Deprecated: in favor of NoAutoCreateEndpointsFromConfig
 	AutoCreatePortsFromConfig *bool `json:"autoCreatePortsFromConfig"`
 	// Deprecated: in favor of NoAutoCreateChecksFromConfig

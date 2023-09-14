@@ -1,7 +1,14 @@
 package types
 
 import (
+	"fmt"
 	"time"
+
+	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
+	writeapi "github.com/influxdata/influxdb-client-go/v2/api/write"
+	influxmodels "github.com/influxdata/influxdb/models"
+
+	"github.com/calyptia/api/types/errs"
 )
 
 // AggregatorMeasurement stores a list of metrics and totals for an aggregator.
@@ -326,4 +333,79 @@ func (i *MetricsOverTimeInput) Init() *MetricsOverTimeInput {
 type MetricOverTime struct {
 	Time  time.Time `json:"time"`
 	Value *float64  `json:"value"`
+}
+
+type MeasurementType string
+
+const (
+	FluentbitInputMeasurementType     MeasurementType = "fluentbit_input"
+	FluentbitFilterMeasurementType    MeasurementType = "fluentbit_filter"
+	FluentbitOutputMeasurementType    MeasurementType = "fluentbit_output"
+	FluentbitStorageMeasurementType   MeasurementType = "fluentbit_storage"
+	FluentdInputMeasurementType       MeasurementType = "fluentd_input"
+	FluentdFilterMeasurementType      MeasurementType = "fluentd_filter"
+	FluentdOutputMeasurementType      MeasurementType = "fluentd_output"
+	FluentdMultiOutputMeasurementType MeasurementType = "fluentd_multi_output"
+	FluentdBareOutputMeasurementType  MeasurementType = "fluentd_bare_output"
+	FluentdStorageMeasurementType     MeasurementType = "fluentd_storage"
+)
+
+type ValidMeasurementType map[string]MeasurementType
+
+var MeasurementTypeMap = ValidMeasurementType{
+	string(FluentbitInputMeasurementType):     FluentbitInputMeasurementType,
+	string(FluentbitFilterMeasurementType):    FluentbitFilterMeasurementType,
+	string(FluentbitOutputMeasurementType):    FluentbitOutputMeasurementType,
+	string(FluentdInputMeasurementType):       FluentdInputMeasurementType,
+	string(FluentdFilterMeasurementType):      FluentdFilterMeasurementType,
+	string(FluentdOutputMeasurementType):      FluentdOutputMeasurementType,
+	string(FluentdMultiOutputMeasurementType): FluentdMultiOutputMeasurementType,
+	string(FluentdBareOutputMeasurementType):  FluentdBareOutputMeasurementType,
+	string(FluentbitStorageMeasurementType):   FluentbitStorageMeasurementType,
+	string(FluentdStorageMeasurementType):     FluentdStorageMeasurementType,
+}
+
+type ValidMetricTag string
+
+const (
+	AgentMetricTag        ValidMetricTag = "agent_id"
+	PipelineMetricTag     ValidMetricTag = "pipeline_id"
+	AggregatorMetricTag   ValidMetricTag = "aggregator_id"
+	CoreInstanceMetricTag ValidMetricTag = "core_instance_id"
+	FleetMetricTag        ValidMetricTag = "fleet_id"
+	PluginTag                            = "plugin"
+	PluginTagFallback                    = "name"
+)
+
+type Metric struct {
+	Measurement string
+	influxmodels.Point
+}
+
+func (m *Metric) AsWritePoint(tags influxmodels.Tags) (*writeapi.Point, error) {
+	fields, err := m.Fields()
+	if err != nil {
+		return nil, err
+	}
+
+	measurement := string(m.Name())
+	if _, ok := MeasurementTypeMap[measurement]; !ok {
+		return nil, fmt.Errorf("invalid measurement type: %s", measurement)
+	}
+
+	pointTags := m.Point.Tags()
+
+	if pointTags.GetString(PluginTag) == "" {
+		name := pointTags.GetString(PluginTagFallback)
+		if name == "" {
+			return nil, errs.InvalidMetricPlugin
+		}
+		pointTags.SetString(PluginTag, name)
+	}
+
+	for _, tag := range tags {
+		pointTags.Set(tag.Key, tag.Value)
+	}
+
+	return influxdb2.NewPoint(measurement, pointTags.Map(), fields, m.Time()), nil
 }

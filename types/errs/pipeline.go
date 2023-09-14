@@ -8,6 +8,7 @@ const (
 	InvalidPipelineMetadataKey          = InvalidArgumentError("invalid pipeline metadata key")
 	InvalidPipelineMetadataValue        = InvalidArgumentError("invalid pipeline metadata value")
 	InvalidPipelineImage                = InvalidArgumentError("invalid pipeline image")
+	InvalidPipelineDeploymentStrategy   = InvalidArgumentError("invalid pipeline deployment strategy")
 	PipelineNameAlreadyExists           = ConflictError("pipeline name already exists")
 	CannotUpdatePipelineKind            = ConflictError("pipeline kind cannot be updated")
 	PipelineNotFound                    = NotFoundError("pipeline not found")
