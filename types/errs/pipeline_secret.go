@@ -2,11 +2,15 @@ package errs
 
 const (
 	InvalidPipelineSecretID      = InvalidArgumentError("invalid pipeline secret ID")
-	InvalidPipelineSecretKey     = InvalidArgumentError("invalid pipeline secret key")
 	PipelineSecretAlreadyExists  = ConflictError("pipeline secret already exists")
 	PipelineSecretNotFound       = NotFoundError("pipeline secret not found")
 	PipelineSecretsQuotaExceeded = PermissionDeniedError("pipeline secrets quota exceeded")
-	PipelineSecretSizeExceeded   = InvalidArgumentError("pipeline secret size exceeded")
+)
+
+const (
+	InvalidSecretKey    = InvalidArgumentError("invalid secret key")
+	SecretSizeExceeded  = InvalidArgumentError("secret size exceeded")
+	SecretValueRequired = InvalidArgumentError("secret value required")
 )
 
 func NewUndefinedPipelineSecretError(s string) *DetailedError {

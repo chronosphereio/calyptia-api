@@ -1,4 +1,3 @@
-// Package client provides a client over the REST HTTP API of Calyptia Cloud.
 package client
 
 import (
