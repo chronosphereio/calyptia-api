@@ -29,6 +29,8 @@ tags:
   - name: agent
   - name: agent_config
   - name: core_instance
+  - name: core_instance_file
+  - name: core_instance_secret
   - name: aggregator
   - name: resource_profile
   - name: core_instance_check
@@ -65,6 +67,38 @@ components:
       type: apiKey
       in: header
   schemas:
+    Created:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - createdAt
+    Updated:
+      type: object
+      properties:
+        updatedAt:
+          type: string
+          format: date-time
+      required: [updatedAt]
+    Deleted:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+          default: null
+      required:
+        - deleted
+        - deletedAt
     UpdatePipelineMetadata:
       type: object
       properties:
@@ -77,7 +111,7 @@ components:
           additionalProperties: true
           description: json object to use as value
           example: |
-             {"value": "1"}
+            {"value": "1"}
     UpdatePipelineClusterObjects:
       type: object
       properties:
@@ -722,6 +756,170 @@ components:
         - items
         - endCursor
         - count
+    CoreInstanceFile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        coreInstanceID:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: myfile
+        contents:
+          type: string
+          format: byte
+          description: |-
+            The contents of the file in base 64 format.
+            If the file is encrypted, the contents will be the encrypted
+            version of the file.
+        encrypted:
+          type: boolean
+          default: false
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - coreInstanceID
+        - name
+        - contents
+        - encrypted
+        - createdAt
+        - updatedAt
+    CoreInstanceFiles:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CoreInstanceFile"
+        endCursor:
+          type: string
+          nullable: true
+        count:
+          type: number
+          format: int32
+      required:
+        - items
+        - endCursor
+        - count
+    CreateCoreInstanceFile:
+      type: object
+      properties:
+        name:
+          type: string
+          example: myfile
+        contents:
+          type: string
+          format: byte
+          description: The contents of the file to be created in base 64 format.
+        encrypted:
+          type: boolean
+          default: false
+      required:
+        - name
+        - contents
+        - encrypted
+    UpdateCoreInstanceFile:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+          default: null
+          example: myfile
+        contents:
+          type: string
+          format: byte
+          nullable: true
+          default: null
+          description: Optional contents of the file to be updated in base 64 format.
+        encrypted:
+          type: boolean
+          nullable: true
+          default: null
+    CoreInstanceSecret:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        coreInstanceID:
+          type: string
+          format: uuid
+        key:
+          type: string
+          example: mysecret
+        value:
+          type: string
+          format: byte
+          description: |-
+            The value of the secret in base 64 format.
+            The value is always encrypted.
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - coreInstanceID
+        - key
+        - value
+        - createdAt
+        - updatedAt
+    CoreInstanceSecrets:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CoreInstanceSecret"
+        endCursor:
+          type: string
+          nullable: true
+        count:
+          type: number
+          format: int32
+      required:
+        - items
+        - endCursor
+        - count
+    CreateCoreInstanceSecret:
+      type: object
+      properties:
+        key:
+          type: string
+          example: mysecret
+        value:
+          type: string
+          format: byte
+          description: The value of the secret in base 64 format.
+      required:
+        - key
+        - value
+        - encrypted
+    UpdateCoreInstanceSecret:
+      type: object
+      properties:
+        key:
+          type: string
+          nullable: true
+          default: null
+          example: mysecret
+        value:
+          type: string
+          format: byte
+          nullable: true
+          default: null
+          description: Optional value of the secret in base 64 format.
     ResourceProfile:
       type: object
       description: Resource profile model.
@@ -3407,7 +3605,6 @@ components:
       required:
         - key
         - value
-
     CreateProcessingRule:
       type: object
       properties:
@@ -3975,7 +4172,7 @@ components:
           description: semver version of core-fluent-bit is running
         input:
           type: string
-          example: {"log": "line 2"}
+          example: { "log": "line 2" }
           maxLength: 1048576
           minimum: 1
           description: input to use as an example for the processing rule template
@@ -4005,7 +4202,7 @@ components:
           description: semver version of core-fluent-bit is running
         input:
           type: string
-          example: {"log": "line 2"}
+          example: { "log": "line 2" }
           maxLength: 1048576
           minimum: 1
           description: input to use as an example for the processing rule template
@@ -4078,7 +4275,7 @@ components:
           default: null
         input:
           type: string
-          example: {"log": "line 2"}
+          example: { "log": "line 2" }
           maxLength: 1048576
           minimum: 1
           description: input to use as an example for the processing rule template
@@ -4847,6 +5044,228 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CoreInstances"
+
+  "/v1/core_instances/{coreInstanceID}/files":
+    parameters:
+      - name: coreInstanceID
+        in: path
+        schema:
+          type: string
+          format: uuid
+        required: true
+    post:
+      operationId: createCoreInstanceFile
+      summary: Create Core Instance File
+      description: |-
+        Create a new file within a core instance.
+        The file will be created with the given name and content.
+        If `encypted` is set to `true`, the file will be encrypted using the
+        core instance's encryption key.
+        The name must be unique among all files within the core instance.
+      tags: [core_instance_file]
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCoreInstanceFile"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Created"
+    get:
+      operationId: coreInstanceFiles
+      summary: Core Instance Files
+      description: |-
+        Files from a core instance with backward pagination.
+      tags: [core_instance_file]
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - name: last
+          schema:
+            type: integer
+            minimum: 0
+          in: query
+          description: Limit to the last files.
+        - name: before
+          schema:
+            type: string
+          in: query
+          description: Paginate files before the given cursor.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreInstanceFiles"
+
+  "/v1/core_instance_files/{coreInstanceFileID}":
+    parameters:
+      - name: coreInstanceFileID
+        in: path
+        schema:
+          type: string
+          format: uuid
+        required: true
+    patch:
+      operationId: updateCoreInstanceFile
+      summary: Update Core Instance File
+      description: |-
+        Update a file within a core instance.
+        The file will be updated with the given name and content.
+        If `encypted` is set to `true`, the file will be encrypted using the
+        core instance's encryption key.
+      tags: [core_instance_file]
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCoreInstanceFile"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Updated"
+    delete:
+      operationId: deleteCoreInstanceFile
+      summary: Delete Core Instance File
+      description: |-
+        Delete a file within a core instance.
+      tags: [core_instance_file]
+      security:
+        - user: []
+        - project: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deleted"
+
+  "/v1/core_instances/{coreInstanceID}/secrets":
+    parameters:
+      - name: coreInstanceID
+        in: path
+        schema:
+          type: string
+          format: uuid
+        required: true
+    post:
+      operationId: createCoreInstanceSecret
+      summary: Create Core Instance Secret
+      description: |-
+        Create a new secret within a core instance.
+        The secret will be created with the given name and content.
+        If `encypted` is set to `true`, the secret will be encrypted using the
+        core instance's encryption key.
+        The name must be unique among all secrets within the core instance.
+      tags: [core_instance_secret]
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCoreInstanceSecret"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Created"
+    get:
+      operationId: coreInstanceSecrets
+      summary: Core Instance Secrets
+      description: |-
+        Secrets from a core instance with backward pagination.
+      tags: [core_instance_secret]
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - name: last
+          schema:
+            type: integer
+            minimum: 0
+          in: query
+          description: Limit to the last secrets.
+        - name: before
+          schema:
+            type: string
+          in: query
+          description: Paginate secrets before the given cursor.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreInstanceSecrets"
+
+  "/v1/core_instance_secrets/{coreInstanceSecretID}":
+    parameters:
+      - name: coreInstanceSecretID
+        in: path
+        schema:
+          type: string
+          format: uuid
+        required: true
+    patch:
+      operationId: updateCoreInstanceSecret
+      summary: Update Core Instance Secret
+      description: |-
+        Update a secret within a core instance.
+        The secret will be updated with the given name and content.
+        If `encypted` is set to `true`, the secret will be encrypted using the
+        core instance's encryption key.
+      tags: [core_instance_secret]
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCoreInstanceSecret"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Updated"
+    delete:
+      operationId: deleteCoreInstanceSecret
+      summary: Delete Core Instance Secret
+      description: |-
+        Delete a secret within a core instance.
+      tags: [core_instance_secret]
+      security:
+        - user: []
+        - project: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deleted"
 
   "/v1/aggregators/{aggregatorID}/ping":
     parameters:

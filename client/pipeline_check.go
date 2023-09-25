@@ -1,6 +1,3 @@
-// Package client provides a client over the REST HTTP API of Calyptia Cloud.
-//
-//nolint:dupl // no need to remove duplication here.
 package client
 
 import (
