@@ -41,6 +41,7 @@ type Pipeline struct {
 	TracingEnabled               bool               `json:"tracingEnabled" yaml:"tracingEnabled"`
 	WaitForChecksBeforeDeploying bool               `json:"waitForChecksBeforeDeploying" yaml:"waitForChecksBeforeDeploying"`
 	ReplicasCount                uint               `json:"replicasCount" yaml:"replicasCount"`
+	ReplicasCountPrev            uint               `json:"replicasCountPrev" yaml:"replicasCountPrev"`
 	Tags                         []string           `json:"tags" yaml:"tags"`
 	Metadata                     *json.RawMessage   `json:"metadata" yaml:"metadata"`
 	ChecksTotal                  uint               `json:"checksTotal" yaml:"checksTotal"`
