@@ -1023,6 +1023,9 @@ components:
         replicasCount:
           type: integer
           minimum: 0
+        replicasCountPrev:
+          description: the previous replica set counter
+          minimum: 0
         checksTotal:
           type: integer
           minimum: 0
