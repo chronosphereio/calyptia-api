@@ -2,8 +2,6 @@ package types
 
 import (
 	"time"
-
-	fluentbitconfig "github.com/calyptia/go-fluentbit-config/v2"
 )
 
 const (
@@ -20,71 +18,6 @@ type IngestCheck struct {
 	Retries         uint        `json:"retries" yaml:"retries"`
 	CreatedAt       time.Time   `json:"createdAt" yaml:"createdAt"`
 	UpdatedAt       time.Time   `json:"updatedAt" yaml:"updatedAt"`
-}
-
-func (ic *IngestCheck) ApplySection(configSection ConfigSection) error {
-	sections := append([]ConfigSection{
-		{
-			Kind: SectionKindService,
-			Properties: Pairs{
-				{
-					Key:   "HTTP_Server",
-					Value: "On",
-				},
-				{
-					Key:   "HTTP_Listen",
-					Value: "0.0.0.0",
-				},
-				{
-					Key:   "HTTP_Port",
-					Value: DefaultHealthCheckPipelinePort,
-				},
-			},
-		},
-		{
-			Kind: SectionKindInput,
-			Properties: Pairs{
-				{
-					Key:   "name",
-					Value: "dummy",
-				},
-				{
-					Key:   "Samples",
-					Value: 10,
-				},
-			},
-		},
-	}, configSection)
-	c := &fluentbitconfig.Config{}
-	for _, section := range sections {
-		c.AddSection(fluentbitconfig.SectionKind(section.Kind), section.Properties.AsProperties())
-	}
-
-	raw, err := c.DumpAsClassic()
-	if err != nil {
-		return err
-	}
-
-	ic.Config = raw
-
-	return nil
-}
-
-// ApplyStatus based on its last update for the check.
-func (ic *IngestCheck) ApplyStatus() {
-	// skip any status != new or running.
-	if ic == nil || ic.Status != CheckStatusNew && ic.Status != CheckStatusRunning {
-		return
-	}
-
-	// For now, we ensure that checks on "new" or "running"
-	// status will be automatically flagged as failed if they have not been updated
-	// since check's retries * IngestCheckDefaultTimeout.
-	timeoutWithRetries := time.Duration(ic.Retries) * IngestCheckDefaultTimeout
-
-	if time.Since(ic.UpdatedAt) >= timeoutWithRetries {
-		ic.Status = CheckStatusFailed
-	}
 }
 
 // CreateIngestCheck request payload for creating a core_instance ingestion check.
