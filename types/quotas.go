@@ -6,4 +6,6 @@ type Quotas struct {
 	Pipelines       uint
 	PipelineFiles   uint
 	PipelineSecrets uint
+	Fleets          uint
+	FleetFiles      uint
 }

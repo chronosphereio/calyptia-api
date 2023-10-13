@@ -515,7 +515,6 @@ components:
             - json
             - yaml
           nullable: true
-          default: null
         tags:
           type: array
           items:
@@ -601,6 +600,55 @@ components:
       required:
         - deleted
         - deletedAt
+    FleetFile:
+      type: object
+      properties:
+        contents:
+          type: string
+          format: byte
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    CreateFleetFile:
+      type: object
+      properties:
+        name:
+          type: string
+        contents:
+          type: string
+          format: byte
+      required:
+        - name
+        - contents
+    CreatedFleetFile:
+      type: object
+      description: Created fleet file response body.
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - createdAt
+    UpdateFleetFile:
+      type: object
+      properties:
+        name:
+          type: string
+        contents:
+          type: string
+          format: byte
     AggregatorPingResponse:
       type: object
       description: Aggregator Ping Response model.
@@ -2499,7 +2547,9 @@ components:
           description: number of retries for the check before marking it as failed
         configSectionID:
           type: string
-          description: config section UUID to be used on this Ingest check.
+          description: |
+            config section UUID to be used on this Ingest check.
+            Note that the ingest check config section's kind has to be of either type input or output.
           format: uuid
       required:
         - status
@@ -8453,55 +8503,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Fleet"
-  /v1/fleets/{fleetID}/config:
-    parameters:
-      - name: fleetID
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-    get:
-      operationId: fleetConfig
-      summary: get the configuration for a fleet ID.
-      security:
-        - user: []
-        - project: []
-      parameters:
-        - schema:
-            type: string
-            enum:
-              - ini
-              - json
-              - yaml
-          in: query
-          name: config_format
-          description: Desired output config format.
-        - schema:
-            type: string
-            enum:
-              - ini
-              - json
-              - yaml
-          in: query
-          name: format
-          deprecated: true
-          description: Desired output config format (depreacted in favour of config_format).
-      tags: [fleet]
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: string
-            application/yaml:
-              schema:
-                type: string
-            text/plain:
-              schema:
-                type: string
-
   /v1/fleets/{fleetID}:
     parameters:
       - name: fleetID
@@ -8574,6 +8575,170 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DeletedFleet"
+  /v1/fleets/{fleetID}/config:
+    parameters:
+      - name: fleetID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: fleetConfig
+      summary: get the configuration for a fleet ID.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - ini
+              - json
+              - yaml
+          in: query
+          name: config_format
+          description: Desired output config format.
+        - schema:
+            type: string
+            enum:
+              - ini
+              - json
+              - yaml
+          in: query
+          name: format
+          deprecated: true
+          description: Desired output config format (depreacted in favour of config_format).
+      tags: [fleet]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+            application/yaml:
+              schema:
+                type: string
+            text/plain:
+              schema:
+                type: string
+  /v1/fleets/{fleetID}/files:
+    parameters:
+      - name: fleetID
+        description: Unique ID for the Fleet.
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: fleetFiles
+      summary: Fleet.
+      description: |-
+        Retrieve the list of fleet files.
+      security:
+        - user: []
+        - project: []
+      tags: [fleet]
+      parameters:
+        - name: before
+          description: Fleet files before the given cursor.
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: last
+          description: Last fleet files.
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FleetFile"
+    post:
+      operationId: createFleetFile
+      summary: Create Fleet File.
+      description: |-
+        Create a new Fleet File.
+      security:
+        - user: []
+        - project: []
+      tags: [fleet]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateFleetFile"
+      responses:
+        "200":
+          description: Updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedFleetFile"
+  /v1/fleet_files/{fleetFileID}:
+    parameters:
+      - name: fleetFileID
+        description: UUID of the fleet file.
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: fleetFile
+      summary: retrieve a fleet file.
+      description: |-
+        Retrieve a single fleet file with its metadata.
+      security:
+        - user: []
+        - project: []
+      tags: [fleet]
+      responses:
+        "200":
+          description: Fleet File.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FleetFile"
+    patch:
+      operationId: updateFleetFile
+      summary: Update fleet file.
+      description: |-
+        Update a fleet file.
+      security:
+        - user: []
+        - project: []
+      tags: [fleet]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateFleetFile"
+      responses:
+        "204":
+          description: Updated.
+    delete:
+      operationId: deleteFleetFile
+      summary: Delete fleet file.
+      description: |-
+        Delete a single fleet file by its ID.
+      security:
+        - user: []
+        - project: []
+      tags: [fleet]
+      responses:
+        "204":
+          description: Deleted.
   /v1/search:
     get:
       operationId: search
