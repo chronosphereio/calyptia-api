@@ -1,8 +1,6 @@
 package types
 
-import (
-	"time"
-)
+import "time"
 
 // ConfigSectionKind enum with known fluent-bit section types.
 type ConfigSectionKind string
@@ -47,6 +45,7 @@ type CreateConfigSection struct {
 	Properties                 Pairs             `json:"properties"`
 	ProcessingRuleID           *string           `json:"-"`
 	PipelineClusterObjectSetID *string           `json:"-"`
+	SkipConfigValidation       bool              `json:"skipConfigValidation"`
 }
 
 // ConfigSectionsParams request payload for querying
@@ -66,5 +65,6 @@ type ConfigSections struct {
 // UpdateConfigSection request payload for updating a
 // fluent-bit config section on a project.
 type UpdateConfigSection struct {
-	Properties *Pairs `json:"properties"`
+	Properties           *Pairs `json:"properties"`
+	SkipConfigValidation bool   `json:"skipConfigValidation"`
 }

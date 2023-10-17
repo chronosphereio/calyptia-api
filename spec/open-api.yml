@@ -3492,7 +3492,10 @@ components:
           $ref: "#/components/schemas/ConfigSectionKind"
         properties:
           $ref: "#/components/schemas/Pairs"
-      required: [kind, properties]
+        skipConfigValidation:
+          type: boolean
+          default: false
+      required: [kind, properties, skipConfigValidation]
     CreatedConfigSection:
       type: object
       properties:
@@ -3510,6 +3513,9 @@ components:
           $ref: "#/components/schemas/Pairs"
           nullable: true
           default: null
+        skipConfigValidation:
+          type: boolean
+          default: false
 
     UpdatedConfigSection:
       type: object
