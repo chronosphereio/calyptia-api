@@ -375,6 +375,15 @@ const (
 	FleetMetricTag        ValidMetricTag = "fleet_id"
 	PluginTag                            = "plugin"
 	PluginTagFallback                    = "name"
+	// PodPipelineMetricTag preserves dimensionality for pipelines
+	// with replicas > 1.
+	PodPipelineMetricTag ValidMetricTag = "pod_id"
+	// HostnameFleetMetricTag is the most user-friendly dimension
+	// for fleet agents.
+	HostnameFleetMetricTag ValidMetricTag = "hostname"
+	// MachineIDFleetMetricTag should preserve dimensionality for
+	// most fleet agents.
+	MachineIDFleetMetricTag ValidMetricTag = "machine_id"
 )
 
 type Metric struct {
