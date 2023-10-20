@@ -475,6 +475,40 @@ components:
         - createdAt
         - updatedAt
 
+    FleetsStatus:
+      type: object
+      description: |-
+        Show the numerical count of the status of all Agents
+        within a Fleet or all Fleets within a Project.
+        The status is one of:
+          * Managed: the full total of agents managed by the fleet
+                     or all fleets in a project.
+          * Healthy: total of all fully functioning fleet agents.
+          * In Progress: total of all fleet agents that are pending an
+                         upgrade to their configuration.
+          * Unhleathy: total of all fleet agents that either have a
+                       pending error or have not responded in
+                       predetermined length of time.
+      properties:
+        managed:
+          type: integer
+          description: total of all fleet agents.
+        healthy:
+          type: integer
+          description: |-
+            total of fleet agents that are deemed alive and fully
+            up to date.
+        inProgress:
+          type: integer
+          description: |-
+            total of fleet agents that are pending a configuration
+            update.
+        unhealthy:
+          type: integer
+          description: |-
+            total of all agents with a pending error or have not
+            responded in a predetermined interval of time.
+
     FleetAgentsCount:
       type: object
       description: |-
@@ -8557,6 +8591,30 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Fleet"
+  /v1/projects/{projectID}/fleets/status:
+    parameters:
+      - name: projectID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: fleetsstatus
+      summary: Fleets Status for a Project.
+      description: |-
+        Show the status of all fleets within a project.
+      security:
+        - user: []
+        - project: []
+      tags: [fleet]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FleetsStatus"
   /v1/fleets/{fleetID}:
     parameters:
       - name: fleetID
@@ -8629,6 +8687,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DeletedFleet"
+  /v1/fleets/{fleetID}/status:
+    parameters:
+      - name: fleetID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: fleetstatus
+      summary: Fleet Status.
+      description: |-
+        Show the status of all agents within a fleet.
+      security:
+        - user: []
+        - project: []
+      tags: [fleet]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FleetsStatus"
   /v1/fleets/{fleetID}/config:
     parameters:
       - name: fleetID
