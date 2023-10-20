@@ -141,6 +141,9 @@ type CreatePipeline struct {
 	// will be executed.
 	WaitForChecksBeforeDeploying bool `json:"waitForChecksBeforeDeploying"`
 
+	// The default portKind to be used for input ports that belongs to this pipeline.
+	PortKind PipelinePortKind `json:"portKind"`
+
 	status PipelineStatusKind
 	// Internal denotes that this pipeline was created by the system.
 	// That's the case for the "health-check-*" automated pipeline
@@ -251,6 +254,7 @@ type UpdatePipeline struct {
 	Status             *PipelineStatusKind `json:"status"`
 	ConfigFormat       *ConfigFormat       `json:"configFormat"`
 	DeploymentStrategy *DeploymentStrategy `json:"deploymentStrategy"`
+	PortKind           *PipelinePortKind   `json:"portKind"`
 	ReplicasCount      *uint               `json:"replicasCount"`
 	RawConfig          *string             `json:"rawConfig"`
 	ResourceProfile    *string             `json:"resourceProfile"`

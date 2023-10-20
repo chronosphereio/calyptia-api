@@ -16,18 +16,33 @@ var AllPipelinePortProtocols = [...]PipelinePortProtocol{
 	PipelineProtocolUDP,
 }
 
+type PipelinePortKind string
+
+const (
+	PipelinePortKindClusterIP    PipelinePortKind = "ClusterIP"
+	PipelinePortKindLoadBalancer PipelinePortKind = "LoadBalancer"
+	PipelinePortKindNodePort     PipelinePortKind = "NodePort"
+)
+
+var AllValidPipelinePortKinds = [...]PipelinePortKind{
+	PipelinePortKindClusterIP,
+	PipelinePortKindLoadBalancer,
+	PipelinePortKindNodePort,
+}
+
 // PipelinePort model.
 type PipelinePort struct {
-	ID           string    `json:"id" yaml:"id"`
-	Protocol     string    `json:"protocol" yaml:"protocol"`
-	FrontendPort uint      `json:"frontendPort" yaml:"frontendPort"`
-	BackendPort  uint      `json:"backendPort" yaml:"backendPort"`
-	Endpoint     string    `json:"endpoint" yaml:"endpoint"`
-	PluginID     *string   `json:"pluginID" yaml:"pluginID"`
-	PluginName   *string   `json:"pluginName" yaml:"pluginName"`
-	PluginAlias  *string   `json:"pluginAlias" yaml:"pluginAlias"`
-	CreatedAt    time.Time `json:"createdAt" yaml:"createdAt"`
-	UpdatedAt    time.Time `json:"updatedAt" yaml:"updatedAt"`
+	ID           string           `json:"id" yaml:"id"`
+	Protocol     string           `json:"protocol" yaml:"protocol"`
+	FrontendPort uint             `json:"frontendPort" yaml:"frontendPort"`
+	BackendPort  uint             `json:"backendPort" yaml:"backendPort"`
+	Kind         PipelinePortKind `json:"kind" yaml:"kind"`
+	Endpoint     string           `json:"endpoint" yaml:"endpoint"`
+	PluginID     *string          `json:"pluginID" yaml:"pluginID"`
+	PluginName   *string          `json:"pluginName" yaml:"pluginName"`
+	PluginAlias  *string          `json:"pluginAlias" yaml:"pluginAlias"`
+	CreatedAt    time.Time        `json:"createdAt" yaml:"createdAt"`
+	UpdatedAt    time.Time        `json:"updatedAt" yaml:"updatedAt"`
 }
 
 // PipelinePorts paginated list.
@@ -38,14 +53,14 @@ type PipelinePorts struct {
 
 // CreatePipelinePort request payload for creating a pipeline port.
 type CreatePipelinePort struct {
-	Protocol     string `json:"protocol"`
-	FrontendPort uint   `json:"frontendPort"`
-	BackendPort  uint   `json:"backendPort"`
-	Endpoint     string `json:"endpoint"`
-
-	pluginID    *string
-	pluginName  *string
-	pluginAlias *string
+	Protocol     string           `json:"protocol"`
+	FrontendPort uint             `json:"frontendPort"`
+	BackendPort  uint             `json:"backendPort"`
+	Endpoint     string           `json:"endpoint"`
+	Kind         PipelinePortKind `json:"kind"`
+	pluginID     *string
+	pluginName   *string
+	pluginAlias  *string
 }
 
 func CreatePipelinePortWithOpts(base CreatePipelinePort, pluginID, pluginName, pluginAlias *string) CreatePipelinePort {
@@ -61,6 +76,10 @@ func (in *CreatePipelinePort) SetPluginID(pluginID string) {
 
 func (in *CreatePipelinePort) SetPluginName(pluginName string) {
 	in.pluginName = &pluginName
+}
+
+func (in *CreatePipelinePort) SetPortKind(kind PipelinePortKind) {
+	in.Kind = kind
 }
 
 func (in *CreatePipelinePort) SetPluginAlias(pluginAlias string) {
@@ -96,8 +115,9 @@ type PipelinePortsParams struct {
 
 // UpdatePipelinePort request payload for updating a pipeline port.
 type UpdatePipelinePort struct {
-	Protocol     *string `json:"protocol"`
-	FrontendPort *uint   `json:"frontendPort"`
-	BackendPort  *uint   `json:"backendPort"`
-	Endpoint     *string `json:"endpoint"`
+	Protocol     *string           `json:"protocol"`
+	FrontendPort *uint             `json:"frontendPort"`
+	BackendPort  *uint             `json:"backendPort"`
+	Endpoint     *string           `json:"endpoint"`
+	Kind         *PipelinePortKind `json:"kind"`
 }
