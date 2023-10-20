@@ -198,6 +198,14 @@ components:
         - failed
         - running
         - ok
+    PipelinePortKind:
+      type: string
+      description: The kind/type of the service associated to this port.
+      default: LoadBalancer
+      enum:
+        - LoadBalancer
+        - ClusterIP
+        - NodePort
     PipelinePortProtocol:
       type: string
       description: Valid protocol types defined for a pipelines.
@@ -1564,6 +1572,8 @@ components:
         protocol:
           type: string
           example: tcp
+        kind:
+          $ref: "#/components/schemas/PipelinePortKind"
         frontendPort:
           type: integer
           format: int32
@@ -1598,6 +1608,7 @@ components:
       required:
         - id
         - protocol
+        - kind
         - frontendPort
         - backendPort
         - endpoint
@@ -2083,6 +2094,8 @@ components:
           type: integer
           format: int32
           minimum: 0
+        healthCheckPipelinePortKind:
+          $ref: "#/components/schemas/PipelinePortKind"
         metadata:
           type: object
           nullable: true
@@ -2104,6 +2117,7 @@ components:
         - version
         - addHealthCheckPipeline
         - healthCheckPipelinePort
+        - healthCheckPipelinePortKind
     UpdateAggregator:
       description: Update aggregator request body.
       type: object
@@ -2349,6 +2363,14 @@ components:
           nullable: true
           default: null
           additionalProperties: true
+        portKind:
+          type: string
+          description: Kind of service for the service/ports created under this pipeline.
+          default: LoadBalancer
+          enum:
+            - LoadBalancer
+            - ClusterIP
+            - NodePort
       required:
         - name
         - replicasCount
@@ -2358,6 +2380,7 @@ components:
         - files
         - resourceProfile
         - skipConfigValidation
+        - portKind
     UpdatePipeline:
       description: Update pipeline request body.
       type: object
@@ -2475,7 +2498,16 @@ components:
             - STARTED
             - SCALING
             - CHECKS_OK
-            - CHECKS_FAILED
+            - CHECKS_FAILED            -
+        portKind:
+          type: string
+          description: Kind of service for the service/ports created for this pipeline.
+          default: null
+          nullable: true
+          enum:
+            - LoadBalancer
+            - ClusterIP
+            - NodePort
         events:
           type: array
           nullable: true
@@ -2701,11 +2733,14 @@ components:
           minimum: 0
         endpoint:
           type: string
+        kind:
+          $ref: "#/components/schemas/PipelinePortKind"
       required:
         - protocol
         - frontendPort
         - backendPort
         - endpoint
+        - kind
     UpdatePipelinePort:
       description: Update pipeline port request body.
       type: object
@@ -2729,6 +2764,15 @@ components:
           type: string
           nullable: true
           default: null
+        kind:
+          type: string
+          description: The kind/type of the service associated to this port.
+          default: null
+          nullable: true
+          enum:
+            - LoadBalancer
+            - ClusterIP
+            - NodePort
     ValidatingConfig:
       description: Validating configuration request body.
       type: object
@@ -3002,6 +3046,10 @@ components:
         id:
           type: string
           format: uuid
+        kind:
+          type: string
+          default: null
+          nullable: true
         pluginID:
           type: string
           nullable: true

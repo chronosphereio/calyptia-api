@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	DefaultCoreInstanceVersion = "v0.1.12"
+	DefaultCoreInstanceVersion = "v2.0-dev"
 )
 
 // CoreInstance model.
@@ -156,16 +156,17 @@ type MetadataGCP struct {
 
 // CreateCoreInstance request payload for creating a new core instance.
 type CreateCoreInstance struct {
-	Name                    string               `json:"name"`
-	Version                 string               `json:"version"`
-	AddHealthCheckPipeline  bool                 `json:"addHealthCheckPipeline"`
-	HealthCheckPipelinePort uint                 `json:"healthCheckPipelinePort"`
-	ClusterLogging          bool                 `json:"clusterLogging"`
-	Tags                    []string             `json:"tags"`
-	Image                   *string              `json:"image"`
-	Metadata                CoreInstanceMetadata `json:"metadata"`
-	EnvironmentID           string               `json:"environmentID"`
-	SkipServiceCreation     bool                 `json:"skipServiceCreation"`
+	Name                        string               `json:"name"`
+	Version                     string               `json:"version"`
+	AddHealthCheckPipeline      bool                 `json:"addHealthCheckPipeline"`
+	HealthCheckPipelinePort     uint                 `json:"healthCheckPipelinePort"`
+	HealthCheckPipelinePortKind PipelinePortKind     `json:"healthCheckPipelinePortKind"`
+	ClusterLogging              bool                 `json:"clusterLogging"`
+	Tags                        []string             `json:"tags"`
+	Image                       *string              `json:"image"`
+	Metadata                    CoreInstanceMetadata `json:"metadata"`
+	EnvironmentID               string               `json:"environmentID"`
+	SkipServiceCreation         bool                 `json:"skipServiceCreation"`
 
 	id           string
 	signingKey   []byte

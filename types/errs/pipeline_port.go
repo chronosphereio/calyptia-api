@@ -7,6 +7,7 @@ const (
 	InvalidPipelinePortProtocol = InvalidArgumentError("invalid pipeline port protocol")
 	InvalidPipelinePortNumber   = InvalidArgumentError("invalid pipeline port number")
 	InvalidPipelinePortEndpoint = InvalidArgumentError("invalid pipeline port endpoint")
+	InvalidPipelinePortKind     = InvalidArgumentError("invalid pipeline port type")
 	PipelinePortNotFound        = NotFoundError("pipeline port not found")
 	PipelinePortInUse           = ConflictError("pipeline port already in use")
 )
