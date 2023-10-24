@@ -39,6 +39,12 @@ func (c *Client) Fleets(ctx context.Context, params types.FleetsParams) (types.F
 	return out, c.do(ctx, http.MethodGet, path, nil, &out.Items, withCursor(&out.EndCursor))
 }
 
+func (c *Client) FleetsStatus(ctx context.Context, params types.FleetsStatusParams) (types.FleetsStatus, error) {
+	var out types.FleetsStatus
+	path := "/v1/projects/" + url.PathEscape(params.ProjectID) + "/fleets/status"
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+}
+
 func (c *Client) Fleet(ctx context.Context, in types.FleetParams) (types.Fleet, error) {
 	var out types.Fleet
 	q := url.Values{}
@@ -47,6 +53,12 @@ func (c *Client) Fleet(ctx context.Context, in types.FleetParams) (types.Fleet, 
 	}
 
 	path := "/v1/fleets/" + url.PathEscape(in.FleetID) + "?" + q.Encode()
+	return out, c.do(ctx, http.MethodGet, path, nil, &out)
+}
+
+func (c *Client) FleetStatus(ctx context.Context, params types.FleetStatusParams) (types.FleetsStatus, error) {
+	var out types.FleetsStatus
+	path := "/v1/fleets/" + url.PathEscape(params.FleetID) + "/status"
 	return out, c.do(ctx, http.MethodGet, path, nil, &out)
 }
 

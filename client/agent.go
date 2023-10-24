@@ -57,6 +57,10 @@ func (c *Client) UpdateAgent(ctx context.Context, agentID string, payload types.
 	return c.do(ctx, http.MethodPatch, "/v1/agents/"+url.PathEscape(agentID), payload, nil)
 }
 
+func (c *Client) AddAgentMetrics(ctx context.Context, agentID string, payload []byte) error {
+	return c.do(ctx, http.MethodPost, "/v1/agents/"+url.PathEscape(agentID)+"/metrics", payload, nil)
+}
+
 // DeleteAgent by its ID.
 func (c *Client) DeleteAgent(ctx context.Context, agentID string) error {
 	return c.do(ctx, http.MethodDelete, "/v1/agents/"+url.PathEscape(agentID), nil, nil)

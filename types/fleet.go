@@ -68,6 +68,20 @@ type Fleets struct {
 	EndCursor *string `json:"endCursor" yaml:"endCursor"`
 }
 
+type FleetsStatusParams struct {
+	ProjectID string
+}
+
+type FleetStatusParams struct {
+	FleetID string
+}
+type FleetsStatus struct {
+	Managed    int `json:"managed"`
+	Healthy    int `json:"healthy"`
+	InProgress int `json:"inProgress"`
+	Unhealthy  int `json:"inactive"`
+}
+
 type UpdateFleet struct {
 	ID           string        `json:"-"`
 	Name         *string       `json:"name"`
