@@ -75,11 +75,12 @@ type FleetsStatusParams struct {
 type FleetStatusParams struct {
 	FleetID string
 }
+
 type FleetsStatus struct {
 	Managed    int `json:"managed"`
 	Healthy    int `json:"healthy"`
 	InProgress int `json:"inProgress"`
-	Unhealthy  int `json:"inactive"`
+	Unhealthy  int `json:"unhealthy"`
 }
 
 type UpdateFleet struct {
