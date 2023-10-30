@@ -1520,6 +1520,12 @@ components:
           format: fluent-bit configuration
         status:
           $ref: "#/components/schemas/CheckStatus"
+        collectLogs:
+          type: boolean
+          default: false
+        logs:
+          type: string
+          format: byte
         retries:
           type: number
           default: 0
@@ -2617,6 +2623,12 @@ components:
             config section UUID to be used on this Ingest check.
             Note that the ingest check config section's kind has to be of either type input or output.
           format: uuid
+        collectLogs:
+          type: boolean
+          default: false
+          description: |
+            Determine if the logs for the fluent-bit pod should be forwarded
+            to Calyptia.
       required:
         - status
         - retries
@@ -2719,6 +2731,11 @@ components:
       description: Update a core instance Ingest check request body.
       type: object
       properties:
+        logs:
+          description: logs coming from the fluent-bit pod, maximum size is 10MiB.
+          nullable: true
+          default: null
+          type: string
         status:
           $ref: "#/components/schemas/CheckStatus"
           nullable: true
