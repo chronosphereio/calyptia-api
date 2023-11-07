@@ -42,6 +42,7 @@ tags:
   - name: pipeline_secret
   - name: pipeline_port
   - name: pipeline_check
+  - name: pipeline_log
   - name: pipeline_cluster_objects
   - name: config_validator
   - name: config_validator_v2
@@ -1310,6 +1311,61 @@ components:
         - host
         - createdAt
         - updatedAt
+    PipelineLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        pipelineID:
+          type: string
+          format: uuid
+        logs:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - pipelineID
+        - logs
+        - createdAt
+        - updatedAt
+    PipelineLogs:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PipelineLog"
+        endCursor:
+          type: string
+          nullable: true
+          default: null
+        count:
+          type: number
+          format: int32
+          minimum: 0
+      required:
+        - items
+        - endCursor
+        - count
+    CreatePipelineLog:
+      type: object
+      properties:
+        logs:
+          type: string
+      required: ["logs"]
+    UpdatePipelineLog:
+      type: object
+      properties:
+        logs:
+          type: string
+          nullable: true
+          default: null
     CoreInstanceCheck:
       type: object
       description: Core instance(aggregator) check model.
@@ -6213,6 +6269,111 @@ paths:
       responses:
         "204":
           description: No Content
+  "/v1/pipelines/{pipelineID}/logs":
+    parameters:
+      - name: pipelineID
+        schema:
+          type: string
+          format: uuid
+        in: path
+        description: Parent pipeline ID.
+        required: true
+    post:
+      operationId: createPipelineLog
+      summary: Create Pipeline Log
+      description: |-
+        Create a new log within a pipeline.
+        The log will be created with the given `logs` blob of text.
+      tags: [pipeline_log]
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePipelineLog"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Created"
+    get:
+      operationId: pipelineLogs
+      summary: Pipeline Logs
+      description: |-
+        Logs from a pipeline with backward pagination.
+      tags: [pipeline_log]
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - name: last
+          schema:
+            type: integer
+            minimum: 0
+          in: query
+          description: Limit to the last logs.
+        - name: before
+          schema:
+            type: string
+          in: query
+          description: Paginate logs before the given cursor.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PipelineLogs"
+  "/v1/pipeline_logs/{pipelineLogID}":
+    parameters:
+      - name: pipelineLogID
+        in: path
+        schema:
+          type: string
+          format: uuid
+        required: true
+    patch:
+      operationId: updatePipelineLog
+      summary: Update Pipeline Log
+      description: |-
+        Update a log given its ID.
+        The log will be updated with the given `logs` blob of text.
+      tags: [pipeline_log]
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePipelineLog"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Updated"
+    delete:
+      operationId: deletePipelineLog
+      summary: Delete Pipeline Log
+      description: |-
+        Delete a log given its ID.
+      tags: [pipeline_log]
+      security:
+        - user: []
+        - project: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deleted"
   "/v1/pipelines/{pipelineID}/checks":
     parameters:
       - schema:
