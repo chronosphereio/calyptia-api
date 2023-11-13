@@ -8,7 +8,7 @@ require (
 	github.com/influxdata/influxdb v1.11.2
 	github.com/influxdata/influxdb-client-go/v2 v2.12.3
 	github.com/peterhellberg/link v1.2.0
-	github.com/vmihailenco/msgpack/v5 v5.4.0
+	github.com/vmihailenco/msgpack/v5 v5.4.1
 	gopkg.in/yaml.v2 v2.4.0
 )
 
