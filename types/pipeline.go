@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"slices"
+	"sort"
 	"strings"
 	"time"
 
@@ -17,6 +18,13 @@ type DeploymentStrategy string
 const (
 	DeploymentStrategyRecreate  DeploymentStrategy = "recreate"
 	DeploymentStrategyHotReload DeploymentStrategy = "hotReload"
+)
+
+const (
+	SectionKindServiceOrdinal int = iota + 1
+	SectionKindInputOrdinal
+	SectionKindFilterOrdinal
+	SectionKindOutputOrdinal
 )
 
 var (
@@ -54,22 +62,65 @@ type Pipeline struct {
 	Secrets                      []PipelineSecret   `json:"secrets,omitempty" yaml:"secrets,omitempty"`
 }
 
-func (p *Pipeline) ApplyConfigSections() error {
+func sortSections(sections []ConfigSection) []ConfigSection {
+	// sort on a copy of the slice
+	result := append([]ConfigSection{}, sections...)
+
+	// Have to name these constants or the lint job won't pass
+	sectionKindOrdering := map[ConfigSectionKind]int{
+		SectionKindService: SectionKindServiceOrdinal,
+		SectionKindInput:   SectionKindInputOrdinal,
+		SectionKindFilter:  SectionKindFilterOrdinal,
+		SectionKindOutput:  SectionKindOutputOrdinal,
+	}
+
+	sort.SliceStable(result, func(i, j int) bool {
+		iSection := result[i]
+		jSection := result[j]
+
+		if sectionKindOrdering[iSection.Kind] < sectionKindOrdering[jSection.Kind] {
+			// Put filters next to each other in the section slice following the
+			// ordering defined in "sectionKindOrdering"
+			return true
+		}
+
+		// this code can only be reached if "i" and "j" are of the same kind, don't
+		// reorder if they are not filters
+		if iSection.Kind != SectionKindFilter {
+			return false
+		}
+
+		// If the filter name is "kubernetes", then it should be less
+		return iSection.Name() == "kubernetes"
+	})
+	return result
+}
+
+func (p Pipeline) RenderConfig() (string, error) {
 	if len(p.ConfigSections) == 0 {
-		return nil
+		return "", nil
 	}
 
 	format := fluentbitconfig.Format(p.Config.ConfigFormat)
 	c, err := fluentbitconfig.ParseAs(p.Config.RawConfig, format)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	for _, section := range p.ConfigSections {
+	for _, section := range sortSections(p.ConfigSections) {
 		c.AddSection(fluentbitconfig.SectionKind(section.Kind), section.Properties.AsProperties())
 	}
 
 	raw, err := c.DumpAs(format)
+	if err != nil {
+		return "", err
+	}
+
+	return raw, nil
+}
+
+func (p *Pipeline) ApplyConfigSections() error {
+	raw, err := p.RenderConfig()
 	if err != nil {
 		return err
 	}
