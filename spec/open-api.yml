@@ -199,6 +199,15 @@ components:
         - failed
         - running
         - ok
+    PipelineLogStatus:
+      type: string
+      description: |
+        The status of a pipeline log, if NEW hasn't been updated from the cluster.
+        If DONE, logs have been retrieved from the cluster.
+      default: NEW
+      enum:
+        - NEW
+        - DONE
     PipelinePortKind:
       type: string
       description: The kind/type of the service associated to this port.
@@ -1322,6 +1331,11 @@ components:
           format: uuid
         logs:
           type: string
+        lines:
+          type: integer
+          default: 100
+        status:
+          $ref: "#/components/schemas/PipelineLogStatus"
         createdAt:
           type: string
           format: date-time
@@ -1332,6 +1346,8 @@ components:
         - id
         - pipelineID
         - logs
+        - lines
+        - status
         - createdAt
         - updatedAt
     PipelineLogs:
@@ -1358,6 +1374,9 @@ components:
       properties:
         logs:
           type: string
+        lines:
+          type: integer
+          default: 100
       required: ["logs"]
     UpdatePipelineLog:
       type: object
@@ -1366,6 +1385,17 @@ components:
           type: string
           nullable: true
           default: null
+        lines:
+          type: integer
+          nullable: true
+          default: null
+        status:
+          type: string
+          nullable: true
+          default: null
+          enum:
+            - NEW
+            - DONE
     CoreInstanceCheck:
       type: object
       description: Core instance(aggregator) check model.
@@ -6321,6 +6351,14 @@ paths:
             type: string
           in: query
           description: Paginate logs before the given cursor.
+        - name: status
+          schema:
+            type: string
+            enum:
+              - NEW
+              - DONE
+          in: query
+          description: Filter logs by status
       responses:
         "200":
           description: OK
