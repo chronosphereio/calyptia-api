@@ -38,6 +38,14 @@ type ConfigSection struct {
 	UpdatedAt        time.Time         `json:"updatedAt" yaml:"updatedAt"`
 }
 
+func (s ConfigSection) Name() string {
+	name, _ := s.Properties.Get("Name")
+	if str, ok := name.(string); ok {
+		return str
+	}
+	return ""
+}
+
 // CreateConfigSection request payload for creating a new
 // fluent-bit config section on a project.
 type CreateConfigSection struct {

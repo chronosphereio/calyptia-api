@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 
 	"github.com/peterhellberg/link"
 	"gopkg.in/yaml.v2"
@@ -149,7 +150,9 @@ func (c *Client) do(ctx context.Context, method, path string, v, dest interface{
 		body = bytes.NewReader(b)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, c.BaseURL+path, body)
+	endpoint := strings.TrimSuffix(c.BaseURL, "/") + path
+
+	req, err := http.NewRequestWithContext(ctx, method, endpoint, body)
 	if err != nil {
 		return err
 	}

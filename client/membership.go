@@ -27,3 +27,8 @@ func (c *Client) Members(ctx context.Context, projectID string, params types.Mem
 func (c *Client) UpdateMember(ctx context.Context, in types.UpdateMember) error {
 	return c.do(ctx, http.MethodPatch, "/v1/members/"+url.PathEscape(in.MemberID), in, nil)
 }
+
+func (c *Client) DeleteMember(ctx context.Context, memberID string) (types.Deleted, error) {
+	var out types.Deleted
+	return out, c.do(ctx, http.MethodDelete, "/v1/members/"+url.PathEscape(memberID), nil, &out)
+}
