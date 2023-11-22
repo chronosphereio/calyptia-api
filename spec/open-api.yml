@@ -4863,7 +4863,6 @@ paths:
       description: Update member by its ID.
       security:
         - user: []
-        - project: []
       requestBody:
         content:
           application/json:
@@ -4872,6 +4871,35 @@ paths:
       responses:
         "204":
           description: No Content
+    delete:
+      tags: [membership]
+      operationId: deleteMember
+      summary: Delete member
+      description: Delete member by its ID.
+      security:
+        - user: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deleted"
+        "409":
+          description: |-
+            Conflict.
+
+            Uppon receiving `cannot delete last creator` error,
+            clients should instead delete the project.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "cannot delete last creator"
+                required: ["error"]
   "/v1/projects/{projectID}/invite":
     parameters:
       - schema:
@@ -6374,6 +6402,21 @@ paths:
           type: string
           format: uuid
         required: true
+    get:
+      tags: [pipeline_log]
+      summary: Pipeline log
+      operationId: pipelineLog
+      description: Pipeline log by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PipelineLog"
     patch:
       operationId: updatePipelineLog
       summary: Update Pipeline Log

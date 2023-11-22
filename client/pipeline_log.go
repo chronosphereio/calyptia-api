@@ -39,3 +39,8 @@ func (c *Client) DeletePipelineLog(ctx context.Context, id string) (types.Delete
 	var out types.Deleted
 	return out, c.do(ctx, http.MethodDelete, "/v1/pipeline_logs/"+url.PathEscape(id), nil, &out)
 }
+
+func (c *Client) PipelineLog(ctx context.Context, id string) (types.PipelineLog, error) {
+	var out types.PipelineLog
+	return out, c.do(ctx, http.MethodGet, "/v1/pipeline_logs/"+url.PathEscape(id), nil, &out)
+}
