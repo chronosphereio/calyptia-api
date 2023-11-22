@@ -24,6 +24,11 @@ func (c *Client) PipelineLogs(ctx context.Context, in types.ListPipelineLogs) (t
 	if in.Before != nil {
 		q.Set("before", *in.Before)
 	}
+
+	if in.Status != nil {
+		q.Set("status", string(*in.Status))
+	}
+
 	if len(q) != 0 {
 		endpoint += "?" + q.Encode()
 	}
