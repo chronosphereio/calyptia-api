@@ -29,4 +29,4 @@ docker run --rm --network=host -v "$SPEC_DIR/":/spec:ro \
         --stateful=links \
         --workers "$WORKER_COUNT" \
         /spec/open-api.yml \
-        --base-url="$CLOUD_URL/"
+        --base-url="$CLOUD_URL/" "$@"
