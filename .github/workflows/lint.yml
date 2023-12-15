@@ -7,20 +7,24 @@ jobs:
     runs-on: ubuntu-latest
     name: PR - Go Linters
     steps:
-      - name: Setup Golang
-        uses: actions/setup-go@v5
+      - uses: actions/checkout@v4
         with:
-          go-version: "^1.21"
+          fetch-depth: 0
 
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Go Lint
-        uses: golangci/golangci-lint-action@v3
+      - name: Set up Go
+        uses: actions/setup-go@v4 # action page: <https://github.com/actions/setup-go>
         with:
-          version: v1.49
+          go-version: "1.21"
 
-      - name: Run golangci lint
+      - name: Go Generate
+        run: go generate ./...
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v3 # Action page: <https://github.com/golangci/golangci-lint-action>
+        with:
+          version: v1.54.0
+
+      - name: Lint reviewdog
         if: github.event_name == 'pull_request'
         uses: reviewdog/action-golangci-lint@v2
 
