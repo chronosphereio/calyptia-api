@@ -17,10 +17,10 @@ if [[ -z "${TOKEN:-}" ]]; then
 fi
 
 # Schema linting
-docker run --rm -v "$SPEC_DIR/":/spec:ro redocly/openapi-cli lint /spec/open-api.yml
+docker run --pull=always --rm -v "$SPEC_DIR/":/spec:ro redocly/openapi-cli lint /spec/open-api.yml
 
 # Schema validation against the cloud image
-docker run --rm --network=host -v "$SPEC_DIR/":/spec:ro \
+docker run --pull=always --rm --network=host -v "$SPEC_DIR/":/spec:ro \
     schemathesis/schemathesis:stable \
         run \
         --hypothesis-suppress-health-check=too_slow \
@@ -29,4 +29,4 @@ docker run --rm --network=host -v "$SPEC_DIR/":/spec:ro \
         --stateful=links \
         --workers "$WORKER_COUNT" \
         /spec/open-api.yml \
-        --base-url="$CLOUD_URL/"
+        --base-url="$CLOUD_URL/" "$@"
