@@ -21,7 +21,7 @@ chmod 666 "$TOKENFILE"
 # END OF TODO
 
 docker rm -f cloud
-docker run -d \
+docker run --pull=always -d \
     --name cloud \
     -e AUTH0_DOMAIN="$TEST_AUTH0_DOMAIN" \
     -e AUTH0_MANAGEMENT_CLIENT_ID="$TEST_AUTH0_MANAGEMENT_CLIENT_ID" \

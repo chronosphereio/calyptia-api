@@ -5,7 +5,7 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    name: PR - Linters
+    name: PR - Go Linters
     steps:
       - name: Setup Golang
         uses: actions/setup-go@v5
@@ -24,8 +24,22 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: reviewdog/action-golangci-lint@v2
 
+  markdownlint:
+    runs-on: ubuntu-latest
+    name: PR - MarkdownLint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Run Markdown lint
         uses: actionshub/markdownlint@v3.1.4
+
+  actionlint:
+    runs-on: ubuntu-latest
+    name: PR - ActionLint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Run Action lint
         run: |
@@ -33,6 +47,13 @@ jobs:
           bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
           ./actionlint -color -shellcheck=
         shell: bash
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    name: PR - Shellcheck
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: PR - Shellcheck
         uses: ludeeus/action-shellcheck@master
