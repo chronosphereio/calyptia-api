@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -68,9 +69,16 @@ func (c *Client) DeleteAgent(ctx context.Context, agentID string) error {
 
 // DeleteAgents from a project passing a list of the IDs to be deleted.
 func (c *Client) DeleteAgents(ctx context.Context, projectID string, agentIDs ...string) error {
-	q := url.Values{}
-	for _, id := range agentIDs {
-		q.Add("agent_id", id)
+	var errs error
+	for _, chunk := range makeChunks(agentIDs, chunksSizeByID) {
+		q := url.Values{}
+		for _, id := range chunk {
+			q.Add("agent_id", id)
+		}
+		err := c.do(ctx, http.MethodDelete, "/v1/projects/"+url.PathEscape(projectID)+"/agents?"+q.Encode(), nil, nil)
+		if err != nil {
+			errs = errors.Join(errs, err)
+		}
 	}
-	return c.do(ctx, http.MethodDelete, "/v1/projects/"+url.PathEscape(projectID)+"/agents?"+q.Encode(), nil, nil)
+	return errs
 }

@@ -247,3 +247,17 @@ func disableRedirect(c *http.Client) func() {
 		c.CheckRedirect = old
 	}
 }
+
+// chunksSizeByID is the max URL lentgh (2048) minus the endpoint lentgh (around 100) by UUID lentgh (36).
+// This makes sure the full URL with the query strings params does not exceed the max URL length.
+//
+//nolint:gomnd // documented already
+const chunksSizeByID = (2048 - 100) / 36
+
+func makeChunks[T any](ss []T, size int) [][]T {
+	chunks := make([][]T, 0, (len(ss)/size)+1)
+	for size < len(ss) {
+		ss, chunks = ss[size:], append(chunks, ss[0:size:size])
+	}
+	return append(chunks, ss)
+}

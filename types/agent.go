@@ -15,8 +15,11 @@ type Agent struct {
 	MachineID           string           `json:"machineID" yaml:"machineID"`
 	EnvironmentName     string           `json:"environmentName" yaml:"environmentName"`
 	Type                AgentType        `json:"type" yaml:"type"`
+	Status              AgentStatus      `json:"status" yaml:"status"`
 	Version             string           `json:"version" yaml:"version"`
 	Edition             AgentEdition     `json:"edition" yaml:"edition"`
+	OperatingSystem     AgentOS          `json:"os" yaml:"os"`
+	Architecture        AgentArch        `json:"arch" yaml:"arch"`
 	Flags               []string         `json:"flags" yaml:"flags"`
 	RawConfig           string           `json:"rawConfig" yaml:"rawConfig"`
 	Metadata            *json.RawMessage `json:"metadata" yaml:"metadata"`
@@ -27,6 +30,13 @@ type Agent struct {
 	CreatedAt           time.Time        `json:"createdAt" yaml:"createdAt"`
 	UpdatedAt           time.Time        `json:"updatedAt" yaml:"updatedAt"`
 }
+
+type AgentStatus string
+
+const (
+	AgentStatusHealthy   AgentStatus = "healthy"
+	AgentStatusUnhealthy AgentStatus = "unhealthy"
+)
 
 // Agents paginated list.
 type Agents struct {
@@ -54,19 +64,57 @@ const (
 	AgentEditionEnterprise AgentEdition = "enterprise"
 )
 
+// AgentOS is set to the operating system the agent is running on.
+type AgentOS string
+
+const (
+	// AgentOSUnknown is the default value for the operating system.
+	AgentOSUnknown AgentOS = "unknown"
+	// AgentOSWindows is for Win32 machines.
+	AgentOSWindows AgentOS = "windows"
+	// AgentOSMacOS is for macOS machines.
+	AgentOSMacOS AgentOS = "macos"
+	// AgentOSLinux is for Win32 machines.
+	AgentOSLinux AgentOS = "linux"
+	// AgentOSFreeBSD is for FreeBSD machines.
+	AgentOSFreeBSD AgentOS = "freebsd"
+	// AgentOSOpenBSD is for OpenBSD machines.
+	AgentOSOpenBSD AgentOS = "openbsd"
+	// AgentOSNetBSD is for NetBSD machines.
+	AgentOSNetBSD AgentOS = "netbsd"
+)
+
+// AgentArch is set to the architecture an agent is running on.
+type AgentArch string
+
+const (
+	// AgentArchUnknown is the default value for architecture.
+	AgentArchUnknown AgentArch = "unknown"
+	// AgentArchX86 is for intel i686 machines.
+	AgentArchX86 AgentArch = "x86"
+	// AgentArchX86_64 is for intel x86_64 machines.
+	AgentArchX86_64 AgentArch = "x86_64"
+	// AgentArchArm is for arm machines.
+	AgentArchArm AgentArch = "arm"
+	// AgentArchArm64 is for arm64 machines.
+	AgentArchArm64 AgentArch = "arm64"
+)
+
 // RegisterAgent request payload for registering a new agent.
 type RegisterAgent struct {
-	EnvironmentID string           `json:"environmentID"`
-	FleetID       *string          `json:"fleetID"`
-	Name          string           `json:"name"`
-	MachineID     string           `json:"machineID"`
-	Type          AgentType        `json:"type"`
-	Version       string           `json:"version"`
-	Edition       AgentEdition     `json:"edition"`
-	Flags         []string         `json:"flags"`
-	RawConfig     string           `json:"rawConfig"`
-	Metadata      *json.RawMessage `json:"metadata"`
-	Tags          []string         `json:"tags"`
+	EnvironmentID   string           `json:"environmentID"`
+	FleetID         *string          `json:"fleetID"`
+	Name            string           `json:"name"`
+	MachineID       string           `json:"machineID"`
+	Type            AgentType        `json:"type"`
+	Version         string           `json:"version"`
+	Edition         AgentEdition     `json:"edition"`
+	OperatingSystem *AgentOS         `json:"os"`
+	Architecture    *AgentArch       `json:"arch"`
+	Flags           []string         `json:"flags"`
+	RawConfig       string           `json:"rawConfig"`
+	Metadata        *json.RawMessage `json:"metadata"`
+	Tags            []string         `json:"tags"`
 
 	id         string
 	signingKey []byte
@@ -127,14 +175,16 @@ func (in AgentsParams) Tags() []string {
 
 // UpdateAgent request payload for updating an agent.
 type UpdateAgent struct {
-	FleetID       *string          `json:"fleetID"`
-	EnvironmentID *string          `json:"environmentID"`
-	Name          *string          `json:"name"`
-	Version       *string          `json:"version"`
-	Edition       *AgentEdition    `json:"edition"`
-	Flags         *[]string        `json:"flags"`
-	RawConfig     *string          `json:"rawConfig"`
-	Metadata      *json.RawMessage `json:"metadata"`
+	FleetID         *string          `json:"fleetID"`
+	EnvironmentID   *string          `json:"environmentID"`
+	Name            *string          `json:"name"`
+	Version         *string          `json:"version"`
+	Edition         *AgentEdition    `json:"edition"`
+	OperatingSystem *AgentOS         `json:"os"`
+	Architecture    *AgentArch       `json:"arch"`
+	Flags           *[]string        `json:"flags"`
+	RawConfig       *string          `json:"rawConfig"`
+	Metadata        *json.RawMessage `json:"metadata"`
 
 	firstMetricsAddedAt *time.Time
 	lastMetricsAddedAt  *time.Time
