@@ -9,6 +9,8 @@ const (
 	InvalidAgentVersion           = InvalidArgumentError("invalid agent version")
 	UnsupportedAgentVersion       = InvalidArgumentError("unsupported agent version")
 	InvalidAgentEdition           = InvalidArgumentError("invalid agent edition")
+	InvalidAgentOperatingSystem   = InvalidArgumentError("invalid agent operating system")
+	InvalidAgentArchitecture      = InvalidArgumentError("invalid agent architecture")
 	InvalidAgentFlags             = InvalidArgumentError("invalid agent flags")
 	InvalidAgentFlag              = InvalidArgumentError("invalid agent flag")
 	InvalidAgentRawConfig         = InvalidArgumentError("invalid agent raw config")

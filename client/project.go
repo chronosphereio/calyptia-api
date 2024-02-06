@@ -45,3 +45,9 @@ func (c *Client) Project(ctx context.Context, projectID string) (types.Project, 
 func (c *Client) UpdateProject(ctx context.Context, projectID string, opts types.UpdateProject) error {
 	return c.do(ctx, http.MethodPatch, "/v1/projects/"+url.PathEscape(projectID), opts, nil)
 }
+
+// DeleteProject by its ID.
+func (c *Client) DeleteProject(ctx context.Context, projectID string) (types.Deleted, error) {
+	var out types.Deleted
+	return out, c.do(ctx, http.MethodDelete, "/v1/projects/"+url.PathEscape(projectID), nil, &out)
+}

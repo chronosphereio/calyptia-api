@@ -102,11 +102,18 @@ func (c *Client) DeletePipeline(ctx context.Context, pipelineID string) error {
 
 // DeletePipelines from a core instance passing a list of the IDs to be deleted.
 func (c *Client) DeletePipelines(ctx context.Context, instanceID string, pipelineIDs ...string) error {
-	q := url.Values{}
-	for _, id := range pipelineIDs {
-		q.Add("pipeline_id", id)
+	var errs error
+	for _, chunk := range makeChunks(pipelineIDs, chunksSizeByID) {
+		q := url.Values{}
+		for _, id := range chunk {
+			q.Add("pipeline_id", id)
+		}
+		err := c.do(ctx, http.MethodDelete, "/v1/aggregators/"+url.PathEscape(instanceID)+"/pipelines?"+q.Encode(), nil, nil)
+		if err != nil {
+			errs = errors.Join(errs, err)
+		}
 	}
-	return c.do(ctx, http.MethodDelete, "/v1/aggregators/"+url.PathEscape(instanceID)+"/pipelines?"+q.Encode(), nil, nil)
+	return errs
 }
 
 // UpdatePipelineClusterObjects update a list of related cluster objects to a pipeline.
@@ -116,12 +123,19 @@ func (c *Client) UpdatePipelineClusterObjects(ctx context.Context, pipelineID st
 
 // DeletePipelineClusterObjects un-relate a list of cluster objects from a pipeline.
 func (c *Client) DeletePipelineClusterObjects(ctx context.Context, pipelineID string, clusterObjectIDs ...string) error {
-	q := url.Values{}
-	for _, id := range clusterObjectIDs {
-		q.Add("cluster_object_id", id)
-	}
+	var errs error
+	for _, chunk := range makeChunks(clusterObjectIDs, chunksSizeByID) {
+		q := url.Values{}
+		for _, id := range chunk {
+			q.Add("cluster_object_id", id)
+		}
 
-	return c.do(ctx, http.MethodDelete, "/v1/pipelines/"+url.PathEscape(pipelineID)+"/cluster_objects?"+q.Encode(), nil, nil)
+		err := c.do(ctx, http.MethodDelete, "/v1/pipelines/"+url.PathEscape(pipelineID)+"/cluster_objects?"+q.Encode(), nil, nil)
+		if err != nil {
+			errs = errors.Join(errs, err)
+		}
+	}
+	return errs
 }
 
 // PipelineClusterObjects returns the entire set of cluster objects associated to a pipeline.

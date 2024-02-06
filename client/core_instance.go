@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -65,9 +66,16 @@ func (c *Client) CoreInstancePing(ctx context.Context, instanceID string) (types
 
 // DeleteCoreInstances from a project passing a list of the IDs to be deleted.
 func (c *Client) DeleteCoreInstances(ctx context.Context, projectID string, instanceIDs ...string) error {
-	q := url.Values{}
-	for _, id := range instanceIDs {
-		q.Add("aggregator_id", id)
+	var errs error
+	for _, chunk := range makeChunks(instanceIDs, chunksSizeByID) {
+		q := url.Values{}
+		for _, id := range chunk {
+			q.Add("aggregator_id", id)
+		}
+		err := c.do(ctx, http.MethodDelete, "/v1/projects/"+url.PathEscape(projectID)+"/aggregators?"+q.Encode(), nil, nil)
+		if err != nil {
+			errs = errors.Join(errs, err)
+		}
 	}
-	return c.do(ctx, http.MethodDelete, "/v1/projects/"+url.PathEscape(projectID)+"/aggregators?"+q.Encode(), nil, nil)
+	return errs
 }

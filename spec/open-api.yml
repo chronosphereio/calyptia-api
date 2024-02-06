@@ -286,6 +286,12 @@ components:
         id:
           type: string
           format: uuid
+        userID:
+          type: string
+          format: uuid
+        projectID:
+          type: string
+          format: uuid
         roles:
           type: array
           nullable: true
@@ -308,6 +314,8 @@ components:
           $ref: "#/components/schemas/User"
       required:
         - id
+        - userID
+        - projectID
         - roles
         - permissions
         - createdAt
@@ -4699,6 +4707,23 @@ paths:
       responses:
         "204":
           description: No Content
+    delete:
+      tags:
+        - project
+      summary: Delete project
+      operationId: deleteProject
+      description: |-
+        Delete project by its ID.
+        Only the creator of the project can delete it.
+      security:
+        - user: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deleted"
   "/v1/projects/{projectID}/tokens":
     parameters:
       - schema:
