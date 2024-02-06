@@ -363,6 +363,29 @@ components:
           enum:
             - community
             - enterprise
+        status:
+          type: string
+          enum:
+            - healthy
+            - unhealthy
+        os:
+          type: string
+          enum:
+            - unknown
+            - linux
+            - macos
+            - windows
+            - freebsd
+            - netbsd
+            - openbsd
+        arch:
+          type: string
+          enum:
+            - unknown
+            - x86
+            - x86_64
+            - arm
+            - arm64
         flags:
           type: array
           nullable: true
@@ -415,7 +438,10 @@ components:
         - type
         - version
         - edition
+        - os
+        - arch
         - flags
+        - status
         - rawConfig
         - metadata
         - environmentName
