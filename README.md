@@ -1,8 +1,6 @@
 # Calyptia Cloud API - OpenAPI specification, Golang reference client and types
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/calyptia/api.svg)](https://pkg.go.dev/github.com/calyptia/api)
-[![CI](https://github.com/calyptia/go-repo-template/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/calyptia/go-repo-template/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/calyptia/api/branch/main/graph/badge.svg?token=FUCFZ7JRAS)](https://codecov.io/gh/calyptia/api)
 
 OpenAPI spec, Golang types and client for the API to [Calyptia Cloud](https://cloud.calyptia.com).
 
