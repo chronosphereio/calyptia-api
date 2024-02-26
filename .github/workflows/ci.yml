@@ -12,6 +12,9 @@ env:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,11 +28,11 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ secrets.CI_USERNAME }}
-          password: ${{ secrets.CI_PAT }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create k8s Kind Cluster
-        uses: helm/kind-action@v1.8.0
+        uses: helm/kind-action@v1.9.0
         timeout-minutes: 5
         with:
           config: ./.github/workflows/kind/config
@@ -59,33 +62,28 @@ jobs:
             coverage.out
             coverage.html
 
-      - name: Upload coverage to Codecov
-        if: github.event_name != 'pull_request'
-        uses: codecov/codecov-action@v3.1.4
-        with:
-          file: ./coverage.out
-          flags: ${{ runner.os }}
-          token: ${{ secrets.CODECOV_TOKEN }}
-
   component-test:
     name: Run component tests against Cloud image
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
     steps:
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ secrets.CI_USERNAME }}
-          password: ${{ secrets.CI_PAT }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/checkout@v4
         with:
-          repository: calyptia/api
-          token: ${{ secrets.CI_PAT }}
+          repository: chronosphereio/calyptia-api
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/checkout@v4
         with:
-          repository: calyptia/cloud
+          repository: chronosphereio/calyptia-cloud
           token: ${{ secrets.CI_PAT }}
           ref: 'main'
           path: scripts/resources/cloud

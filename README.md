@@ -2,12 +2,12 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/calyptia/api.svg)](https://pkg.go.dev/github.com/calyptia/api)
 
-OpenAPI spec, Golang types and client for the API to [Calyptia Cloud](https://cloud.calyptia.com).
+OpenAPI spec, Golang types and client for the API to [Calyptia Core](https://core.calyptia.com).
 
 ## Install
 
 ```bash
-go get github.com/calyptia/api
+go get github.com/chronosphereio/calyptia-api
 ```
 
 ## Client usage
@@ -17,7 +17,7 @@ Get an API key from [Calyptia Cloud](https://cloud.calyptia.com) under settings.
 ```go
 package main
 
-import "github.com/calyptia/api/client"
+import "github.com/chronosphereio/calyptia-api/client"
 
 func main() {
     c := client.New()
@@ -48,14 +48,14 @@ tokSrc := oauth2.StaticTokenSource(tok)
 c.Client = oauth2.NewClient(ctx, tokSrc)
 ```
 
-Refer to [client/client_test.go](https://github.com/calyptia/api/blob/eec74522b60638539bdb7f2334548d3c4cda813d/client/client_test.go#L528-L531)
+Refer to [client/client_test.go](https://github.com/chronosphereio/calyptia-api/blob/eec74522b60638539bdb7f2334548d3c4cda813d/client/client_test.go#L528-L531)
 for a testing example.
 
 ## Spec
 
 The `/spec` directory contains an OpenAPI specification.
 You can use it to generate clients for your favorite programming language.
-Or preview it using [SwaggerUI](https://editor.swagger.io/?url=https://raw.githubusercontent.com/calyptia/api/main/spec/open-api.yml).
+Or preview it using [SwaggerUI](https://editor.swagger.io/?url=https://raw.githubusercontent.com/chronosphereio/calyptia-api/main/spec/open-api.yml).
 
 ### Typescript codegen
 
