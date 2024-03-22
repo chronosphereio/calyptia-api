@@ -46,6 +46,17 @@ func New() *Client {
 	}
 }
 
+func (c *Client) Clone() *Client {
+	return &Client{
+		BaseURL:           c.BaseURL,
+		Client:            c.Client,
+		userAgent:         c.userAgent,
+		projectToken:      c.projectToken,
+		agentToken:        c.agentToken,
+		coreInstanceToken: c.coreInstanceToken,
+	}
+}
+
 // NewFromEnv creates a new client using default environment variables.
 func NewFromEnv() *Client {
 	c := New()
