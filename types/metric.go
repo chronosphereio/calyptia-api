@@ -1,83 +1,158 @@
 package types
 
 import (
-	"fmt"
 	"time"
-
-	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
-	writeapi "github.com/influxdata/influxdb-client-go/v2/api/write"
-	influxmodels "github.com/influxdata/influxdb/models"
-
-	"github.com/calyptia/api/types/errs"
 )
 
-// AggregatorMeasurement stores a list of metrics and totals for an aggregator.
-type AggregatorMeasurement struct {
-	Metrics map[string][]MetricFields `json:"metrics"`
-	Totals  map[string][]MetricFields `json:"totals"`
+// Label model used internally for metrics.
+type Label struct {
+	Name  string `json:"name" msgpack:"name"`
+	Value string `json:"value" msgpack:"value"`
 }
 
-// CoreInstanceMetricsV1 stores a set of AggregatorMeasurement metrics for an aggregator.
-type CoreInstanceMetricsV1 struct {
-	Measurements map[string]AggregatorMeasurement `json:"measurements"`
+// CreateMetrics types defined by fluent-bit cmetrics v0.5.x.
+type CreateMetrics struct {
+	// AgentID is set internally by the server and is not part of the request body.
+	AgentID string `json:"-" msgpack:"-"`
+	// ProjectID is set internally by the server and is not part of the request body.
+	ProjectID string `json:"-" msgpack:"-"`
+	// FleetID is set internally by the server and is not part of the request body.
+	FleetID *string `json:"-" msgpack:"-"`
+	// PipelineID is set internally by the server and is not part of the request body.
+	PipelineID *string `json:"-" msgpack:"-"`
+	// CoreInstanceID is set internally by the server and is not part of the request body.
+	CoreInstanceID *string `json:"-" msgpack:"-"`
+
+	Meta    CreateMetricsMeta `json:"meta" msgpack:"meta"`
+	Metrics []Metric          `json:"metrics" msgpack:"metrics"`
 }
 
-// AddMeasurementMetrics appends a set of metrics/totals to a given measurement field on a AggregatorMetrics struct.
-func (a *CoreInstanceMetricsV1) AddMeasurementMetrics(measurement string, metrics, totals []MetricFields) {
-	if a.Measurements == nil {
-		a.Measurements = map[string]AggregatorMeasurement{}
-	}
-	if _, ok := a.Measurements[measurement]; !ok {
-		a.Measurements[measurement] = AggregatorMeasurement{
-			Metrics: map[string][]MetricFields{},
-			Totals:  map[string][]MetricFields{},
-		}
-	}
-	for _, m := range metrics {
-		a.Measurements[measurement].Metrics[m.Field] = append(a.Measurements[measurement].Metrics[m.Field], m)
-	}
-	for _, t := range totals {
-		a.Measurements[measurement].Totals[t.Field] = append(a.Measurements[measurement].Totals[t.Field], t)
+type CreateMetricsMeta struct {
+	// Cmetrics   struct{}                    `json:"cmetrics" msgpack:"cmetrics"`
+	// External   struct{}                    `json:"external" msgpack:"external"`
+	Processing CreateMetricsMetaProcessing `json:"processing" msgpack:"processing"`
+}
+
+type CreateMetricsMetaProcessing struct {
+	StaticLabels [][2]string `json:"static_abels" msgpack:"static_labels"` // example: [["foo", "bar"], ["my-label", "my-value"]]
+}
+
+type Metric struct {
+	Meta   MetricMeta    `json:"meta" msgpack:"meta"`
+	Values []MetricValue `json:"values" msgpack:"values"`
+}
+
+type MetricMeta struct {
+	// AggregationType MetricAggregationType `json:"aggregation_type" msgpack:"aggregation_type"`
+	// Labels contains only the label keys.
+	Labels []string       `json:"labels" msgpack:"labels"` // ex: ["hostname", "name"]
+	Opts   MetricMetaOpts `json:"opts" msgpack:"opts"`
+	Type   MetricType     `json:"type" msgpack:"type"`
+	// Ver    int            `json:"ver" msgpack:"ver"`
+	// Buckets []float64 `json:"buckets" msgpack:"buckets"`
+}
+
+type MetricAggregationType int
+
+// https://github.com/fluent/fluent-bit/blob/9d9ac68a2b45a4cedeafbf7c5aba513f494eced6/lib/cmetrics/include/cmetrics/cmetrics.h#L32-L34
+const (
+	MetricAggregationTypeUnspecified MetricAggregationType = iota
+	MetricAggregationTypeDelta
+	MetricAggregationTypeCumulative
+)
+
+func (t MetricAggregationType) String() string {
+	switch t {
+	case MetricAggregationTypeUnspecified:
+		return "unspecified"
+	case MetricAggregationTypeDelta:
+		return "delta"
+	case MetricAggregationTypeCumulative:
+		return "cumulative"
+	default:
+		return "unknown"
 	}
 }
 
-// ProjectMetrics response payload for project level metrics.
-type ProjectMetrics struct {
-	Measurements map[string]ProjectMeasurement `json:"measurements"`
-	TopPlugins   MetricsPluginTotal            `json:"topPlugins"`
+func (t MetricAggregationType) GoString() string {
+	return t.String()
 }
 
-// ProjectMeasurement struct to store project metrics, used for project level metrics.
-type ProjectMeasurement struct {
-	Totals  MeasurementTotal   `json:"totals"`
-	Plugins map[string]Metrics `json:"plugins"`
+type MetricMetaOpts struct {
+	Desc      string `json:"desc" msgpack:"desc"`
+	Name      string `json:"name" msgpack:"name"` // ex: bytes_total
+	Namespace string `json:"ns" msgpack:"ns"`     // ex: fluentbit
+	Subsystem string `json:"ss" msgpack:"ss"`     // ex: input
 }
 
-// AddMeasurementMetrics appends a set of metrics/totals to a given measurement field on a ProjectMetrics struct.
-func (a *ProjectMetrics) AddMeasurementMetrics(measurement string, metrics []MetricFields, total MeasurementTotal) {
-	if a.Measurements == nil {
-		a.Measurements = map[string]ProjectMeasurement{}
-	}
+type MetricType int
 
-	mm := a.Measurements[measurement]
-	if mm.Plugins == nil {
-		mm.Plugins = map[string]Metrics{}
-	}
-	mm.Totals = total
+// https://github.com/fluent/fluent-bit/blob/9d9ac68a2b45a4cedeafbf7c5aba513f494eced6/lib/cmetrics/include/cmetrics/cmetrics.h#L26-L30
+const (
+	MetricTypeCounter MetricType = iota
+	MetricTypeGauge
+	MetricTypeHistogram
+	MetricTypeSummary
+	MetricTypeUntyped
+)
 
-	for _, metric := range metrics {
-		plugin := mm.Plugins[metric.Plugin]
-		if plugin.Metrics == nil {
-			plugin.Metrics = map[string][]MetricFields{}
-		}
-		plugin.Metrics[metric.Field] = append(plugin.Metrics[metric.Field], metric)
-		mm.Plugins[metric.Plugin] = plugin
+func (t MetricType) String() string {
+	switch t {
+	case MetricTypeCounter:
+		return "counter"
+	case MetricTypeGauge:
+		return "gauge"
+	case MetricTypeHistogram:
+		return "histogram"
+	case MetricTypeSummary:
+		return "summary"
+	case MetricTypeUntyped:
+		return "untyped"
+	default:
+		return "unknown"
 	}
-
-	a.Measurements[measurement] = mm
 }
 
-// MetricsSummary stores a list of totals for a core instance.
+func (t MetricType) GoString() string {
+	return t.String()
+}
+
+type MetricValue struct {
+	// Hash int64 `json:"hash" msgpack:"hash"`
+	// Labels contains the label values from the metric meta label keys.
+	// It should match the length of the metric meta label keys.
+	Labels []string `json:"labels" msgpack:"labels"` // ex: ["dummy.0"]
+	TS     int64    `json:"ts" msgpack:"ts"`         // nanoseconds
+	Value  float64  `json:"value" msgpack:"value"`
+	// Histogram struct {} `json:"histogram" msgpack:"histogram"`
+	// Summary struct {} `json:"summary" msgpack:"summary"`
+}
+
+func (v MetricValue) Time() time.Time {
+	return time.Unix(0, v.TS)
+}
+
+// CreatedMetrics response model for created agent metrics.
+type CreatedMetrics struct {
+	TotalInserted uint `json:"totalInserted"`
+}
+
+// MetricsParams parameters to filtering metrics by.
+type MetricsParams struct {
+	Start    time.Duration
+	Interval time.Duration
+}
+
+// PipelinesMetricsParams request payload for bulk querying pipeline metrics for a given aggregator.
+type PipelinesMetricsParams struct {
+	MetricsParams
+	PipelineIDs []string
+}
+
+// MetricsSummary is the rate of metrics per second.
+// For example, the amount of input records per second,
+// or the amount of output bytes per second.
+// It returns the current (last) value of the metric.
 type MetricsSummary struct {
 	Input  MetricsInput  `json:"input"`
 	Filter MetricsFilter `json:"filter"`
@@ -86,26 +161,74 @@ type MetricsSummary struct {
 
 // MetricsInput stores totals for a core instance input.
 type MetricsInput struct {
-	Bytes   *float64 `json:"bytes"`
-	Records *float64 `json:"records"`
+	Bytes   float64 `json:"bytes"`
+	Records float64 `json:"records"`
 }
 
 // MetricsFilter stores totals for a core instance filter.
 type MetricsFilter struct {
-	DropRecords *float64 `json:"dropRecords"`
-	EmitRecords *float64 `json:"emitRecords"`
+	Records     float64 `json:"records"`
+	Bytes       float64 `json:"bytes"`
+	AddRecords  float64 `json:"addRecords"`
+	DropRecords float64 `json:"dropRecords"`
+	EmitRecords float64 `json:"emitRecords"`
 }
 
 // MetricsOutput stores totals for a core instance output.
 type MetricsOutput struct {
-	Bytes          *float64 `json:"bytes"`
-	Records        *float64 `json:"records"`
-	Errors         *float64 `json:"errors"`
-	Retries        *float64 `json:"retries"`
-	RetriedRecords *float64 `json:"retriedRecords"`
-	RetriesFailed  *float64 `json:"retriesFailed"`
-	DroppedRecords *float64 `json:"droppedRecords"`
-	Loads          *float64 `json:"loads"`
+	Bytes          float64 `json:"bytes"`
+	Records        float64 `json:"records"`
+	Errors         float64 `json:"errors"`
+	Retries        float64 `json:"retries"`
+	RetriedRecords float64 `json:"retriedRecords"`
+	RetriesFailed  float64 `json:"retriesFailed"`
+	DroppedRecords float64 `json:"droppedRecords"`
+
+	// Deprecated: `load` is not a valid counter metric.
+	// TODO: review `load` output metrics as they might not even exists in the first place.
+	Loads float64 `json:"loads"`
+}
+
+// MetricsOverTime stores a list of metrics over time for a core instance.
+type MetricsOverTime struct {
+	Input  MetricsOverTimeInput  `json:"input"`
+	Filter MetricsOverTimeFilter `json:"filter"`
+	Output MetricsOverTimeOutput `json:"output"`
+}
+
+// MetricsOverTimeInput stores a list of metrics over time for a core instance input.
+type MetricsOverTimeInput struct {
+	Bytes   []MetricOverTime `json:"bytes"`
+	Records []MetricOverTime `json:"records"`
+}
+
+// MetricsOverTimeFilter stores a list of metrics over time for a core instance filter.
+type MetricsOverTimeFilter struct {
+	Bytes       []MetricOverTime `json:"bytes"`
+	Records     []MetricOverTime `json:"records"`
+	AddRecords  []MetricOverTime `json:"addRecords"`
+	DropRecords []MetricOverTime `json:"dropRecords"`
+	EmitRecords []MetricOverTime `json:"emitRecords"`
+}
+
+// MetricsOverTimeOutput stores a list of metrics over time for a core instance output.
+type MetricsOverTimeOutput struct {
+	Bytes          []MetricOverTime `json:"bytes"`
+	Records        []MetricOverTime `json:"records"`
+	Errors         []MetricOverTime `json:"errors"`
+	Retries        []MetricOverTime `json:"retries"`
+	RetriedRecords []MetricOverTime `json:"retriedRecords"`
+	RetriesFailed  []MetricOverTime `json:"retriesFailed"`
+	DroppedRecords []MetricOverTime `json:"droppedRecords"`
+
+	// Deprecated: `load` is not a valid counter metric.
+	// TODO: review `load` output metrics as they might not even exists in the first place.
+	Loads []MetricOverTime `json:"loads"`
+}
+
+type MetricOverTime struct {
+	Time  time.Time `json:"time"`
+	Value float64   `json:"value"`
 }
 
 // MetricsSummaryPlugin stores a list of totals for a core instance
@@ -114,13 +237,6 @@ type MetricsSummaryPlugin struct {
 	Inputs  []MetricsInputPlugin  `json:"inputs"`
 	Filters []MetricsFilterPlugin `json:"filters"`
 	Outputs []MetricsOutputPlugin `json:"outputs"`
-}
-
-func (msp *MetricsSummaryPlugin) Init() *MetricsSummaryPlugin {
-	msp.Inputs = []MetricsInputPlugin{}
-	msp.Filters = []MetricsFilterPlugin{}
-	msp.Outputs = []MetricsOutputPlugin{}
-	return msp
 }
 
 type MetricsInputPlugin struct {
@@ -138,151 +254,12 @@ type MetricsOutputPlugin struct {
 	Metrics  MetricsOutput `json:"metrics"`
 }
 
-// AgentMetrics response payload for agent level metrics.
-type AgentMetrics struct {
-	Measurements map[string]AgentMeasurement `json:"measurements"`
-}
-
-// AddMeasurementMetrics appends a set of metrics/totals to a given measurement field on a AgentMetrics struct.
-func (a *AgentMetrics) AddMeasurementMetrics(measurement string, metrics []MetricFields, totals []MetricFields) {
-	if a.Measurements == nil {
-		a.Measurements = map[string]AgentMeasurement{}
-	}
-
-	if _, ok := a.Measurements[measurement]; !ok {
-		a.Measurements[measurement] = AgentMeasurement{
-			Plugins: map[string]Metrics{},
-			Totals:  map[string][]MetricFields{},
-		}
-	}
-
-	for _, m := range metrics {
-		plugin := a.Measurements[measurement].Plugins[m.Plugin]
-		if plugin.Metrics == nil {
-			plugin.Metrics = map[string][]MetricFields{}
-		}
-		plugin.Metrics[m.Field] = append(plugin.Metrics[m.Field], m)
-		a.Measurements[measurement].Plugins[m.Plugin] = plugin
-	}
-
-	for _, t := range totals {
-		a.Measurements[measurement].Totals[t.Field] = append(a.Measurements[measurement].Totals[t.Field], t)
-	}
-}
-
-// PipelineMetric response payload for pipeline level metric.
-type PipelineMetric struct {
-	Data  AgentMetrics `json:"data"`
-	Error string       `json:"error"`
-}
-
-// AgentMeasurement stores per plugin and total agent level metrics.
-type AgentMeasurement struct {
-	Plugins map[string]Metrics        `json:"plugins"`
-	Totals  map[string][]MetricFields `json:"totals"`
-}
-
-// MetricsPluginTotal stores totals per plugin metrics.
-type MetricsPluginTotal map[string]map[string]*float64
-
-// MeasurementTotal stores totals per measurement.
-type MeasurementTotal map[string]*float64
-
-// Metrics stores a dict of metric type and its fields.
-type Metrics struct {
-	Metrics map[string][]MetricFields `json:"metrics"`
-}
-
-// MetricFields stores a tuple of time, value per metric.
-type MetricFields struct {
-	Time   time.Time `json:"time"`
-	Value  *float64  `json:"value"`
-	Field  string    `json:"-"`
-	Plugin string    `json:"-"`
-}
-
-// ToOverTime converts a regular MetricFields to a MetricOverTime.
-func (m MetricFields) ToOverTime() MetricOverTime {
-	return MetricOverTime{
-		Time:  m.Time,
-		Value: m.Value,
-	}
-}
-
-// MetricsParams parameters to filtering metrics by.
-type MetricsParams struct {
-	Start    time.Duration
-	Interval time.Duration
-}
-
-// PipelinesMetricsParams request payload for bulk querying pipeline metrics for a given aggregator.
-type PipelinesMetricsParams struct {
-	MetricsParams
-	PipelineIDs []string
-}
-
-// CreatedAgentMetrics response model for created agent metrics.
-type CreatedAgentMetrics struct {
-	Total uint `json:"totalInserted"`
-}
-
-// PipelinesMetrics response payload for aggregator level pipeline metrics.
-// This type is a map of PipelineID(s) -> PipelineMetric.
-type PipelinesMetrics map[string]PipelineMetric
-
-// TODO: define "add metrics" type.
-
-// MetricsOverTime stores a list of metrics over time for a core instance.
-type MetricsOverTime struct {
-	Input  MetricsOverTimeInput  `json:"input"`
-	Filter MetricsOverTimeFilter `json:"filter"`
-	Output MetricsOverTimeOutput `json:"output"`
-}
-
-func (mot *MetricsOverTime) Init() *MetricsOverTime {
-	mot.Input.Init()
-	mot.Filter.Init()
-	mot.Output.Init()
-	return mot
-}
-
-// MetricsOverTimeInput stores a list of metrics over time for a core instance input.
-type MetricsOverTimeInput struct {
-	Bytes   []MetricOverTime `json:"bytes"`
-	Records []MetricOverTime `json:"records"`
-}
-
-// MetricsOverTimeFilter stores a list of metrics over time for a core instance filter.
-type MetricsOverTimeFilter struct {
-	DropRecords []MetricOverTime `json:"dropRecords"`
-	EmitRecords []MetricOverTime `json:"emitRecords"`
-}
-
-// MetricsOverTimeOutput stores a list of metrics over time for a core instance output.
-type MetricsOverTimeOutput struct {
-	Bytes          []MetricOverTime `json:"bytes"`
-	Records        []MetricOverTime `json:"records"`
-	Errors         []MetricOverTime `json:"errors"`
-	Retries        []MetricOverTime `json:"retries"`
-	RetriedRecords []MetricOverTime `json:"retriedRecords"`
-	RetriesFailed  []MetricOverTime `json:"retriesFailed"`
-	DroppedRecords []MetricOverTime `json:"droppedRecords"`
-	Loads          []MetricOverTime `json:"loads"`
-}
-
 // MetricsOverTimeByPlugin stores a list of metrics over time for a core instance
 // for a specific plugin.
 type MetricsOverTimeByPlugin struct {
 	Inputs  []MetricsOverTimeByPluginInput  `json:"inputs"`
 	Filters []MetricsOverTimeByPluginFilter `json:"filters"`
 	Outputs []MetricsOverTimeByPluginOutput `json:"outputs"`
-}
-
-func (motbp *MetricsOverTimeByPlugin) Init() *MetricsOverTimeByPlugin {
-	motbp.Inputs = []MetricsOverTimeByPluginInput{}
-	motbp.Filters = []MetricsOverTimeByPluginFilter{}
-	motbp.Outputs = []MetricsOverTimeByPluginOutput{}
-	return motbp
 }
 
 // MetricsOverTimeByPluginInput stores a list of metrics over time for core instance inputs
@@ -304,117 +281,4 @@ type MetricsOverTimeByPluginFilter struct {
 type MetricsOverTimeByPluginOutput struct {
 	Instance string                `json:"instance"`
 	Metrics  MetricsOverTimeOutput `json:"metrics"`
-}
-
-func (o *MetricsOverTimeOutput) Init() *MetricsOverTimeOutput {
-	o.Bytes = []MetricOverTime{}
-	o.Records = []MetricOverTime{}
-	o.Errors = []MetricOverTime{}
-	o.Retries = []MetricOverTime{}
-	o.RetriedRecords = []MetricOverTime{}
-	o.RetriesFailed = []MetricOverTime{}
-	o.DroppedRecords = []MetricOverTime{}
-	o.Loads = []MetricOverTime{}
-	return o
-}
-
-func (f *MetricsOverTimeFilter) Init() *MetricsOverTimeFilter {
-	f.DropRecords = []MetricOverTime{}
-	f.EmitRecords = []MetricOverTime{}
-	return f
-}
-
-func (i *MetricsOverTimeInput) Init() *MetricsOverTimeInput {
-	i.Bytes = []MetricOverTime{}
-	i.Records = []MetricOverTime{}
-	return i
-}
-
-type MetricOverTime struct {
-	Time  time.Time `json:"time"`
-	Value *float64  `json:"value"`
-}
-
-type MeasurementType string
-
-const (
-	FluentbitInputMeasurementType     MeasurementType = "fluentbit_input"
-	FluentbitFilterMeasurementType    MeasurementType = "fluentbit_filter"
-	FluentbitOutputMeasurementType    MeasurementType = "fluentbit_output"
-	FluentbitStorageMeasurementType   MeasurementType = "fluentbit_storage"
-	FluentdInputMeasurementType       MeasurementType = "fluentd_input"
-	FluentdFilterMeasurementType      MeasurementType = "fluentd_filter"
-	FluentdOutputMeasurementType      MeasurementType = "fluentd_output"
-	FluentdMultiOutputMeasurementType MeasurementType = "fluentd_multi_output"
-	FluentdBareOutputMeasurementType  MeasurementType = "fluentd_bare_output"
-	FluentdStorageMeasurementType     MeasurementType = "fluentd_storage"
-)
-
-type ValidMeasurementType map[string]MeasurementType
-
-var MeasurementTypeMap = ValidMeasurementType{
-	string(FluentbitInputMeasurementType):     FluentbitInputMeasurementType,
-	string(FluentbitFilterMeasurementType):    FluentbitFilterMeasurementType,
-	string(FluentbitOutputMeasurementType):    FluentbitOutputMeasurementType,
-	string(FluentdInputMeasurementType):       FluentdInputMeasurementType,
-	string(FluentdFilterMeasurementType):      FluentdFilterMeasurementType,
-	string(FluentdOutputMeasurementType):      FluentdOutputMeasurementType,
-	string(FluentdMultiOutputMeasurementType): FluentdMultiOutputMeasurementType,
-	string(FluentdBareOutputMeasurementType):  FluentdBareOutputMeasurementType,
-	string(FluentbitStorageMeasurementType):   FluentbitStorageMeasurementType,
-	string(FluentdStorageMeasurementType):     FluentdStorageMeasurementType,
-}
-
-type ValidMetricTag string
-
-const (
-	AgentMetricTag        ValidMetricTag = "agent_id"
-	PipelineMetricTag     ValidMetricTag = "pipeline_id"
-	AggregatorMetricTag   ValidMetricTag = "aggregator_id"
-	CoreInstanceMetricTag ValidMetricTag = "core_instance_id"
-	FleetMetricTag        ValidMetricTag = "fleet_id"
-	PluginTag                            = "plugin"
-	PluginTagFallback                    = "name"
-	// PodPipelineMetricTag preserves dimensionality for pipelines
-	// with replicas > 1.
-	PodPipelineMetricTag ValidMetricTag = "pod_id"
-	// HostnameFleetMetricTag is the most user-friendly dimension
-	// for fleet agents.
-	HostnameFleetMetricTag ValidMetricTag = "hostname"
-	// MachineIDFleetMetricTag should preserve dimensionality for
-	// most fleet agents.
-	MachineIDFleetMetricTag ValidMetricTag = "machine_id"
-)
-
-type Metric struct {
-	Measurement string
-	influxmodels.Point
-}
-
-func (m *Metric) AsWritePoint(tags influxmodels.Tags) (*writeapi.Point, error) {
-	fields, err := m.Fields()
-	if err != nil {
-		return nil, err
-	}
-
-	measurement := string(m.Name())
-	if _, ok := MeasurementTypeMap[measurement]; !ok {
-		return nil, fmt.Errorf("invalid measurement type: %s", measurement)
-	}
-
-	pointTags := m.Point.Tags()
-
-	if pointTags.GetString(PluginTag) == "" {
-		name := pointTags.GetString(PluginTagFallback)
-		if name == "" {
-			return nil, errs.InvalidMetricPlugin
-		}
-		pointTags.SetString(PluginTag, name)
-	}
-
-	for _, tag := range tags {
-		pointTags.Set(tag.Key, tag.Value)
-	}
-
-	return influxdb2.NewPoint(measurement, pointTags.Map(), fields, m.Time()), nil
 }
