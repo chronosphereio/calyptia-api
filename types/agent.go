@@ -9,6 +9,7 @@ import (
 // Agent model.
 type Agent struct {
 	ID                  string           `json:"id" yaml:"id"`
+	ProjectID           string           `json:"projectID" yaml:"projectID"`
 	FleetID             *string          `json:"fleetID" yaml:"fleetID"`
 	Token               string           `json:"token" yaml:"token"`
 	Name                string           `json:"name" yaml:"name"`

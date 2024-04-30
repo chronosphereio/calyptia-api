@@ -8,6 +8,7 @@ const (
 	Conflict         = ConflictError("conflict")
 	PermissionDenied = PermissionDeniedError("permission denied")
 	Gone             = GoneError("gone")
+	Unavailable      = UnavailableError("unavailable")
 )
 
 type UnauthenticatedError string
@@ -39,6 +40,11 @@ type GoneError string
 
 func (e GoneError) Error() string        { return string(e) }
 func (e GoneError) Is(target error) bool { return target == Gone }
+
+type UnavailableError string
+
+func (e UnavailableError) Error() string        { return string(e) }
+func (e UnavailableError) Is(target error) bool { return target == Unavailable }
 
 type DetailedError struct {
 	Msg    string  `json:"error"`

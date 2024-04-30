@@ -4084,9 +4084,25 @@ components:
           format: float
           nullable: true
           default: null
+          deprecated: true
     FilterMetrics:
       type: object
       properties:
+        records:
+          type: number
+          format: float
+          nullable: true
+          default: null
+        bytes:
+          type: number
+          format: float
+          nullable: true
+          default: null
+        addRecords:
+          type: number
+          format: float
+          nullable: true
+          default: null
         dropRecords:
           type: number
           format: float
@@ -4160,6 +4176,18 @@ components:
     MetricsOverTimeFilter:
       type: object
       properties:
+        bytes:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricOverTime"
+        records:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricOverTime"
+        addRecords:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricOverTime"
         dropRecords:
           type: array
           items:
@@ -4169,6 +4197,9 @@ components:
           items:
             $ref: "#/components/schemas/MetricOverTime"
       required:
+        - bytes
+        - records
+        - addRecords
         - dropRecords
         - emitRecords
     MetricsOverTimeOutput:
@@ -4203,6 +4234,7 @@ components:
           items:
             $ref: "#/components/schemas/MetricOverTime"
         loads:
+          deprecated: true
           type: array
           items:
             $ref: "#/components/schemas/MetricOverTime"

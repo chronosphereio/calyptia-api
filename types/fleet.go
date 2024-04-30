@@ -30,6 +30,7 @@ type CreateFleet struct {
 	RawConfig           string       `json:"rawConfig"`
 	ConfigFormat        ConfigFormat `json:"configFormat"`
 	Tags                []string     `json:"tags"`
+	Files               []CreateFleetFile
 
 	SkipConfigValidation bool `json:"skipConfigValidation"`
 }
