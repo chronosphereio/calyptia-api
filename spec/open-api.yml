@@ -7786,6 +7786,15 @@ paths:
           name: name
           description: Kubernetes object name to filter by.
           example: kube-system
+        - name: last
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+        - name: before
+          in: query
+          schema:
+            type: string
       security:
         - user: []
         - project: []
