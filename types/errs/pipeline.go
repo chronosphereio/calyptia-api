@@ -9,6 +9,8 @@ const (
 	InvalidPipelineMetadataValue        = InvalidArgumentError("invalid pipeline metadata value")
 	InvalidPipelineImage                = InvalidArgumentError("invalid pipeline image")
 	InvalidPipelineDeploymentStrategy   = InvalidArgumentError("invalid pipeline deployment strategy")
+	InvalidHPAScalingType               = InvalidArgumentError("invalid pipeline HPA scaling type")
+	InvalidMinReplicasCount             = InvalidArgumentError("invalid min replica count")
 	PipelineNameAlreadyExists           = ConflictError("pipeline name already exists")
 	CannotUpdatePipelineKind            = ConflictError("pipeline kind cannot be updated")
 	PipelineNotFound                    = NotFoundError("pipeline not found")

@@ -1158,6 +1158,7 @@ components:
           type: integer
           minimum: 0
         replicasCountPrev:
+          type: integer
           description: the previous replica set counter
           minimum: 0
         checksTotal:
@@ -1202,6 +1203,39 @@ components:
           default: null
           items:
             $ref: "#/components/schemas/PipelinePort"
+        minReplicas:
+          type: integer
+          description: minReplicas is the lower limit for the number of replicas to which the autoscaler can scale down.
+        scaleUpType:
+          type: string
+          description: HPAScalingPolicyType is the type of the policy which could be used while making scaling decisions. It can be "Pods" or "Percent"
+          enum:
+            - Pods
+            - Percent
+        scaleUpValue:
+          type: integer
+          description: value contains the amount of change which is permitted by the policy.
+        scaleUpPeriodSeconds:
+          type: integer
+          description: ScaleUpPeriodSeconds specifies the window of time for which the policy should hold true.
+        scaleDownType:
+          type: string
+          description: HPAScalingPolicyType is the type of the policy which could be used while making scaling decisions. It can be "Pods" or "Percent"
+          enum:
+            - Pods
+            - Percent
+        scaleDownValue:
+          type: integer
+          description: value contains the amount of change which is permitted by the policy.
+        scaleDownPeriodSeconds:
+          type: integer
+          description: ScaleUpPeriodSeconds specifies the window of time for which the policy should hold true.
+        utilizationCPUAverage:
+          type: integer
+          description: UtilizationCPUAverage defines the target value for average CPU utilization
+        utilizationMemoryAverage:
+          type: integer
+          description: UtilizationMemoryAverage defines the target value for average CPU utilization
         createdAt:
           type: string
           format: date-time
@@ -1220,6 +1254,15 @@ components:
         - metadata
         - createdAt
         - updatedAt
+        - minReplicas
+        - scaleUpType
+        - scaleUpValue
+        - scaleUpPeriodSeconds
+        - scaleDownType
+        - scaleDownValue
+        - scaleDownPeriodSeconds
+        - utilizationCPUAverage
+        - utilizationMemoryAverage
     PipelineKind:
       type: string
       default: deployment
@@ -2531,6 +2574,30 @@ components:
             - LoadBalancer
             - ClusterIP
             - NodePort
+        minReplicas:
+          type: integer
+        scaleUpType:
+          type: string
+          enum:
+            - Pods
+            - Percent
+        scaleUpValue:
+          type: integer
+        scaleUpPeriodSeconds:
+          type: integer
+        scaleDownType:
+          type: string
+          enum:
+            - Pods
+            - Percent
+        scaleDownValue:
+          type: integer
+        scaleDownPeriodSeconds:
+          type: integer
+        utilizationCPUAverage:
+          type: integer
+        utilizationMemoryAverage:
+          type: integer
       required:
         - name
         - replicasCount
@@ -2541,6 +2608,15 @@ components:
         - resourceProfile
         - skipConfigValidation
         - portKind
+        - minReplicas
+        - scaleUpType
+        - scaleUpValue
+        - scaleUpPeriodSeconds
+        - scaleDownType
+        - scaleDownValue
+        - scaleDownPeriodSeconds
+        - utilizationCPUAverage
+        - utilizationMemoryAverage
     UpdatePipeline:
       description: Update pipeline request body.
       type: object
@@ -2679,6 +2755,48 @@ components:
           nullable: true
           default: null
           additionalProperties: true
+        minReplicas:
+          type: integer
+          nullable: true
+          default: null
+        scaleUpType:
+          type: string
+          nullable: true
+          default: null
+          enum:
+            - Pods
+            - Percent
+        scaleUpValue:
+          type: integer
+          nullable: true
+          default: null
+        scaleUpPeriodSeconds:
+          type: integer
+          nullable: true
+          default: null
+        scaleDownType:
+          type: string
+          nullable: true
+          default: null
+          enum:
+            - Pods
+            - Percent
+        scaleDownValue:
+          type: integer
+          nullable: true
+          default: null
+        scaleDownPeriodSeconds:
+          type: integer
+          nullable: true
+          default: null
+        utilizationCPUAverage:
+          type: integer
+          nullable: true
+          default: null
+        utilizationMemoryAverage:
+          type: integer
+          nullable: true
+          default: null
     CreatePipelineCheck:
       description: Create pipeline check request body.
       type: object
