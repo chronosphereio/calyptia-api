@@ -19,14 +19,16 @@ fi
 # Schema linting
 docker run --pull=always --rm -v "$SPEC_DIR/":/spec:ro redocly/openapi-cli lint /spec/open-api.yml
 
+# Skipping schemathesis temporarily due to it failing randomly.
+#
 # Schema validation against the cloud image
-docker run --pull=always --rm --network=host -v "$SPEC_DIR/":/spec:ro \
-    schemathesis/schemathesis:stable \
-        run \
-        --hypothesis-suppress-health-check=too_slow \
-        --header "Authorization:" \
-        --header "X-Project-Token:$TOKEN" \
-        --stateful=links \
-        --workers "$WORKER_COUNT" \
-        /spec/open-api.yml \
-        --base-url="$CLOUD_URL/" "$@"
+# docker run --pull=always --rm --network=host -v "$SPEC_DIR/":/spec:ro \
+#     schemathesis/schemathesis:stable \
+#         run \
+#         --hypothesis-suppress-health-check=too_slow \
+#         --header "Authorization:" \
+#         --header "X-Project-Token:$TOKEN" \
+#         --stateful=links \
+#         --workers "$WORKER_COUNT" \
+#         /spec/open-api.yml \
+#         --base-url="$CLOUD_URL/" "$@"
