@@ -20,6 +20,13 @@ const (
 	DeploymentStrategyHotReload DeploymentStrategy = "hotReload"
 )
 
+type HPAScalingPolicyType string
+
+const (
+	PodsScalingPolicy    HPAScalingPolicyType = "Pods"
+	PercentScalingPolicy HPAScalingPolicyType = "Percent"
+)
+
 const (
 	SectionKindServiceOrdinal int = iota + 1
 	SectionKindInputOrdinal
@@ -32,6 +39,10 @@ var (
 	AllValidDeploymentStrategies = [...]DeploymentStrategy{
 		DeploymentStrategyRecreate,
 		DeploymentStrategyHotReload,
+	}
+	AllValidHPAScalingTypes = [...]HPAScalingPolicyType{
+		PodsScalingPolicy,
+		PercentScalingPolicy,
 	}
 )
 
@@ -60,6 +71,26 @@ type Pipeline struct {
 	Ports                        []PipelinePort     `json:"ports,omitempty" yaml:"ports,omitempty"`
 	Files                        []PipelineFile     `json:"files,omitempty" yaml:"files,omitempty"`
 	Secrets                      []PipelineSecret   `json:"secrets,omitempty" yaml:"secrets,omitempty"`
+
+	// Horizontal Pod Autoscaler properties
+	// minReplicas is the lower limit for the number of replicas to which the autoscaler can scale down.
+	MinReplicas int32 `json:"minReplicas" yaml:"minReplicas"`
+	// HPAScalingPolicyType is the type of the policy which could be used while making scaling decisions. It can be "Pods" or "Percent"
+	ScaleUpType HPAScalingPolicyType `json:"scaleUpType" yaml:"scaleUpType"`
+	// value contains the amount of change which is permitted by the policy.
+	ScaleUpValue int32 `json:"scaleUpValue" yaml:"scaleUpValue"`
+	// ScaleUpPeriodSeconds specifies the window of time for which the policy should hold true.
+	ScaleUpPeriodSeconds int32 `json:"scaleUpPeriodSeconds" yaml:"scaleUpPeriodSeconds"`
+	// HPAScalingPolicyType is the type of the policy which could be used while making scaling decisions. It can be "Pods" or "Percent"
+	ScaleDownType HPAScalingPolicyType `json:"scaleDownType" yaml:"scaleDownType"`
+	// value contains the amount of change which is permitted by the policy.
+	ScaleDownValue int32 `json:"scaleDownValue" yaml:"scaleDownValue"`
+	// ScaleDownPeriodSeconds specifies the window of time for which the policy should hold true.
+	ScaleDownPeriodSeconds int32 `json:"scaleDownPeriodSeconds" yaml:"scaleDownPeriodSeconds"`
+	// UtilizationCPUAverage defines the target percentage value for average CPU utilization
+	UtilizationCPUAverage int32 `json:"utilizationCPUAverage" yaml:"utilizationCPUAverage"`
+	// UtilizationMemoryAverage defines the target percentage value for average CPU utilization
+	UtilizationMemoryAverage int32 `json:"utilizationMemoryAverage" yaml:"utilizationMemoryAverage"`
 }
 
 func (p *Pipeline) sortSections() {
@@ -182,6 +213,17 @@ type CreatePipeline struct {
 
 	// The default portKind to be used for input ports that belongs to this pipeline.
 	PortKind PipelinePortKind `json:"portKind"`
+
+	// Horizontal Pod Autoscaler properties
+	MinReplicas              int32                `json:"minReplicas"`
+	ScaleUpType              HPAScalingPolicyType `json:"scaleUpType"`
+	ScaleUpValue             int32                `json:"scaleUpValue"`
+	ScaleUpPeriodSeconds     int32                `json:"scaleUpPeriodSeconds"`
+	ScaleDownType            HPAScalingPolicyType `json:"scaleDownType"`
+	ScaleDownValue           int32                `json:"scaleDownValue"`
+	ScaleDownPeriodSeconds   int32                `json:"scaleDownPeriodSeconds"`
+	UtilizationCPUAverage    int32                `json:"utilizationCPUAverage"`
+	UtilizationMemoryAverage int32                `json:"utilizationMemoryAverage"`
 
 	status PipelineStatusKind
 	// Internal denotes that this pipeline was created by the system.
@@ -317,8 +359,21 @@ type UpdatePipeline struct {
 	Files                []UpdatePipelineFile   `json:"files"`
 	Events               []PipelineEvent        `json:"events"`
 
+	// Horizontal Pod Autoscaler properties
+	MinReplicas              *int32                `json:"minReplicas"`
+	ScaleUpType              *HPAScalingPolicyType `json:"scaleUpType"`
+	ScaleUpValue             *int32                `json:"scaleUpValue"`
+	ScaleUpPeriodSeconds     *int32                `json:"scaleUpPeriodSeconds"`
+	ScaleDownType            *HPAScalingPolicyType `json:"scaleDownType"`
+	ScaleDownValue           *int32                `json:"scaleDownValue"`
+	ScaleDownPeriodSeconds   *int32                `json:"scaleDownPeriodSeconds"`
+	UtilizationCPUAverage    *int32                `json:"utilizationCPUAverage"`
+	UtilizationMemoryAverage *int32                `json:"utilizationMemoryAverage"`
+
 	clusterLogging    *bool
 	resourceProfileID *string
+	statusID          *string
+	configID          *string
 }
 
 func (in *UpdatePipeline) SetClusterLogging(clusterLogging bool) {
@@ -329,12 +384,28 @@ func (in *UpdatePipeline) SetResourceProfileID(resourceProfileID string) {
 	in.resourceProfileID = &resourceProfileID
 }
 
+func (in *UpdatePipeline) SetStatusID(statusID string) {
+	in.statusID = &statusID
+}
+
+func (in *UpdatePipeline) SetConfigID(configID string) {
+	in.configID = &configID
+}
+
 func (in UpdatePipeline) ClusterLogging() *bool {
 	return in.clusterLogging
 }
 
 func (in UpdatePipeline) ResourceProfileID() *string {
 	return in.resourceProfileID
+}
+
+func (in UpdatePipeline) StatusID() *string {
+	return in.statusID
+}
+
+func (in UpdatePipeline) ConfigID() *string {
+	return in.configID
 }
 
 // PipelineParams request payload for querying a single pipeline.
