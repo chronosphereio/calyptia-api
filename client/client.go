@@ -262,7 +262,7 @@ func disableRedirect(c *http.Client) func() {
 // chunksSizeByID is the max URL lentgh (2048) minus the endpoint lentgh (around 100) by UUID lentgh (36).
 // This makes sure the full URL with the query strings params does not exceed the max URL length.
 //
-//nolint:gomnd // documented already
+//nolint:mnd // documented already
 const chunksSizeByID = (2048 - 100) / 36
 
 func makeChunks[T any](ss []T, size int) [][]T {

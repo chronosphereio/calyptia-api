@@ -4773,6 +4773,32 @@ components:
         definition:
           $ref: "#/components/schemas/ProcessingRuleDef"
 
+    ConfigFormat:
+      type: string
+      enum:
+        - classic
+        - yaml
+        - json
+      default: classic
+      example: yaml
+
+    ValidateFluentbitConfig:
+      type: object
+      properties:
+        rawConfig:
+          type: string
+          example: |-
+            pipeline:
+              inputs:
+                - name: dummy
+              outputs:
+                - name: stdout
+                  match: "*"
+        configFormat:
+          $ref: "#/components/schemas/ConfigFormat"
+      required:
+        - rawConfig
+
 paths:
   /v1/verification_email:
     get:
@@ -7413,6 +7439,7 @@ paths:
         in: path
         required: true
     post:
+      deprecated: true
       tags:
         - config_validator
       summary: Validate configuration
@@ -7437,6 +7464,7 @@ paths:
                 $ref: "#/components/schemas/ValidatedConfig"
   "/v1/config_validate_v2":
     post:
+      deprecated: true
       tags:
         - config_validator_v2
       summary: Validate configuration on the v2 endpoint of the service
@@ -9846,3 +9874,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DeletedProcessingRuleTemplate"
+
+  /v2/validate_fluentbit_config:
+    post:
+      operationId: validateFluentBitConfig
+      summary: Validate Fluent-bit configuration.
+      security: []
+      tags: [config_validator]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValidateFluentbitConfig"
+      responses:
+        204:
+          description: No Content

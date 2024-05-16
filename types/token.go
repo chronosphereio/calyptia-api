@@ -4,11 +4,12 @@ import "time"
 
 // Token model.
 type Token struct {
-	ID          string    `json:"id" yaml:"id"`
-	Token       string    `json:"token" yaml:"token"`
-	Name        string    `json:"name" yaml:"name"`
-	Permissions []string  `json:"permissions" yaml:"permissions"`
-	CreatedAt   time.Time `json:"createdAt" yaml:"createdAt"`
+	ID          string    `json:"id" yaml:"id" db:"id"`
+	ProjectID   string    `json:"projectID" yaml:"projectID" db:"project_id"`
+	Token       string    `json:"token" yaml:"token" db:"token"`
+	Name        string    `json:"name" yaml:"name" db:"name"`
+	Permissions []string  `json:"permissions" yaml:"permissions" db:"permissions"`
+	CreatedAt   time.Time `json:"createdAt" yaml:"createdAt" db:"created_at"`
 }
 
 // Tokens paginated list.
