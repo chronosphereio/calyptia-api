@@ -23,8 +23,9 @@ const (
 type HPAScalingPolicyType string
 
 const (
-	PodsScalingPolicy    HPAScalingPolicyType = "Pods"
-	PercentScalingPolicy HPAScalingPolicyType = "Percent"
+	ScalingPolicyUnknown HPAScalingPolicyType = ""
+	ScalingPolicyPods    HPAScalingPolicyType = "Pods"
+	ScalingPolicyPercent HPAScalingPolicyType = "Percent"
 )
 
 const (
@@ -41,8 +42,9 @@ var (
 		DeploymentStrategyHotReload,
 	}
 	AllValidHPAScalingTypes = [...]HPAScalingPolicyType{
-		PodsScalingPolicy,
-		PercentScalingPolicy,
+		ScalingPolicyUnknown,
+		ScalingPolicyPods,
+		ScalingPolicyPercent,
 	}
 )
 

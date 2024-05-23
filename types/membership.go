@@ -44,32 +44,8 @@ func (m Membership) CanManageMembership(target Membership) bool {
 	return false
 }
 
-func (m Membership) HasPermission(permission string) bool {
-	// no permissions means all permissions.
-	if len(m.Permissions) == 0 {
-		return true
-	}
-
-	for _, p := range m.Permissions {
-		if p == permission {
-			return true
-		}
-	}
-	return false
-}
-
-func (m Membership) HasAllPermissions(permissions ...string) bool {
-	// no permissions means all permissions.
-	if len(m.Permissions) == 0 {
-		return true
-	}
-
-	for _, p := range permissions {
-		if !m.HasPermission(p) {
-			return false
-		}
-	}
-	return true
+func (m Membership) HasOnlyPermission(permission string) bool {
+	return len(m.Permissions) == 1 && m.Permissions[0] == permission
 }
 
 // Memberships paginated list.
