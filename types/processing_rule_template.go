@@ -1,59 +1,43 @@
 package types
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type ProcessingRuleTemplate struct {
-	ID              string            `json:"id" yaml:"id" db:"id"`
-	ProjectID       string            `json:"projectID" yaml:"projectID" db:"project_id"`
-	Name            string            `json:"name" yaml:"name" db:"name"`
-	Definition      ProcessingRuleDef `json:"definition" yaml:"definition" db:"definition"`
-	PipelineVersion string            `json:"pipelineVersion" yaml:"pipelineVersion" db:"pipeline_version"`
-	Input           string            `json:"input" yaml:"input" db:"input"`
-	IsRawInput      bool              `json:"isRawInput" yaml:"isRawInput" db:"is_raw_input"`
-	CreatedAt       time.Time         `json:"createdAt" yaml:"createdAt" db:"created_at"`
-	UpdatedAt       time.Time         `json:"updatedAt" yaml:"updatedAt" db:"updated_at"`
-}
-
-type ProcessingRuleDef struct {
-	Name  string `json:"name" yaml:"name"`
-	Match string `json:"match" yaml:"match"`
-	Code  string `json:"code" yaml:"code"`
-	Call  string `json:"call" yaml:"call"`
-}
-
-type StaticProcessingRuleTemplate struct {
-	Name       string            `json:"name" yaml:"name"`
-	Definition ProcessingRuleDef `json:"definition" yaml:"definition"`
+	ID              string          `json:"id" yaml:"id" db:"id"`
+	ProjectID       string          `json:"projectID" yaml:"projectID" db:"project_id"`
+	Name            string          `json:"name" yaml:"name" db:"name"`
+	PipelineVersion *string         `json:"pipelineVersion" yaml:"pipelineVersion" db:"pipeline_version"`
+	Definition      json.RawMessage `json:"definition" yaml:"definition" db:"definition"`
+	CreatedAt       time.Time       `json:"createdAt" yaml:"createdAt" db:"created_at"`
+	UpdatedAt       time.Time       `json:"updatedAt" yaml:"updatedAt" db:"updated_at"`
 }
 
 type CreateProcessingRuleTemplate struct {
-	ProjectID       string            `json:"-"`
-	Name            string            `json:"name"`
-	Definition      ProcessingRuleDef `json:"definition"`
-	PipelineVersion string            `json:"pipelineVersion"`
-	Input           string            `json:"input"`
-	IsRawInput      bool              `json:"isRawInput"`
+	ProjectID       string          `json:"-"`
+	Name            string          `json:"name"`
+	PipelineVersion *string         `json:"pipelineVersion"`
+	Definition      json.RawMessage `json:"definition"`
 }
 
 type ListProcessingRuleTemplates struct {
-	ProjectID string
-	Last      *uint
-	Before    *string
-	Name      *string
+	ProjectID string  `json:"-"`
+	Last      *uint   `json:"-"`
+	Before    *string `json:"-"`
+	Name      *string `json:"-"`
 }
 
 type ProcessingRuleTemplates struct {
-	Items     []ProcessingRuleTemplate       `json:"items" yaml:"items"`
-	EndCursor *string                        `json:"endCursor" yaml:"endCursor"`
-	Count     uint                           `json:"count" yaml:"count"`
-	Static    []StaticProcessingRuleTemplate `json:"static" yaml:"static"`
+	Items     []ProcessingRuleTemplate `json:"items" yaml:"items"`
+	EndCursor *string                  `json:"endCursor" yaml:"endCursor"`
+	Count     uint                     `json:"count" yaml:"count"`
 }
 
 type UpdateProcessingRuleTemplate struct {
-	TemplateID      string             `json:"-"`
-	Name            *string            `json:"name"`
-	Definition      *ProcessingRuleDef `json:"definition"`
-	PipelineVersion *string            `json:"pipelineVersion"`
-	Input           *string            `json:"input"`
-	IsRawInput      *bool              `json:"isRawInput"`
+	ID              string           `json:"-"`
+	Name            *string          `json:"name"`
+	PipelineVersion *string          `json:"pipelineVersion"`
+	Definition      *json.RawMessage `json:"definition"`
 }

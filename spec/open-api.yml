@@ -56,6 +56,7 @@ tags:
   - name: agent_error
   - name: aws_marketplace
   - name: cluster_object_regex
+  - name: processing_rule
   - name: processing_rule_template
 
 components:
@@ -2576,28 +2577,29 @@ components:
             - NodePort
         minReplicas:
           type: integer
+          default: 0
         scaleUpType:
-          type: string
-          enum:
-            - Pods
-            - Percent
+          $ref: "#/components/schemas/ScalePolicy"
         scaleUpValue:
           type: integer
+          default: 0
         scaleUpPeriodSeconds:
           type: integer
+          default: 0
         scaleDownType:
-          type: string
-          enum:
-            - Pods
-            - Percent
+          $ref: "#/components/schemas/ScalePolicy"
         scaleDownValue:
           type: integer
+          default: 0
         scaleDownPeriodSeconds:
           type: integer
+          default: 0
         utilizationCPUAverage:
           type: integer
+          default: 0
         utilizationMemoryAverage:
           type: integer
+          default: 0
       required:
         - name
         - replicasCount
@@ -2617,6 +2619,19 @@ components:
         - scaleDownPeriodSeconds
         - utilizationCPUAverage
         - utilizationMemoryAverage
+
+    ScalePolicy:
+      type: string
+      enum:
+        - ""
+        - Pods
+        - Percent
+      x-graphql-enum-mapping:
+        "": SCALE_POLICY_UNKNOWN
+        Pods: SCALE_POLICY_PODS
+        Percent: SCALE_POLICY_PERCENT
+      default: ""
+
     UpdatePipeline:
       description: Update pipeline request body.
       type: object
@@ -2760,12 +2775,9 @@ components:
           nullable: true
           default: null
         scaleUpType:
-          type: string
+          $ref: "#/components/schemas/ScalePolicy"
           nullable: true
           default: null
-          enum:
-            - Pods
-            - Percent
         scaleUpValue:
           type: integer
           nullable: true
@@ -2775,12 +2787,9 @@ components:
           nullable: true
           default: null
         scaleDownType:
-          type: string
+          $ref: "#/components/schemas/ScalePolicy"
           nullable: true
           default: null
-          enum:
-            - Pods
-            - Percent
         scaleDownValue:
           type: integer
           nullable: true
@@ -3862,7 +3871,8 @@ components:
           format: date-time
       required: [updatedAt]
 
-    ProcessingRule:
+    ProcessingRuleV1:
+      deprecated: true
       type: object
       properties:
         id:
@@ -3884,11 +3894,11 @@ components:
           type: boolean
           default: false
         language:
-          $ref: "#/components/schemas/ProcessingRuleLanguage"
+          $ref: "#/components/schemas/ProcessingRuleLanguageV1"
         actions:
           type: array
           items:
-            $ref: "#/components/schemas/RuleAction"
+            $ref: "#/components/schemas/RuleActionV1"
         createdAt:
           type: string
           format: date-time
@@ -3907,15 +3917,17 @@ components:
         - createdAt
         - updatedAt
 
-    ProcessingRuleLanguage:
+    ProcessingRuleLanguageV1:
+      deprecated: true
       type: string
       enum: [lua]
 
-    RuleAction:
+    RuleActionV1:
+      deprecated: true
       type: object
       properties:
         kind:
-          $ref: "#/components/schemas/RuleActionKind"
+          $ref: "#/components/schemas/RuleActionKindV1"
         description:
           type: string
           example: Sample action
@@ -3926,7 +3938,7 @@ components:
         selectors:
           type: array
           items:
-            $ref: "#/components/schemas/LogSelector"
+            $ref: "#/components/schemas/LogSelectorV1"
         add:
           $ref: "#/components/schemas/LogAttr"
           nullable: true
@@ -3956,7 +3968,8 @@ components:
         - enabled
         - selectors
 
-    RuleActionKind:
+    RuleActionKindV1:
+      deprecated: true
       type: string
       enum:
         - add
@@ -3966,13 +3979,14 @@ components:
         - remove
         - skip
 
-    LogSelector:
+    LogSelectorV1:
+      deprecated: true
       type: object
       properties:
         kind:
-          $ref: "#/components/schemas/LogSelectorKind"
+          $ref: "#/components/schemas/LogSelectorKindV1"
         op:
-          $ref: "#/components/schemas/LogSelectorOpKind"
+          $ref: "#/components/schemas/LogSelectorOpKindV1"
         expr:
           type: string
           example: some_key
@@ -3981,11 +3995,13 @@ components:
         - op
         - expr
 
-    LogSelectorKind:
+    LogSelectorKindV1:
+      deprecated: true
       type: string
       enum: [key]
 
-    LogSelectorOpKind:
+    LogSelectorOpKindV1:
+      deprecated: true
       type: string
       enum: [equal]
 
@@ -4001,7 +4017,8 @@ components:
       required:
         - key
         - value
-    CreateProcessingRule:
+    CreateProcessingRuleV1:
+      deprecated: true
       type: object
       properties:
         match:
@@ -4011,18 +4028,19 @@ components:
           type: boolean
           default: false
         language:
-          $ref: "#/components/schemas/ProcessingRuleLanguage"
+          $ref: "#/components/schemas/ProcessingRuleLanguageV1"
         actions:
           type: array
           items:
-            $ref: "#/components/schemas/RuleAction"
+            $ref: "#/components/schemas/RuleActionV1"
       required:
         - match
         - isMatchRegexp
         - language
         - actions
 
-    CreatedProcessingRule:
+    CreatedProcessingRuleV1:
+      deprecated: true
       type: object
       properties:
         id:
@@ -4043,7 +4061,8 @@ components:
         - fileID
         - createdAt
 
-    UpdateProcessingRule:
+    UpdateProcessingRuleV1:
+      deprecated: true
       type: object
       properties:
         match:
@@ -4056,17 +4075,18 @@ components:
           nullable: true
           default: null
         language:
-          $ref: "#/components/schemas/ProcessingRuleLanguage"
+          $ref: "#/components/schemas/ProcessingRuleLanguageV1"
           nullable: true
           default: null
         actions:
           type: array
           items:
-            $ref: "#/components/schemas/RuleAction"
+            $ref: "#/components/schemas/RuleActionV1"
           nullable: true
           default: null
 
-    UpdatedProcessingRule:
+    UpdatedProcessingRuleV1:
+      deprecated: true
       type: object
       properties:
         updatedAt:
@@ -4434,15 +4454,16 @@ components:
       required:
         - time
         - value
-    PreviewProcessingRule:
+    PreviewProcessingRuleV1:
+      deprecated: true
       type: object
       properties:
         language:
-          $ref: "#/components/schemas/ProcessingRuleLanguage"
+          $ref: "#/components/schemas/ProcessingRuleLanguageV1"
         actions:
           type: array
           items:
-            $ref: "#/components/schemas/RuleAction"
+            $ref: "#/components/schemas/RuleActionV1"
         logs:
           type: array
           items:
@@ -4580,7 +4601,7 @@ components:
           minLength: 1
       required: [amazonMarketplaceToken]
 
-    ProcessingRuleTemplate:
+    ProcessingRuleTemplateV1:
       type: object
       properties:
         id:
@@ -4593,7 +4614,7 @@ components:
           type: string
           example: "My template"
         definition:
-          $ref: "#/components/schemas/ProcessingRuleDef"
+          $ref: "#/components/schemas/ProcessingRuleDefV1"
         pipelineVersion:
           type: string
           example: v1.3.5
@@ -4614,7 +4635,8 @@ components:
           type: string
           format: date-time
 
-    CreateProcessingRuleTemplate:
+    CreateProcessingRuleTemplateV1:
+      deprecated: true
       type: object
       properties:
         name:
@@ -4623,7 +4645,7 @@ components:
           minLength: 1
           maxLength: 30
         definition:
-          $ref: "#/components/schemas/ProcessingRuleDef"
+          $ref: "#/components/schemas/ProcessingRuleDefV1"
         pipelineVersion:
           type: string
           example: v1.3.5
@@ -4642,26 +4664,14 @@ components:
         - name
         - definition
 
-    CreatedProcessingRuleTemplate:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        createdAt:
-          type: string
-          format: date-time
-      required:
-        - id
-        - createdAt
-
-    ProcessingRuleTemplates:
+    ProcessingRuleTemplatesV1:
+      deprecated: true
       type: object
       properties:
         items:
           type: array
           items:
-            $ref: "#/components/schemas/ProcessingRuleTemplate"
+            $ref: "#/components/schemas/ProcessingRuleTemplateV1"
         endCursor:
           type: string
           format: uuid
@@ -4674,14 +4684,15 @@ components:
         static:
           type: array
           items:
-            $ref: "#/components/schemas/StaticProcessingRuleTemplate"
+            $ref: "#/components/schemas/StaticProcessingRuleTemplateV1"
       required:
         - items
         - endCursor
         - count
         - static
 
-    UpdateProcessingRuleTemplate:
+    UpdateProcessingRuleTemplateV1:
+      deprecated: true
       type: object
       properties:
         name:
@@ -4692,7 +4703,7 @@ components:
           nullable: true
           default: null
         definition:
-          $ref: "#/components/schemas/ProcessingRuleDef"
+          $ref: "#/components/schemas/ProcessingRuleDefV1"
           nullable: true
           default: null
         pipelineVersion:
@@ -4713,31 +4724,9 @@ components:
           type: boolean
           description: define if the input parameter is in raw or json format (false)
           default: false
-    UpdatedProcessingRuleTemplate:
-      type: object
-      properties:
-        updatedAt:
-          type: string
-          format: date-time
-      required:
-        - updatedAt
 
-    DeletedProcessingRuleTemplate:
-      type: object
-      properties:
-        deleted:
-          type: boolean
-          default: false
-        deletedAt:
-          type: string
-          format: date-time
-          nullable: true
-          default: null
-      required:
-        - deleted
-        - deletedAt
-
-    ProcessingRuleDef:
+    ProcessingRuleDefV1:
+      deprecated: true
       type: object
       properties:
         name:
@@ -4761,7 +4750,8 @@ components:
           example: filter
           minLength: 1
 
-    StaticProcessingRuleTemplate:
+    StaticProcessingRuleTemplateV1:
+      deprecated: true
       description: |
         A static processing rule template is a template that is not editable.
         It's a template that is provided by Calyptia.
@@ -4771,7 +4761,7 @@ components:
           type: string
           example: "By Calyptia"
         definition:
-          $ref: "#/components/schemas/ProcessingRuleDef"
+          $ref: "#/components/schemas/ProcessingRuleDefV1"
 
     ConfigFormat:
       type: string
@@ -4798,6 +4788,104 @@ components:
           $ref: "#/components/schemas/ConfigFormat"
       required:
         - rawConfig
+
+    ProcessingRuleTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        projectID:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "My Processing Rule Template"
+        pipelineVersion:
+          type: string
+          nullable: true
+          default: null
+          example: v24.5.0
+        definition:
+          type: object
+          additionalProperties: true
+          example: {}
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - projectID
+        - name
+        - pipelineVersion
+        - definition
+        - createdAt
+        - updatedAt
+
+    CreateProcessingRuleTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "My Processing Rule Template"
+        pipelineVersion:
+          type: string
+          nullable: true
+          default: null
+          example: v24.5.0
+        definition:
+          type: object
+          additionalProperties: true
+          example: {}
+      required:
+        - name
+        - pipelineVersion
+        - definition
+
+    ProcessingRuleTemplates:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProcessingRuleTemplate"
+        endCursor:
+          type: string
+          format: uuid
+          nullable: true
+          default: null
+        count:
+          type: number
+          format: int32
+          minimum: 0
+          example: 1
+      required:
+        - items
+        - endCursor
+        - count
+
+    UpdateProcessingRuleTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "My Processing Rule Template"
+          nullable: true
+          default: null
+        pipelineVersion:
+          type: string
+          nullable: true
+          default: null
+          example: v24.5.0
+        definition:
+          type: object
+          nullable: true
+          default: null
+          additionalProperties: true
+          example: {}
 
 paths:
   /v1/verification_email:
@@ -8375,6 +8463,7 @@ paths:
           format: uuid
         required: true
     post:
+      deprecated: true
       tags: [processing_rule]
       security:
         - user: []
@@ -8383,20 +8472,21 @@ paths:
       description: |
         Create a processing rule in the given pipeline.
         Only one processing rule is allowed per pipeline.
-      operationId: createProcessingRule
+      operationId: createProcessingRuleV1
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateProcessingRule"
+              $ref: "#/components/schemas/CreateProcessingRuleV1"
       responses:
         "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreatedProcessingRule"
+                $ref: "#/components/schemas/CreatedProcessingRuleV1"
     get:
+      deprecated: true
       tags: [processing_rule]
       security:
         - user: []
@@ -8414,7 +8504,7 @@ paths:
           in: query
           description: Processing rules before the given cursor.
       summary: Processing rules
-      operationId: processingRules
+      operationId: processingRulesV1
       responses:
         "200":
           description: OK
@@ -8426,7 +8516,7 @@ paths:
               description: RFC5988 with `rel="next"`.
           links:
             NextTraceRecordsPage:
-              operationId: processingRules
+              operationId: processingRulesV1
               parameters:
                 before: "$response.header.Link#rel=next"
           content:
@@ -8434,7 +8524,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/ProcessingRule"
+                  $ref: "#/components/schemas/ProcessingRuleV1"
 
   "/v1/processing_rules/{processingRuleID}":
     parameters:
@@ -8445,19 +8535,20 @@ paths:
           format: uuid
         required: true
     get:
+      deprecated: true
       tags: [processing_rule]
       security:
         - user: []
         - project: []
       summary: Processing rule
-      operationId: processingRule
+      operationId: processingRuleV1
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProcessingRule"
+                $ref: "#/components/schemas/ProcessingRuleV1"
           links:
             Pipeline:
               operationId: pipeline
@@ -8472,9 +8563,10 @@ paths:
               parameters:
                 projectID: "$response.body.fileID"
     patch:
+      deprecated: true
       tags: [processing_rule]
       summary: Update processing rule
-      operationId: updateProcessingRule
+      operationId: updateProcessingRuleV1
       security:
         - user: []
         - project: []
@@ -8482,18 +8574,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateProcessingRule"
+              $ref: "#/components/schemas/UpdateProcessingRuleV1"
       responses:
         "200":
           description: Updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UpdatedProcessingRule"
+                $ref: "#/components/schemas/UpdatedProcessingRuleV1"
     delete:
+      deprecated: true
       tags: [processing_rule]
       summary: Delete processing rule
-      operationId: deleteProcessingRule
+      operationId: deleteProcessingRuleV1
       security:
         - user: []
         - project: []
@@ -8503,9 +8596,10 @@ paths:
 
   "/v1/preview_processing_rule":
     post:
+      deprecated: true
       tags: [processing_rule]
       summary: Preview processing rule
-      operationId: previewProcessingRule
+      operationId: previewProcessingRuleV1
       security:
         - user: []
         - project: []
@@ -8513,7 +8607,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PreviewProcessingRule"
+              $ref: "#/components/schemas/PreviewProcessingRuleV1"
       responses:
         "200":
           description: OK
@@ -9770,7 +9864,8 @@ paths:
           type: string
           format: uuid
     post:
-      operationId: createProcessingRuleTemplate
+      deprecated: true
+      operationId: createProcessingRuleTemplateV1
       summary: Create processing rule template
       description: |-
         Create a new processing rule template.
@@ -9782,16 +9877,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateProcessingRuleTemplate"
+              $ref: "#/components/schemas/CreateProcessingRuleTemplateV1"
       responses:
         201:
           description: Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreatedProcessingRuleTemplate"
+                $ref: "#/components/schemas/Created"
     get:
-      operationId: processingRuleTemplates
+      deprecated: true
+      operationId: processingRuleTemplatesV1
       summary: Processing rule templates
       description: |-
         List all processing rule templates in descending order with backward pagination.
@@ -9827,7 +9923,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProcessingRuleTemplates"
+                $ref: "#/components/schemas/ProcessingRuleTemplatesV1"
 
   /v1/processing_rule_templates/{templateID}:
     parameters:
@@ -9838,7 +9934,8 @@ paths:
           type: string
           format: uuid
     patch:
-      operationId: updateProcessingRuleTemplate
+      deprecated: true
+      operationId: updateProcessingRuleTemplateV1
       summary: Update processing rule template
       description: |-
         Update a processing rule template details.
@@ -9850,16 +9947,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateProcessingRuleTemplate"
+              $ref: "#/components/schemas/UpdateProcessingRuleTemplateV1"
       responses:
         "200":
           description: Updated.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UpdatedProcessingRuleTemplate"
+                $ref: "#/components/schemas/Updated"
     delete:
-      operationId: deleteProcessingRuleTemplate
+      deprecated: true
+      operationId: deleteProcessingRuleTemplateV1
       summary: Delete processing rule template
       description: |-
         Delete a single processing rule template by its ID.
@@ -9873,7 +9971,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DeletedProcessingRuleTemplate"
+                $ref: "#/components/schemas/Deleted"
 
   /v2/validate_fluentbit_config:
     post:
@@ -9889,3 +9987,125 @@ paths:
       responses:
         204:
           description: No Content
+
+  /v2/projects/{projectID}/processing_rule_templates:
+    parameters:
+      - name: projectID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      operationId: createProcessingRuleTemplate
+      summary: Create processing rule template
+      security:
+        - user: []
+        - project: []
+      tags: [processing_rule_template]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProcessingRuleTemplate"
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Created"
+    get:
+      operationId: processingRuleTemplates
+      summary: Processing rule templates
+      description: |-
+        List all processing rule templates in descending order with backward pagination.
+      security:
+        - user: []
+        - project: []
+      tags: [processing_rule_template]
+      parameters:
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 30
+          description: Filter processing rule templates by name.
+        - name: last
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+          description: Last processing rule templates.
+        - name: before
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Processing rule templates before the given cursor.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcessingRuleTemplates"
+
+  /v2/processing_rule_templates/{templateID}:
+    parameters:
+      - name: templateID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: processingRuleTemplate
+      summary: Processing rule template
+      security:
+        - user: []
+        - project: []
+      tags: [processing_rule_template]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcessingRuleTemplate"
+    patch:
+      operationId: updateProcessingRuleTemplate
+      summary: Update processing rule template
+      security:
+        - user: []
+        - project: []
+      tags: [processing_rule_template]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProcessingRuleTemplate"
+      responses:
+        "200":
+          description: Updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Updated"
+    delete:
+      operationId: deleteProcessingRuleTemplate
+      summary: Delete processing rule template
+      security:
+        - user: []
+        - project: []
+      tags: [processing_rule_template]
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deleted"
