@@ -53,11 +53,10 @@ type PipelinePorts struct {
 
 // CreatePipelinePort request payload for creating a pipeline port.
 type CreatePipelinePort struct {
-	Protocol     string           `json:"protocol"`
-	FrontendPort uint             `json:"frontendPort"`
-	BackendPort  uint             `json:"backendPort"`
-	Endpoint     string           `json:"endpoint"`
-	Kind         PipelinePortKind `json:"kind"`
+	Protocol     string `json:"protocol"`
+	FrontendPort uint   `json:"frontendPort"`
+	BackendPort  uint   `json:"backendPort"`
+	Endpoint     string `json:"endpoint"`
 	pluginID     *string
 	pluginName   *string
 	pluginAlias  *string
@@ -76,10 +75,6 @@ func (in *CreatePipelinePort) SetPluginID(pluginID string) {
 
 func (in *CreatePipelinePort) SetPluginName(pluginName string) {
 	in.pluginName = &pluginName
-}
-
-func (in *CreatePipelinePort) SetPortKind(kind PipelinePortKind) {
-	in.Kind = kind
 }
 
 func (in *CreatePipelinePort) SetPluginAlias(pluginAlias string) {
@@ -115,9 +110,8 @@ type PipelinePortsParams struct {
 
 // UpdatePipelinePort request payload for updating a pipeline port.
 type UpdatePipelinePort struct {
-	Protocol     *string           `json:"protocol"`
-	FrontendPort *uint             `json:"frontendPort"`
-	BackendPort  *uint             `json:"backendPort"`
-	Endpoint     *string           `json:"endpoint"`
-	Kind         *PipelinePortKind `json:"kind"`
+	Protocol     *string `json:"protocol"`
+	FrontendPort *uint   `json:"frontendPort"`
+	BackendPort  *uint   `json:"backendPort"`
+	Endpoint     *string `json:"endpoint"`
 }
