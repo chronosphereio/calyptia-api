@@ -1237,6 +1237,8 @@ components:
         utilizationMemoryAverage:
           type: integer
           description: UtilizationMemoryAverage defines the target value for average CPU utilization
+        portKind:
+          $ref: "#/components/schemas/PipelinePortKind"          
         createdAt:
           type: string
           format: date-time
@@ -2568,13 +2570,8 @@ components:
           default: null
           additionalProperties: true
         portKind:
-          type: string
-          description: Kind of service for the service/ports created under this pipeline.
-          default: LoadBalancer
-          enum:
-            - LoadBalancer
-            - ClusterIP
-            - NodePort
+          $ref: "#/components/schemas/PipelinePortKind"          
+
         minReplicas:
           type: integer
           default: 0
@@ -2747,14 +2744,9 @@ components:
             - CHECKS_OK
             - CHECKS_FAILED            -
         portKind:
-          type: string
-          description: Kind of service for the service/ports created for this pipeline.
-          default: null
+          $ref: "#/components/schemas/PipelinePortKind"
           nullable: true
-          enum:
-            - LoadBalancer
-            - ClusterIP
-            - NodePort
+          default: null
         events:
           type: array
           nullable: true
@@ -3028,13 +3020,13 @@ components:
         endpoint:
           type: string
         kind:
+          deprecated: true
           $ref: "#/components/schemas/PipelinePortKind"
       required:
         - protocol
         - frontendPort
         - backendPort
         - endpoint
-        - kind
     UpdatePipelinePort:
       description: Update pipeline port request body.
       type: object
@@ -3059,6 +3051,7 @@ components:
           nullable: true
           default: null
         kind:
+          deprecated: true
           type: string
           description: The kind/type of the service associated to this port.
           default: null

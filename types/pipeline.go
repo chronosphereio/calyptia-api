@@ -73,6 +73,7 @@ type Pipeline struct {
 	Ports                        []PipelinePort     `json:"ports,omitempty" yaml:"ports,omitempty"`
 	Files                        []PipelineFile     `json:"files,omitempty" yaml:"files,omitempty"`
 	Secrets                      []PipelineSecret   `json:"secrets,omitempty" yaml:"secrets,omitempty"`
+	PortKind                     PipelinePortKind   `json:"portKind" yaml:"portKind"`
 
 	// Horizontal Pod Autoscaler properties
 	// minReplicas is the lower limit for the number of replicas to which the autoscaler can scale down.
