@@ -2623,14 +2623,10 @@ components:
     ScalePolicy:
       type: string
       enum:
-        - ""
+        - Unknown
         - Pods
         - Percent
-      x-graphql-enum-mapping:
-        "": SCALE_POLICY_UNKNOWN
-        Pods: SCALE_POLICY_PODS
-        Percent: SCALE_POLICY_PERCENT
-      default: ""
+      default: "Unknown"
 
     UpdatePipeline:
       description: Update pipeline request body.
