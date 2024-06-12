@@ -196,10 +196,25 @@ type MetricsOverTime struct {
 	Output MetricsOverTimeOutput `json:"output"`
 }
 
+func (m *MetricsOverTime) Init() {
+	m.Input.Init()
+	m.Filter.Init()
+	m.Output.Init()
+}
+
 // MetricsOverTimeInput stores a list of metrics over time for a core instance input.
 type MetricsOverTimeInput struct {
 	Bytes   []MetricOverTime `json:"bytes"`
 	Records []MetricOverTime `json:"records"`
+}
+
+func (m *MetricsOverTimeInput) Init() {
+	if m.Bytes == nil {
+		m.Bytes = []MetricOverTime{}
+	}
+	if m.Records == nil {
+		m.Records = []MetricOverTime{}
+	}
 }
 
 // MetricsOverTimeFilter stores a list of metrics over time for a core instance filter.
@@ -209,6 +224,24 @@ type MetricsOverTimeFilter struct {
 	AddRecords  []MetricOverTime `json:"addRecords"`
 	DropRecords []MetricOverTime `json:"dropRecords"`
 	EmitRecords []MetricOverTime `json:"emitRecords"`
+}
+
+func (m *MetricsOverTimeFilter) Init() {
+	if m.Bytes == nil {
+		m.Bytes = []MetricOverTime{}
+	}
+	if m.Records == nil {
+		m.Records = []MetricOverTime{}
+	}
+	if m.AddRecords == nil {
+		m.AddRecords = []MetricOverTime{}
+	}
+	if m.DropRecords == nil {
+		m.DropRecords = []MetricOverTime{}
+	}
+	if m.EmitRecords == nil {
+		m.EmitRecords = []MetricOverTime{}
+	}
 }
 
 // MetricsOverTimeOutput stores a list of metrics over time for a core instance output.
@@ -226,6 +259,33 @@ type MetricsOverTimeOutput struct {
 	Loads []MetricOverTime `json:"loads"`
 }
 
+func (m *MetricsOverTimeOutput) Init() {
+	if m.Bytes == nil {
+		m.Bytes = []MetricOverTime{}
+	}
+	if m.Records == nil {
+		m.Records = []MetricOverTime{}
+	}
+	if m.Errors == nil {
+		m.Errors = []MetricOverTime{}
+	}
+	if m.Retries == nil {
+		m.Retries = []MetricOverTime{}
+	}
+	if m.RetriedRecords == nil {
+		m.RetriedRecords = []MetricOverTime{}
+	}
+	if m.RetriesFailed == nil {
+		m.RetriesFailed = []MetricOverTime{}
+	}
+	if m.DroppedRecords == nil {
+		m.DroppedRecords = []MetricOverTime{}
+	}
+	if m.Loads == nil {
+		m.Loads = []MetricOverTime{}
+	}
+}
+
 type MetricOverTime struct {
 	Time  time.Time `json:"time"`
 	Value float64   `json:"value"`
@@ -237,6 +297,18 @@ type MetricsSummaryPlugin struct {
 	Inputs  []MetricsInputPlugin  `json:"inputs"`
 	Filters []MetricsFilterPlugin `json:"filters"`
 	Outputs []MetricsOutputPlugin `json:"outputs"`
+}
+
+func (m *MetricsSummaryPlugin) Init() {
+	if m.Inputs == nil {
+		m.Inputs = []MetricsInputPlugin{}
+	}
+	if m.Filters == nil {
+		m.Filters = []MetricsFilterPlugin{}
+	}
+	if m.Outputs == nil {
+		m.Outputs = []MetricsOutputPlugin{}
+	}
 }
 
 type MetricsInputPlugin struct {
@@ -260,6 +332,18 @@ type MetricsOverTimeByPlugin struct {
 	Inputs  []MetricsOverTimeByPluginInput  `json:"inputs"`
 	Filters []MetricsOverTimeByPluginFilter `json:"filters"`
 	Outputs []MetricsOverTimeByPluginOutput `json:"outputs"`
+}
+
+func (m *MetricsOverTimeByPlugin) Init() {
+	if m.Inputs == nil {
+		m.Inputs = []MetricsOverTimeByPluginInput{}
+	}
+	if m.Filters == nil {
+		m.Filters = []MetricsOverTimeByPluginFilter{}
+	}
+	if m.Outputs == nil {
+		m.Outputs = []MetricsOverTimeByPluginOutput{}
+	}
 }
 
 // MetricsOverTimeByPluginInput stores a list of metrics over time for core instance inputs
