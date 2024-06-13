@@ -7,7 +7,7 @@ OpenAPI spec, Golang types and client for the API to [Calyptia Core](https://cor
 ## Install
 
 ```bash
-go get github.com/chronosphereio/calyptia-api
+go get github.com/calyptia/api
 ```
 
 ## Client usage
