@@ -58,6 +58,7 @@ tags:
   - name: cluster_object_regex
   - name: processing_rule
   - name: processing_rule_template
+  - name: saml_mapping
 
 components:
   securitySchemes:
@@ -1238,7 +1239,7 @@ components:
           type: integer
           description: UtilizationMemoryAverage defines the target value for average CPU utilization
         portKind:
-          $ref: "#/components/schemas/PipelinePortKind"          
+          $ref: "#/components/schemas/PipelinePortKind"
         createdAt:
           type: string
           format: date-time
@@ -2570,7 +2571,7 @@ components:
           default: null
           additionalProperties: true
         portKind:
-          $ref: "#/components/schemas/PipelinePortKind"          
+          $ref: "#/components/schemas/PipelinePortKind"
 
         minReplicas:
           type: integer
@@ -4875,6 +4876,91 @@ components:
           default: null
           additionalProperties: true
           example: {}
+
+    Role:
+      type: string
+      enum:
+        - admin
+        - manager
+        - team
+        - viewer
+
+    SAMLMapping:
+      type: object
+      description: SAML Mapping required for IDP
+      required:
+        - id
+        - projectID
+        - claimKey
+        - claimValue
+        - role
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        projectID:
+          type: string
+          format: uuid
+        claimKey:
+          type: string
+        claimValue:
+          type: string
+        role:
+          $ref: "#/components/schemas/Role"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    SAMLMappings:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/SAMLMapping"
+        endCursor:
+          type: string
+          nullable: true
+        count:
+          type: number
+          format: int32
+      required:
+        - items
+        - endCursor
+        - count
+
+    CreateSAMLMapping:
+      type: object
+      properties:
+        claimKey:
+          type: string
+        claimValue:
+          type: string
+        role:
+          $ref: "#/components/schemas/Role"
+      required:
+        - claimKey
+        - claimValue
+        - role
+
+    UpdateSAMLMapping:
+      type: object
+      description: SAML Mapping to update.
+      properties:
+        claimKey:
+          type: string
+          nullable: true
+        claimValue:
+          type: string
+          nullable: true
+        role:
+          $ref: "#/components/schemas/Role"
+          nullable: true
 
 paths:
   /v1/verification_email:
@@ -10094,6 +10180,92 @@ paths:
       responses:
         "200":
           description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deleted"
+
+  /v1/projects/{projectID}/saml_mappings:
+    parameters:
+      - name: projectID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: samlMappings
+      summary: SAML Mappings
+      security:
+        - user: []
+        - project: []
+      tags: [saml_mapping]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SAMLMappings"
+    post:
+      operationId: createSAMLMapping
+      summary: Create SAML Mapping
+      security:
+        - user: []
+        - project: []
+      tags: [saml_mapping]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSAMLMapping"
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Created"
+
+  /v1/saml_mappings/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      operationId: updateSAMLMapping
+      summary: Update SAML Mapping
+      security:
+        - user: []
+        - project: []
+      tags: [saml_mapping]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSAMLMapping"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Updated"
+    delete:
+      operationId: deleteSAMLMapping
+      tags: [saml_mapping]
+      summary: Delete SAML Mapping
+      security:
+        - user: []
+        - project: []
+      responses:
+        "200":
+          description: OK
           content:
             application/json:
               schema:
