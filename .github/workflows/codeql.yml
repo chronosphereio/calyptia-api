@@ -2,13 +2,13 @@ name: CodeQL security
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
   schedule:
-    - cron: '11 0 * * 5'
+    - cron: "11 0 * * 5"
 jobs:
   analyze:
     if: ${{!github.event.repository.private}}
@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'go' ]
+        language: ["go"]
 
     steps:
       - name: Checkout repository

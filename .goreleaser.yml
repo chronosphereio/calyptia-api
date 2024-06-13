@@ -1,2 +1,5 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema-pro.json
+
+version: 2
 builds:
-- skip: true
+    - skip: true
