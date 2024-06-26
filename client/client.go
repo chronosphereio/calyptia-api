@@ -13,7 +13,7 @@ import (
 	"strings"
 
 	"github.com/peterhellberg/link"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 
 	"github.com/calyptia/api/types"
 )
