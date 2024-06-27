@@ -68,7 +68,10 @@ func (c *Client) FleetConfig(ctx context.Context, fleetID string, params types.F
 		q.Set("config_format", string(*params.ConfigFormat))
 	}
 
-	path := "/v1/fleets/" + url.PathEscape(fleetID) + "/config?" + q.Encode()
+	path := "/v1/fleets/" + url.PathEscape(fleetID) + "/config"
+	if len(q) != 0 {
+		path += "?" + q.Encode()
+	}
 
 	switch *params.ConfigFormat {
 	case types.ConfigFormatINI:
