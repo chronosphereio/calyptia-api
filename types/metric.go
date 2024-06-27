@@ -183,10 +183,6 @@ type MetricsOutput struct {
 	RetriedRecords float64 `json:"retriedRecords"`
 	RetriesFailed  float64 `json:"retriesFailed"`
 	DroppedRecords float64 `json:"droppedRecords"`
-
-	// Deprecated: `load` is not a valid counter metric.
-	// TODO: review `load` output metrics as they might not even exists in the first place.
-	Loads float64 `json:"loads"`
 }
 
 // MetricsOverTime stores a list of metrics over time for a core instance.
@@ -253,10 +249,6 @@ type MetricsOverTimeOutput struct {
 	RetriedRecords []MetricOverTime `json:"retriedRecords"`
 	RetriesFailed  []MetricOverTime `json:"retriesFailed"`
 	DroppedRecords []MetricOverTime `json:"droppedRecords"`
-
-	// Deprecated: `load` is not a valid counter metric.
-	// TODO: review `load` output metrics as they might not even exists in the first place.
-	Loads []MetricOverTime `json:"loads"`
 }
 
 func (m *MetricsOverTimeOutput) Init() {
@@ -280,9 +272,6 @@ func (m *MetricsOverTimeOutput) Init() {
 	}
 	if m.DroppedRecords == nil {
 		m.DroppedRecords = []MetricOverTime{}
-	}
-	if m.Loads == nil {
-		m.Loads = []MetricOverTime{}
 	}
 }
 

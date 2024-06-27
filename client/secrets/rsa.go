@@ -28,7 +28,7 @@ func NewRSAHandler(bits int) *RSA {
 	return &RSA{Bits: bits}
 }
 
-func (r *RSA) EncryptWithPublicKey(msg []byte, key []byte) ([]byte, error) {
+func (r *RSA) EncryptWithPublicKey(msg, key []byte) ([]byte, error) {
 	publicKey, err := BytesToPublicKey(key)
 	if err != nil {
 		return nil, err
@@ -100,7 +100,7 @@ func Decrypt(hash hash.Hash, privateKey *rsa.PrivateKey, msg []byte) ([]byte, er
 	return plaintext, nil
 }
 
-func (r *RSA) DecryptWithPrivateKey(msg []byte, key []byte) ([]byte, error) {
+func (r *RSA) DecryptWithPrivateKey(msg, key []byte) ([]byte, error) {
 	privateKey, err := BytesToPrivateKey(key)
 	if err != nil {
 		return nil, err
@@ -113,7 +113,7 @@ func (r *RSA) DecryptWithPrivateKey(msg []byte, key []byte) ([]byte, error) {
 	return plaintext, nil
 }
 
-func (r *RSA) GenerateKeyPair() ([]byte, []byte, error) {
+func (r *RSA) GenerateKeyPair() (priv, pub []byte, err error) {
 	privateKey, err := rsa.GenerateKey(rand.Reader, r.Bits)
 	if err != nil {
 		return nil, nil, err
