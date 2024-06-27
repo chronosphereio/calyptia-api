@@ -85,9 +85,7 @@ func (c *Client) FleetConfig(ctx context.Context, fleetID string, params types.F
 			return nil, err
 		}
 		return &cfg, nil
-	case types.ConfigFormatYAML:
-		fallthrough
-	case types.ConfigFormatJSON:
+	case types.ConfigFormatYAML, types.ConfigFormatJSON:
 		var out fluentbitconfig.Config
 		return &out, c.do(ctx, http.MethodGet, path, nil, &out)
 	}

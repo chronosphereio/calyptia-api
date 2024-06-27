@@ -182,11 +182,6 @@ type CreatePipeline struct {
 	Metadata             *json.RawMessage       `json:"metadata"`
 	Tags                 []string               `json:"tags"`
 
-	// Deprecated: in favor of NoAutoCreateEndpointsFromConfig
-	AutoCreatePortsFromConfig bool `json:"autoCreatePortsFromConfig"`
-	// Deprecated: in favor of NoAutoCreateChecksFromConfig
-	AutoCreateChecksFromConfig bool `json:"autoCreateChecksFromConfig"`
-
 	// no automatically create endpoints from config
 	NoAutoCreateEndpointsFromConfig bool `json:"noAutoCreateEndpointsFromConfig"`
 	// no automatically create checks based on the output configuration.
@@ -343,10 +338,6 @@ type UpdatePipeline struct {
 	RawConfig          *string             `json:"rawConfig"`
 	ResourceProfile    *string             `json:"resourceProfile"`
 	Image              *string             `json:"image"`
-	// Deprecated: in favor of NoAutoCreateEndpointsFromConfig
-	AutoCreatePortsFromConfig *bool `json:"autoCreatePortsFromConfig"`
-	// Deprecated: in favor of NoAutoCreateChecksFromConfig
-	AutoCreateChecksFromConfig *bool `json:"autoCreateChecksFromConfig"`
 
 	// no automatically create endpoints from config
 	NoAutoCreateEndpointsFromConfig bool `json:"noAutoCreateEndpointsFromConfig"`

@@ -23,7 +23,7 @@ const (
 	DefaultBaseURL    = "https://cloud-api.calyptia.com"
 	uintBase          = 10
 	CalyptiaEnvAPIURL = "CALYPTIA_API_URL"
-	//nolint: gosec // no credential leaks just a variable.
+	//nolint:gosec // no credential leaks just a variable.
 	CalyptiaEnvAPIToken = "CALYPTIA_API_TOKEN"
 )
 
