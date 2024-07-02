@@ -4491,12 +4491,17 @@ components:
     SearchResource:
       type: string
       enum:
-        - core_instance
-        - resource_profile
-        - pipeline
-        - fleet
         - agent
         - cluster_object
+        - config_section
+        - core_instance
+        - environment
+        - fleet
+        - member
+        - pipeline
+        - pipeline_secret
+        - resource_profile
+        - trace_session
 
     AgentError:
       type: object
