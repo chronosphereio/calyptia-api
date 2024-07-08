@@ -59,6 +59,7 @@ tags:
   - name: processing_rule
   - name: processing_rule_template
   - name: saml_mapping
+  - name: audit_log
 
 components:
   securitySchemes:
@@ -4966,6 +4967,55 @@ components:
         role:
           $ref: "#/components/schemas/Role"
           nullable: true
+
+    AuditLogAction:
+      type: string
+      enum:
+        - CREATE
+        - UPDATE
+        - DELETE
+
+    AuditLogComponents:
+      type: object
+      additionalProperties:
+        type: string
+
+    AuditLogIdentity:
+      type: object
+      additionalProperties:
+        type: object
+
+    AuditLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        timestamp:
+          type: string
+          format: date-time
+        url:
+          type: string
+          format: url
+        components:
+          $ref: "#/components/schemas/AuditLogComponents"
+        identity:
+          $ref: "#/components/schemas/AuditLogIdentity"
+        action:
+          $ref: "#/components/schemas/AuditLogAction"
+        responseCode:
+          type: integer
+
+    AuditLogs:
+      type: object
+      properties:
+        endCursor:
+          type: string            
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/AuditLog"
+
 
 paths:
   /v1/verification_email:
@@ -10275,3 +10325,58 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Deleted"
+
+  /v1/projects/{projectID}/audit_logs:
+    parameters:
+      - name: projectID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: auditLogs
+      summary: Audit Logs
+      security:
+        - user: []
+        - project: []
+      tags: [audit_log]
+      parameters:
+        - in: query
+          name: components
+          required: true
+          schema:
+            $ref: "#/components/schemas/AuditLogComponents"
+        - in: query
+          name: identity
+          required: true
+          schema:
+            $ref: "#/components/schemas/AuditLogIdentity"
+        - in: query
+          name: url
+          schema:
+            type: string
+        - in: query
+          name: action
+          schema:
+            type: string
+            enum:
+              - CREATE
+              - UPDATE
+              - DELETE
+        - in: query
+          name: first
+          schema:
+            type: integer
+        - in: query
+          name: after
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuditLogs"
+
