@@ -3,13 +3,13 @@ package types
 import "time"
 
 type CreateAuditLog struct {
-	Timestamp    time.Time         `json:"timestamp" yaml:"timestamp" db:"timestamp"`
-	ProjectID    string            `json:"projectID" yaml:"projectID" db:"projectID"`
-	URL          string            `json:"url" yaml:"url" db:"url"`
-	Components   map[string]string `json:"components" yaml:"components" db:"components"`
-	Action       string            `json:"action" yaml:"action" db:"action"`
-	Identity     any               `json:"identity" yaml:"identity" db:"identity"`
-	ResponseCode int               `json:"responseCode" yaml:"responseCode" db:"response_code"`
+	ProjectID    string
+	Timestamp    time.Time
+	URL          string
+	Components   map[string]string
+	Action       string
+	Identity     any
+	ResponseCode int
 }
 
 type CreatedAuditLog struct {
@@ -18,6 +18,7 @@ type CreatedAuditLog struct {
 
 type AuditLog struct {
 	ID           string            `json:"id" yaml:"id" db:"id"`
+	ProjectID    string            `json:"projectID" yaml:"projectID" db:"project_id"`
 	Timestamp    time.Time         `json:"timestamp" yaml:"timestamp" db:"created_at"`
 	URL          string            `json:"url" yaml:"url" db:"url"`
 	Components   map[string]string `json:"components" yaml:"components" db:"components"`
