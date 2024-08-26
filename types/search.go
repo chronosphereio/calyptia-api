@@ -4,6 +4,7 @@ type SearchQuery struct {
 	ProjectID string
 	Resource  SearchResource
 	Term      string
+	Exact     bool
 }
 
 type SearchResource string

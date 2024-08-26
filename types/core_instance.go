@@ -215,13 +215,13 @@ type CreatedCoreInstance struct {
 	Name                   string            `json:"name"`
 	Version                string            `json:"version"`
 	Image                  string            `json:"image"`
-	CreatedAt              time.Time         `json:"createdAt"`
 	Tags                   []string          `json:"tags"`
 	HealthCheckPipeline    *Pipeline         `json:"healthCheckPipeline"`
 	ClusterLoggingPipeline *Pipeline         `json:"clusterLoggingPipeline"`
 	ResourceProfiles       []ResourceProfile `json:"resourceProfiles"`
 	EnvironmentName        string            `json:"environmentName"`
 	SkipServiceCreation    bool              `json:"skipServiceCreation"`
+	CreatedAt              time.Time         `json:"createdAt"`
 }
 
 // CoreInstancesParams request payload for querying core instances.
