@@ -23,7 +23,7 @@ const (
 type HPAScalingPolicyType string
 
 const (
-	ScalingPolicyUnknown HPAScalingPolicyType = ""
+	ScalingPolicyUnknown HPAScalingPolicyType = "Unknown"
 	ScalingPolicyPods    HPAScalingPolicyType = "Pods"
 	ScalingPolicyPercent HPAScalingPolicyType = "Percent"
 )
@@ -58,7 +58,7 @@ type Pipeline struct {
 	Image                        *string            `json:"image" yaml:"image"`
 	Status                       PipelineStatus     `json:"status" yaml:"status"`
 	ResourceProfile              ResourceProfile    `json:"resourceProfile" yaml:"resourceProfile"`
-	DeploymentStrategy           DeploymentStrategy `json:"deploymentStrategy,omitempty" yaml:"deploymentStrategy,omitempty"`
+	DeploymentStrategy           DeploymentStrategy `json:"deploymentStrategy" yaml:"deploymentStrategy"`
 	TracingEnabled               bool               `json:"tracingEnabled" yaml:"tracingEnabled"`
 	WaitForChecksBeforeDeploying bool               `json:"waitForChecksBeforeDeploying" yaml:"waitForChecksBeforeDeploying"`
 	ReplicasCount                uint               `json:"replicasCount" yaml:"replicasCount"`

@@ -1116,6 +1116,16 @@ components:
         - memoryRequest
         - createdAt
         - updatedAt
+
+    DeploymentStrategy:
+      type: string
+      description: |
+        The deployment strategy to use when creating or updating changes to this pipeline.
+      default: recreate
+      enum:
+        - recreate
+        - hotReload
+
     Pipeline:
       type: object
       description: Pipeline model.
@@ -1128,20 +1138,7 @@ components:
           description: DNS label format as of defined on RFC1123
           example: my-pipeline
         kind:
-          type: string
-          description: Kind of deployment used when deploying this pipeline
-          default: deployment
-          enum:
-            - daemonSet
-            - deployment
-        deploymentStrategy:
-          type: string
-          description: |
-            The deployment strategy to use when creating or updating changes to this pipeline.
-          default: recreate
-          enum:
-            - recreate
-            - hotReload
+          $ref: "#/components/schemas/PipelineKind"
         config:
           $ref: "#/components/schemas/PipelineConfig"
         configSections:
@@ -1152,6 +1149,14 @@ components:
           $ref: "#/components/schemas/PipelineStatus"
         resourceProfile:
           $ref: "#/components/schemas/ResourceProfile"
+        deploymentStrategy:
+          $ref: "#/components/schemas/DeploymentStrategy"
+        tracingEnabled:
+          type: boolean
+          default: false
+        waitForChecksBeforeDeploying:
+          type: boolean
+          default: false
         image:
           type: string
           example: ghcr.io/calyptia/core/calyptia-fluent-bit:23.1.2
@@ -1210,11 +1215,7 @@ components:
           type: integer
           description: minReplicas is the lower limit for the number of replicas to which the autoscaler can scale down.
         scaleUpType:
-          type: string
-          description: HPAScalingPolicyType is the type of the policy which could be used while making scaling decisions. It can be "Pods" or "Percent"
-          enum:
-            - Pods
-            - Percent
+          $ref: "#/components/schemas/ScalePolicy"
         scaleUpValue:
           type: integer
           description: value contains the amount of change which is permitted by the policy.
@@ -1222,11 +1223,7 @@ components:
           type: integer
           description: ScaleUpPeriodSeconds specifies the window of time for which the policy should hold true.
         scaleDownType:
-          type: string
-          description: HPAScalingPolicyType is the type of the policy which could be used while making scaling decisions. It can be "Pods" or "Percent"
-          enum:
-            - Pods
-            - Percent
+          $ref: "#/components/schemas/ScalePolicy"
         scaleDownValue:
           type: integer
           description: value contains the amount of change which is permitted by the policy.
@@ -1250,13 +1247,23 @@ components:
       required:
         - id
         - name
+        - kind
         - config
         - configSections
+        - image
         - status
         - resourceProfile
-        - image
+        - deploymentStrategy
+        - tracingEnabled
+        - waitForChecksBeforeDeploying
         - replicasCount
+        - replicasCountPrev
+        - tags
         - metadata
+        - checksTotal
+        - checksOK
+        - checksRunning
+        - portKind
         - createdAt
         - updatedAt
         - minReplicas
@@ -3153,21 +3160,28 @@ components:
           type: string
           format: hostname
           example: my-aggregator
+        version:
+          type: string
+          example: v0.1.12
         image:
           type: string
           description: default core-fluent-bit image to use by the pipelines created on this core_instance.
           example: ghcr.io/calyptia/core/calyptia-fluent-bit:23.1.2
           default: ""
-        version:
-          type: string
-          example: v0.1.12
-        createdAt:
-          type: string
-          format: date-time
+        tags:
+          type: array
+          items:
+            type: string
+          nullable: true
+          default: null
         healthCheckPipeline:
           $ref: "#/components/schemas/Pipeline"
+          nullable: true
+          default: null
         clusterLoggingPipeline:
           $ref: "#/components/schemas/Pipeline"
+          nullable: true
+          default: null
         resourceProfiles:
           type: array
           items:
@@ -3179,16 +3193,24 @@ components:
         skipServiceCreation:
           type: boolean
           default: false
+        createdAt:
+          type: string
+          format: date-time
       required:
         - id
         - token
         - privateRSAKey
         - publicRSAKey
         - name
-        - createdAt
+        - version
+        - image
+        - tags
+        - clusterLoggingPipeline
+        - healthCheckPipeline
         - resourceProfiles
         - environmentName
         - skipServiceCreation
+        - createdAt
     CreatedResourceProfile:
       type: object
       description: Created resource profile response body.
@@ -5010,12 +5032,11 @@ components:
       type: object
       properties:
         endCursor:
-          type: string            
+          type: string
         items:
           type: array
           items:
             $ref: "#/components/schemas/AuditLog"
-
 
 paths:
   /v1/verification_email:
@@ -9622,6 +9643,10 @@ paths:
           in: query
           schema:
             type: string
+        - name: exact
+          in: query
+          schema:
+            type: boolean
       tags: [search]
       responses:
         "200":
@@ -10379,4 +10404,3 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuditLogs"
-
