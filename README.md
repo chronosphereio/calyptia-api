@@ -1,55 +1,6 @@
-# Calyptia Cloud API - OpenAPI specification, Golang reference client and types
+# Calyptia Cloud API - OpenAPI specification
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/calyptia/api.svg)](https://pkg.go.dev/github.com/calyptia/api)
-
-OpenAPI spec, Golang types and client for the API to [Calyptia Core](https://core.calyptia.com).
-
-## Install
-
-```bash
-go get github.com/calyptia/api
-```
-
-## Client usage
-
-Get an API key from [Calyptia Cloud](https://cloud.calyptia.com) under settings.
-
-```go
-package main
-
-import "github.com/chronosphereio/calyptia-api/client"
-
-func main() {
-    c := client.New()
-    c.SetProjectToken("YOUR_API_KEY_HERE")
-}
-```
-
-API keys are bound to an specific project.
-With that API key you cannot list all your other projects,
-or create more API keys.
-But you can perform all other actions within a project:
-manage agents, aggregators and pipelines, invite members, etc.
-
-### User authentication
-
-Machines using this client should prefer API key authorization,
-but if you need user authentication, you must setup [Auth0](https://auth0.com).
-After you successfully login and get an access token,
-you can create an authenticated client like so:
-
-```go
-tok := &oauth2.Token{
-    AccessToken:  "YOUR_AUTH0_ACCESS_TOKEN",
-    TokenType:    "Bearer",
-    Expiry:       auth0Expiry,
-}
-tokSrc := oauth2.StaticTokenSource(tok)
-c.Client = oauth2.NewClient(ctx, tokSrc)
-```
-
-Refer to [client/client_test.go](https://github.com/chronosphereio/calyptia-api/blob/eec74522b60638539bdb7f2334548d3c4cda813d/client/client_test.go#L528-L531)
-for a testing example.
+OpenAPI spec for the API to [Calyptia Core](https://core.calyptia.com).
 
 ## Spec
 
@@ -66,4 +17,12 @@ npx openapi-typescript-codegen \
     --input ./spec/open-api.yml \
     --output ./ts-client \
     --name Client
+```
+
+### Go codegen
+
+Example using [openapi-codegen](https://github.com/oapi-codegen/oapi-codegen).
+
+```bash
+oapi-codegen spec/open-api.yml
 ```
