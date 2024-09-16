@@ -565,15 +565,15 @@ components:
         some errors that have not been dismissed yet.
       properties:
         active:
-          type: number
+          type: integer
           format: int32
           minimum: 0
         inactive:
-          type: number
+          type: integer
           format: int32
           minimum: 0
         withErrors:
-          type: number
+          type: integer
           format: int32
           minimum: 0
       required:
@@ -887,7 +887,7 @@ components:
           type: string
           nullable: true
         count:
-          type: number
+          type: integer
           format: int32
       required:
         - items
@@ -940,7 +940,7 @@ components:
           type: string
           nullable: true
         count:
-          type: number
+          type: integer
           format: int32
       required:
         - items
@@ -1023,7 +1023,7 @@ components:
           type: string
           nullable: true
         count:
-          type: number
+          type: integer
           format: int32
       required:
         - items
@@ -1290,7 +1290,7 @@ components:
           type: string
           nullable: true
         count:
-          type: number
+          type: integer
           format: int32
       required:
         - items
@@ -1451,7 +1451,7 @@ components:
           nullable: true
           default: null
         count:
-          type: number
+          type: integer
           format: int32
           minimum: 0
       required:
@@ -4696,7 +4696,7 @@ components:
           nullable: true
           default: null
         count:
-          type: number
+          type: integer
           format: int32
           minimum: 0
         static:
@@ -4876,7 +4876,7 @@ components:
           nullable: true
           default: null
         count:
-          type: number
+          type: integer
           format: int32
           minimum: 0
           example: 1
@@ -4955,7 +4955,7 @@ components:
           type: string
           nullable: true
         count:
-          type: number
+          type: integer
           format: int32
       required:
         - items
