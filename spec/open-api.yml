@@ -565,15 +565,15 @@ components:
         some errors that have not been dismissed yet.
       properties:
         active:
-          type: integer
+          type: number
           format: int32
           minimum: 0
         inactive:
-          type: integer
+          type: number
           format: int32
           minimum: 0
         withErrors:
-          type: integer
+          type: number
           format: int32
           minimum: 0
       required:
@@ -740,7 +740,7 @@ components:
           format: byte
     AggregatorPingResponse:
       type: object
-      description: Aggregator Ping Response model.
+      description: Core instance ping response model.
       properties:
         nextPing:
           type: string
@@ -815,7 +815,7 @@ components:
         - $ref: "#/components/schemas/MetadataK8S"
     Aggregator:
       type: object
-      description: Aggregator model. (to be renamed as CoreInstance).
+      description: Core instance model.
       properties:
         id:
           type: string
@@ -826,14 +826,14 @@ components:
         name:
           type: string
           format: hostname
-          example: my-aggregator
+          example: my-core-instance
         version:
           type: string
           example: v0.1.12
         status:
           type: string
           description: |
-            Running status of the aggregator instance in reference to the last ping.
+            Running status of the core instance in reference to the last ping.
             Refer to https://pkg.go.dev/github.com/calyptia/api@main/types#pkg-constants
             if looking up for the current timeout defaults.
           enum:
@@ -887,7 +887,7 @@ components:
           type: string
           nullable: true
         count:
-          type: integer
+          type: number
           format: int32
       required:
         - items
@@ -940,7 +940,7 @@ components:
           type: string
           nullable: true
         count:
-          type: integer
+          type: number
           format: int32
       required:
         - items
@@ -1023,7 +1023,7 @@ components:
           type: string
           nullable: true
         count:
-          type: integer
+          type: number
           format: int32
       required:
         - items
@@ -1214,6 +1214,9 @@ components:
         minReplicas:
           type: integer
           description: minReplicas is the lower limit for the number of replicas to which the autoscaler can scale down.
+        maxReplicas:
+          type: integer
+          description: maxReplicas is the upper limit for the number of replicas to which the autoscaler can scale up.
         scaleUpType:
           $ref: "#/components/schemas/ScalePolicy"
         scaleUpValue:
@@ -1267,6 +1270,7 @@ components:
         - createdAt
         - updatedAt
         - minReplicas
+        - maxReplicas
         - scaleUpType
         - scaleUpValue
         - scaleUpPeriodSeconds
@@ -1290,7 +1294,7 @@ components:
           type: string
           nullable: true
         count:
-          type: integer
+          type: number
           format: int32
       required:
         - items
@@ -1451,7 +1455,7 @@ components:
           nullable: true
           default: null
         count:
-          type: integer
+          type: number
           format: int32
           minimum: 0
       required:
@@ -1487,7 +1491,7 @@ components:
             - DONE
     CoreInstanceCheck:
       type: object
-      description: Core instance(aggregator) check model.
+      description: Core instance check model.
       properties:
         id:
           type: string
@@ -2284,13 +2288,13 @@ components:
           default: null
           description: environment ID to associate this agent with.
     CreateAggregator:
-      description: Create aggregator request body.
+      description: Create core instance request body.
       type: object
       properties:
         name:
           type: string
           format: hostname
-          example: new-aggregator
+          example: new-core-instance
         image:
           type: string
           description: default core-fluent-bit image to use by the pipelines created on this core_instance.
@@ -2304,7 +2308,7 @@ components:
           type: boolean
         clusterLogging:
           type: boolean
-          description: Enable cluster-logging functionality on this aggregator instance.
+          description: Enable cluster-logging functionality on this core instance.
         healthCheckPipelinePort:
           type: integer
           format: int32
@@ -2319,7 +2323,7 @@ components:
           type: string
           nullable: true
           default: null
-          description: environment ID to associate this aggregator with.
+          description: environment ID to associate this core instance with.
         skipServiceCreation:
           type: boolean
           nullable: true
@@ -2334,13 +2338,13 @@ components:
         - healthCheckPipelinePort
         - healthCheckPipelinePortKind
     UpdateAggregator:
-      description: Update aggregator request body.
+      description: Update core instance request body.
       type: object
       properties:
         name:
           type: string
           format: hostname
-          example: new-aggregator
+          example: new-core-instance
           nullable: true
           default: null
         image:
@@ -2371,7 +2375,7 @@ components:
           type: string
           nullable: true
           default: null
-          description: environment ID to associate this aggregator with.
+          description: environment ID to associate this core instance with.
         skipServiceCreation:
           type: boolean
           nullable: true
@@ -2584,6 +2588,9 @@ components:
         minReplicas:
           type: integer
           default: 0
+        maxReplicas:
+          type: integer
+          default: 0
         scaleUpType:
           $ref: "#/components/schemas/ScalePolicy"
         scaleUpValue:
@@ -2617,6 +2624,7 @@ components:
         - skipConfigValidation
         - portKind
         - minReplicas
+        - maxReplicas
         - scaleUpType
         - scaleUpValue
         - scaleUpPeriodSeconds
@@ -2771,6 +2779,10 @@ components:
           type: integer
           nullable: true
           default: null
+        maxReplicas:
+          type: integer
+          nullable: true
+          default: null
         scaleUpType:
           $ref: "#/components/schemas/ScalePolicy"
           nullable: true
@@ -2829,7 +2841,7 @@ components:
         - host
         - port
     CreateCoreInstanceCheck:
-      description: Create core instance (aggregator) check request body.
+      description: Create core instance check request body.
       type: object
       properties:
         protocol:
@@ -3142,7 +3154,7 @@ components:
         - createdAt
     CreatedAggregator:
       type: object
-      description: Created aggregator response body.
+      description: Created core instance response body.
       properties:
         id:
           type: string
@@ -3159,7 +3171,7 @@ components:
         name:
           type: string
           format: hostname
-          example: my-aggregator
+          example: my-core-instance
         version:
           type: string
           example: v0.1.12
@@ -3313,7 +3325,7 @@ components:
         - createdAt
     CreatedCoreInstanceCheck:
       type: object
-      description: Created core instance (aggregator) check response body.
+      description: Created core instance check response body.
       properties:
         id:
           type: string
@@ -4501,6 +4513,22 @@ components:
               type: string
         example: '[1234.5, {"key": "value"}]'
 
+
+    SearchResultV1:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        ID:
+          type: string
+          format: uuid
+        Name:
+          type: string
+      required: [id, name, ID, Name]
+
     SearchResult:
       type: object
       properties:
@@ -4696,7 +4724,7 @@ components:
           nullable: true
           default: null
         count:
-          type: integer
+          type: number
           format: int32
           minimum: 0
         static:
@@ -4876,7 +4904,7 @@ components:
           nullable: true
           default: null
         count:
-          type: integer
+          type: number
           format: int32
           minimum: 0
           example: 1
@@ -4955,7 +4983,7 @@ components:
           type: string
           nullable: true
         count:
-          type: integer
+          type: number
           format: int32
       required:
         - items
@@ -5062,7 +5090,7 @@ paths:
       description: |-
         Creates a new project.
         A project is the base unit of work at Calyptia Cloud.
-        You can register agents here, create aggregators in which you can deploy an entire set of pipelines, and monitor them.
+        You can register agents here, create core instances in which you can deploy an entire set of pipelines, and monitor them.
         You can even invite other people to the project and have a team.
       security:
         - user: []
@@ -5183,7 +5211,7 @@ paths:
         These tokens are to authorize other applications to access the project.
         For example:
          - an agent might use it to register itself to the project.
-         - you might create a new aggregator in the project using the aggregator CLI.
+         - you might deploy a new core instance in the project with the CLI/Helm.
          - you might use it within the Calyptia CLI to grant access to your project.
       security:
         - user: []
@@ -5621,12 +5649,12 @@ paths:
     post:
       tags:
         - aggregator
-      summary: Create aggregator
+      summary: Create core instance
       operationId: createAggregator
       description: |-
-        Create aggregator within a project.
-        The project in which the aggregator is created is parser from the authorization token.
-        Users are not allowed to create aggregators.
+        Create core instance within a project.
+        The project in which the core instance is created is parser from the authorization token.
+        Users are not allowed to create core instances.
       security:
         - project: []
       requestBody:
@@ -5653,9 +5681,9 @@ paths:
       deprecated: true
       tags:
         - aggregator
-      summary: Aggregators (deprecated)
+      summary: Core instances (deprecated)
       operationId: aggregators
-      description: Aggregators from a project (deprecated).
+      description: Core instances from a project (deprecated).
       security:
         - user: []
         - project: []
@@ -5665,28 +5693,33 @@ paths:
             minimum: 0
           in: query
           name: last
-          description: Last aggregators.
+          description: Last core instances.
         - schema:
             type: string
           in: query
           name: before
-          description: Aggregators before the given cursor.
+          description: Core instances before the given cursor.
         - schema:
             type: string
           in: query
           name: name
-          description: Name matching aggregators.
+          description: Name matching core instances.
         - schema:
             type: string
           in: query
           name: environment_id
-          description: Environment ID for matching aggregators.
+          description: Environment ID for matching core instances.
         - schema:
             type: string
             example: tagone AND tagtwo
           in: query
           name: tags_query
           description: Tag query.
+        - name: exclude_internal
+          schema:
+            type: boolean
+          in: query
+          description: Exclude internal pipelines (health-check) from count.
       responses:
         "200":
           description: OK
@@ -5710,9 +5743,9 @@ paths:
     delete:
       tags:
         - aggregator
-      summary: Delete Aggregators
+      summary: Delete Core instances
       operationId: deleteAggregators
-      description: Delete aggregators from a project.
+      description: Delete core instances from a project.
       security:
         - user: []
         - project: []
@@ -5724,7 +5757,7 @@ paths:
               format: uuid
           in: query
           name: aggregator_id
-          description: List of aggregator IDs to delete.
+          description: List of core instance IDs to delete.
       responses:
         "204":
           description: Deleted
@@ -5775,6 +5808,11 @@ paths:
             example: tagone AND tagtwo
           in: query
           description: Filter core instances with the given tags query.
+        - name: exclude_internal
+          schema:
+            type: boolean
+          in: query
+          description: Exclude internal pipelines (health-check) from count.
       responses:
         "200":
           description: OK
@@ -6016,9 +6054,9 @@ paths:
     post:
       tags:
         - aggregator
-      summary: Ping Cloud API by Aggregator ID
+      summary: Ping Cloud API by core instance ID
       operationId: aggregatorPing
-      description: Ping Cloud API by aggregator ID
+      description: Ping Cloud API by core instance ID
       security:
         - user: []
         - project: []
@@ -6038,11 +6076,17 @@ paths:
         in: path
         required: true
     get:
+      parameters:
+        - name: exclude_internal
+          schema:
+            type: boolean
+          in: query
+          description: Exclude internal pipelines (health-check) from count.
       tags:
         - aggregator
-      summary: Aggregator
+      summary: Core instance
       operationId: aggregator
-      description: Aggregator by ID.
+      description: Core instance by ID.
       security:
         - user: []
         - project: []
@@ -6056,9 +6100,9 @@ paths:
     patch:
       tags:
         - aggregator
-      summary: Update aggregator
+      summary: Update core instance
       operationId: updateAggregator
-      description: Update aggregator by its ID.
+      description: Update core instance by its ID.
       security:
         - user: []
         - project: []
@@ -6073,9 +6117,9 @@ paths:
     delete:
       tags:
         - aggregator
-      summary: Delete aggregator
+      summary: Delete core instance
       operationId: deleteAggregator
-      description: Delete aggregator by its ID.
+      description: Delete core instance by its ID.
       security:
         - user: []
         - project: []
@@ -6096,9 +6140,9 @@ paths:
       summary: Create resource profile
       operationId: createResourceProfile
       description: |-
-        Create resource profile within an aggregator.
+        Create resource profile within a core instance.
         A resource profile is a specification of a resource used during the deployment of a pipeline.
-        By default, when you setup an aggregator, Calyptia Cloud will generate 3 resource profiles for you:
+        By default, when you setup a core instance, Calyptia Cloud will generate 3 resource profiles for you:
          - high-performance-guaranteed-delivery.
          - high-performance-optimal-throughput.
          - best-effort-low-resource.
@@ -6122,7 +6166,7 @@ paths:
         - resource_profile
       summary: Resource profiles
       operationId: resourceProfiles
-      description: Resource profiles from an aggregator.
+      description: Resource profiles from a core instance.
       security:
         - user: []
         - project: []
@@ -6209,10 +6253,10 @@ paths:
       summary: Create pipeline
       operationId: createPipeline
       description: |-
-        Create pipeline within an aggregator.
-        The pipeline name must be unique within the aggregator.
+        Create pipeline within a core instance.
+        The pipeline name must be unique within the core instance.
         The resource profile must exist already. If you don't provide one, it will default to "best-effort-low-resource".
-        Use them to easily deploy configured agents to the aggregator.
+        Use them to easily deploy configured agents to the core instance.
       security:
         - user: []
         - project: []
@@ -6234,7 +6278,7 @@ paths:
         - pipeline
       summary: Pipelines (deprecated)
       operationId: pipelines
-      description: Pipelines from an aggregator (deprecated).
+      description: Pipelines from a core instance (deprecated).
       security:
         - user: []
         - project: []
@@ -6279,6 +6323,11 @@ paths:
           in: query
           name: include
           description: Include all ports, secrets and files objects in the pipeline.
+        - name: exclude_internal
+          schema:
+            type: boolean
+          in: query
+          description: Exclude internal pipelines (health-check).
       responses:
         "200":
           description: OK
@@ -6304,7 +6353,7 @@ paths:
         - pipeline
       summary: Delete Pipelines
       operationId: deletePipelines
-      description: Delete pipelines from an aggregator.
+      description: Delete pipelines from a core instance.
       security:
         - user: []
         - project: []
@@ -6386,6 +6435,11 @@ paths:
                 - secrets
           in: query
           description: Whether to include ports, secrets and files objects in the pipeline.
+        - name: exclude_internal
+          schema:
+            type: boolean
+          in: query
+          description: Exclude internal pipelines (health-check).
       responses:
         "200":
           description: OK
@@ -6514,6 +6568,11 @@ paths:
                 - secrets
           in: query
           description: Whether to include ports, secrets and files objects in the pipeline.
+        - name: exclude_internal
+          schema:
+            type: boolean
+          in: query
+          description: Exclude internal pipelines (health-check).
       responses:
         "200":
           description: OK
@@ -8051,7 +8110,7 @@ paths:
       security:
         - user: []
         - project: []
-      summary: Aggregator metrics
+      summary: Core instance metrics
       deprecated: true
       operationId: aggregatorMetrics
       tags:
@@ -8109,7 +8168,7 @@ paths:
       security:
         - user: []
         - project: []
-      summary: Aggregator pipelines metrics (bulk)
+      summary: Core instance pipelines metrics (bulk)
       deprecated: true
       operationId: aggregatorPipelinesMetrics
       tags:
@@ -9618,6 +9677,48 @@ paths:
         "204":
           description: Deleted.
   /v1/search:
+    get:
+      operationId: searchV1
+      deprecated: true
+      summary: Search.
+      description: |-
+        Search different kinds of resources from the API.
+        It returns just the ID and name of the matching resource.
+        Results are sorted by name in ascending order.
+        If you don't provide a search term, all data is returned.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - name: project_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: resource
+          in: query
+          schema:
+            $ref: "#/components/schemas/SearchResource"
+        - name: term
+          in: query
+          schema:
+            type: string
+        - name: exact
+          in: query
+          schema:
+            type: boolean
+      tags: [search]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchResultV1"
+
+  /v2/search:
     get:
       operationId: search
       summary: Search.
