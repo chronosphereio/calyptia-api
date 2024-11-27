@@ -1241,6 +1241,14 @@ components:
           description: UtilizationMemoryAverage defines the target value for average CPU utilization
         portKind:
           $ref: "#/components/schemas/PipelinePortKind"
+        serviceAccount:
+          type: string
+          description: Serivce Account for pipeline
+        labels:
+          type: object
+          nullable: true
+          default: null
+          additionalProperties: true
         createdAt:
           type: string
           format: date-time
@@ -1267,6 +1275,7 @@ components:
         - checksOK
         - checksRunning
         - portKind
+        - labels
         - createdAt
         - updatedAt
         - minReplicas
@@ -2584,7 +2593,6 @@ components:
           additionalProperties: true
         portKind:
           $ref: "#/components/schemas/PipelinePortKind"
-
         minReplicas:
           type: integer
           default: 0
@@ -2613,6 +2621,14 @@ components:
         utilizationMemoryAverage:
           type: integer
           default: 0
+        serviceAccount:
+          type: string
+          example: serviceAccount
+        labels:
+          type: object
+          nullable: true
+          default: null
+          additionalProperties: true
       required:
         - name
         - replicasCount
@@ -2633,6 +2649,7 @@ components:
         - scaleDownPeriodSeconds
         - utilizationCPUAverage
         - utilizationMemoryAverage
+        - serviceAccount
 
     ScalePolicy:
       type: string
@@ -2815,6 +2832,16 @@ components:
           type: integer
           nullable: true
           default: null
+        serviceAccount:
+          type: string
+          example: serviceAccount
+          default: null
+          nullable: true
+        labels:
+          type: object
+          nullable: true
+          default: null
+          additionalProperties: true
     CreatePipelineCheck:
       description: Create pipeline check request body.
       type: object
@@ -4512,7 +4539,6 @@ components:
             additionalProperties:
               type: string
         example: '[1234.5, {"key": "value"}]'
-
 
     SearchResultV1:
       type: object
