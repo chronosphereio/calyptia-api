@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.0.4
 info:
   title: Calyptia Cloud API
   version: "1.0"
@@ -72,6 +72,16 @@ components:
       name: X-Project-Token
       type: apiKey
       in: header
+    auth0:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: "https://sso.calyptia.com/oauth/token"
+          scopes: {}
+        authorizationCode:
+          authorizationUrl: "https://sso.calyptia.com/authorize"
+          tokenUrl: "https://sso.calyptia.com/oauth/token"
+          scopes: {}
   schemas:
     Created:
       type: object
