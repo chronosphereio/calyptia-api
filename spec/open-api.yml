@@ -832,9 +832,6 @@ components:
         id:
           type: string
           format: uuid
-        token:
-          type: string
-          example: redacted
         name:
           type: string
           format: hostname
@@ -879,7 +876,6 @@ components:
           default: false
       required:
         - id
-        - token
         - name
         - pipelinesCount
         - environmentName
@@ -3663,9 +3659,6 @@ components:
         id:
           type: string
           format: uuid
-        token:
-          type: string
-          example: redacted
         privateRSAKey:
           type: string
           format: byte
@@ -3714,7 +3707,6 @@ components:
           format: date-time
       required:
         - id
-        - token
         - privateRSAKey
         - publicRSAKey
         - name
