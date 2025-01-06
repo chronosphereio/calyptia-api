@@ -1606,9 +1606,9 @@ components:
       type: string
       description: |
         The deployment strategy to use when creating or updating changes to this pipeline.
-      default: recreate
+      default: rollingupdate
       enum:
-        - recreate
+        - rollingupdate
         - hotReload
 
     Pipeline:
@@ -2987,23 +2987,14 @@ components:
           description: DNS label format as of defined on RFC1123
           example: new-pipeline
         kind:
-          type: string
-          description: Kind of deployment used when deploying this pipeline
-          default: deployment
-          enum:
-            - daemonSet
-            - deployment
+          $ref: "#/components/schemas/PipelineKind"
         replicasCount:
           type: integer
           minimum: 0
         rawConfig:
           type: string
         configFormat:
-          type: string
-          enum:
-            - ini
-            - json
-            - yaml
+          $ref: "#/components/schemas/ConfigFormat"
         image:
           type: string
           example: ghcr.io/calyptia/core/calyptia-fluent-bit:23.1.2
@@ -3107,7 +3098,17 @@ components:
           type: object
           nullable: true
           default: null
-          additionalProperties: true
+          additionalProperties:
+            type: string
+        affinity:
+          $ref: "#/components/schemas/Affinity"
+          nullable: true
+        topologySpreadConstraints:
+          type: array
+          nullable: true
+          items:
+            $ref: "#/components/schemas/TopologySpreadConstraint"
+
       required:
         - name
         - replicasCount
@@ -3137,6 +3138,65 @@ components:
         - Percent
       default: "Unknown"
 
+    Affinity:
+      type: object
+      properties:
+        key:
+          type: string
+        operator:
+          $ref: "#/components/schemas/NodeSelectorOperator"
+        values:
+          type: array
+          nullable: true
+          items:
+            type: string
+      required:
+        - key
+        - operator
+        - values
+
+    NodeSelectorOperator:
+      type: string
+      enum:
+        - In
+        - NotIn
+        - Exists
+        - DoesNotExist
+        - Gt
+        - Lt
+
+    TopologySpreadConstraint:
+      type: object
+      properties:
+        maxSkew:
+          type: integer
+          format: int32
+        topologyKey:
+          type: string
+        whenUnsatisfiable:
+          $ref: "#/components/schemas/UnsatisfiableConstraintAction"
+        labelSelector:
+          type: object
+          nullable: true
+          additionalProperties:
+            type: string
+        minDomains:
+          type: integer
+          format: int32
+          nullable: true
+      required:
+        - maxSkew
+        - topologyKey
+        - whenUnsatisfiable
+        - labelSelector
+        - minDomains
+
+    UnsatisfiableConstraintAction:
+      type: string
+      enum:
+        - DoNotSchedule
+        - ScheduleAnyway
+
     UpdatePipeline:
       description: Update pipeline request body.
       type: object
@@ -3158,9 +3218,9 @@ components:
           type: string
           description: |
             The deployment strategy to use when creating or updating changes to this pipeline.
-          default: recreate
+          default: rollingupdate
           enum:
-            - recreate
+            - rollingupdate
             - hotReload
         replicasCount:
           type: integer
@@ -3314,7 +3374,16 @@ components:
           type: object
           nullable: true
           default: null
-          additionalProperties: true
+          additionalProperties:
+            type: string
+        affinity:
+          $ref: "#/components/schemas/Affinity"
+          nullable: true
+        topologySpreadConstraints:
+          type: array
+          nullable: true
+          items:
+            $ref: "#/components/schemas/TopologySpreadConstraint"
     CreatePipelineCheck:
       description: Create pipeline check request body.
       type: object
@@ -3743,14 +3812,11 @@ components:
           type: string
           example: my-pipeline
         kind:
-          type: string
-          description: Kind of deployment used when deploying this pipeline
-          default: deployment
-          enum:
-            - daemonSet
-            - deployment
+          $ref: "#/components/schemas/PipelineKind"
         config:
           $ref: "#/components/schemas/PipelineConfig"
+        status:
+          $ref: "#/components/schemas/PipelineStatus"
         secrets:
           type: array
           items:
@@ -3759,17 +3825,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PipelineFile"
-        status:
-          $ref: "#/components/schemas/PipelineStatus"
         resourceProfile:
           $ref: "#/components/schemas/ResourceProfile"
         checks:
           type: array
           items:
             $ref: "#/components/schemas/PipelineCheck"
-        replicasCount:
-          type: integer
-          minimum: 0
         createdAt:
           type: string
           format: date-time
