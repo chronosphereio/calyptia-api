@@ -433,6 +433,7 @@ components:
           default: null
         metricsCount:
           type: integer
+          format: int64
           minimum: 0
         createdAt:
           type: string
