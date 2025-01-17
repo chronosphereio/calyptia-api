@@ -2289,10 +2289,15 @@ components:
           type: integer
           format: int32
           minimum: 0
+          description: |-
+            FrontendPort is equivalent to Docker's host port and Kubernetes' service port.
+            It should be unique within the pipeline.
         backendPort:
           type: integer
           format: int32
           minimum: 0
+          description: |-
+            BackendPort is equivalent to Docker's container port and Kubernetes' target port (pod).
         endpoint:
           type: string
         pluginID:
@@ -3604,10 +3609,15 @@ components:
           type: integer
           format: int32
           minimum: 0
+          description: |-
+            FrontendPort is equivalent to Docker's host port and Kubernetes' service port.
+            It should be unique within the pipeline.
         backendPort:
           type: integer
           format: int32
           minimum: 0
+          description: |-
+            BackendPort is equivalent to Docker's container port and Kubernetes' target port (pod).
         endpoint:
           type: string
         kind:
@@ -3632,11 +3642,16 @@ components:
           format: int32
           nullable: true
           default: null
+          description: |-
+            FrontendPort is equivalent to Docker's host port and Kubernetes' service port.
+            It should be unique within the pipeline.
         backendPort:
           type: integer
           format: int32
           nullable: true
           default: null
+          description: |-
+            BackendPort is equivalent to Docker's container port and Kubernetes' target port (pod).
         endpoint:
           type: string
           nullable: true
