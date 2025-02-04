@@ -431,10 +431,6 @@ components:
           format: date-time
           nullable: true
           default: null
-        metricsCount:
-          type: integer
-          format: int64
-          minimum: 0
         createdAt:
           type: string
           format: date-time
@@ -463,7 +459,6 @@ components:
         - environmentName
         - firstMetricsAddedAt
         - lastMetricsAddedAt
-        - metricsCount
         - createdAt
         - updatedAt
       description: Agent model.
