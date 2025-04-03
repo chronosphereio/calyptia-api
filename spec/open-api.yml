@@ -3109,6 +3109,11 @@ components:
           nullable: true
           items:
             $ref: "#/components/schemas/TopologySpreadConstraint"
+        tolerations:
+          type: array
+          nullable: true
+          items:
+            $ref: "#/components/schemas/Toleration"
 
       required:
         - name
@@ -3197,6 +3202,38 @@ components:
       enum:
         - DoNotSchedule
         - ScheduleAnyway
+    TolerationEffect:
+      type: string
+      enum:
+        - NoSchedule
+        - PreferNoSchedule
+        - NoExecute
+
+    TolerationOperator:
+      type: string
+      enum:
+        - Equal
+        - Exists
+
+    Toleration:
+      type: object
+      properties:
+        key:
+          type: string
+        operator:
+          $ref: "#/components/schemas/TolerationOperator"
+        value:
+          type: string
+        effect:
+          $ref: "#/components/schemas/TolerationEffect"
+        tolerationSeconds:
+          type: integer
+          format: int64
+          nullable: true
+      required:
+        - key
+        - operator
+        - effect
 
     UpdatePipeline:
       description: Update pipeline request body.
