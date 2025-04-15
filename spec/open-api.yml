@@ -1419,6 +1419,16 @@ components:
       required:
         - port
 
+    SleepAction:
+      type: object
+      properties:
+        seconds:
+          type: integer
+          format: int64
+          minimum: 0
+      required:
+        - seconds
+
     URIScheme:
       type: string
       enum:
@@ -3114,6 +3124,14 @@ components:
           nullable: true
           items:
             $ref: "#/components/schemas/Toleration"
+        terminationGracePeriodSeconds:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        lifecycle:
+          $ref: "#/components/schemas/Lifecycle"
+          nullable: true
 
       required:
         - name
@@ -3234,6 +3252,32 @@ components:
         - key
         - operator
         - effect
+
+    LifecycleHandler:
+      type: object
+      properties:
+        exec:
+          $ref: "#/components/schemas/ExecAction"
+          nullable: true
+        httpGet:
+          $ref: "#/components/schemas/HTTPGetAction"
+          nullable: true
+        tcpSocket:
+          $ref: "#/components/schemas/TCPSocketAction"
+          nullable: true
+        sleep:
+          $ref: "#/components/schemas/SleepAction"
+          nullable: true
+
+    Lifecycle:
+      type: object
+      properties:
+        preStop:
+          $ref: "#/components/schemas/LifecycleHandler"
+          nullable: true
+        postStart:
+          $ref: "#/components/schemas/LifecycleHandler"
+          nullable: true
 
     UpdatePipeline:
       description: Update pipeline request body.
@@ -3422,6 +3466,14 @@ components:
           nullable: true
           items:
             $ref: "#/components/schemas/TopologySpreadConstraint"
+        terminationGracePeriodSeconds:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        lifecycle:
+          $ref: "#/components/schemas/Lifecycle"
+          nullable: true
     CreatePipelineCheck:
       description: Create pipeline check request body.
       type: object
