@@ -9,9 +9,6 @@ CLOUD_IMAGE_TAG=${CLOUD_IMAGE_TAG:-main}
 CLOUD_IMAGE=${CLOUD_IMAGE:-ghcr.io/chronosphereio/calyptia-cloud/all-in-one:$CLOUD_IMAGE_TAG}
 TOKEN_DIR=${TOKEN_DIR:-$SCRIPT_DIR/resources}
 TOKENFILE="$TOKEN_DIR/token"
-TEST_AUTH0_DOMAIN=${TEST_AUTH0_DOMAIN:?}
-TEST_AUTH0_MANAGEMENT_CLIENT_ID=${TEST_AUTH0_MANAGEMENT_CLIENT_ID:?}
-TEST_AUTH0_MANAGEMENT_CLIENT_SECRET=${TEST_AUTH0_MANAGEMENT_CLIENT_SECRET:?}
 
 # TODO: only due to permissions issues: https://github.com/calyptia/cloud/issues/309
 mkdir -p "$TOKEN_DIR"
@@ -23,9 +20,6 @@ chmod 666 "$TOKENFILE"
 docker rm -f cloud
 docker run --pull=always -d \
     --name cloud \
-    -e AUTH0_DOMAIN="$TEST_AUTH0_DOMAIN" \
-    -e AUTH0_MANAGEMENT_CLIENT_ID="$TEST_AUTH0_MANAGEMENT_CLIENT_ID" \
-    -e AUTH0_MANAGEMENT_CLIENT_SECRET="$TEST_AUTH0_MANAGEMENT_CLIENT_SECRET" \
     -e DEBUG=true \
     -e DEFAULT_TOKEN_FILE=/token/token -v "$TOKEN_DIR":/token:Z \
     -p "$CLOUD_EXPOSED_PORT:$CLOUD_PORT" \
