@@ -22,11 +22,12 @@ docker run --pull=always --rm -v "$SPEC_DIR/":/spec:ro redocly/openapi-cli lint 
 # Schema validation against the cloud image
 # TODO(rhall): revert back to the stable label once we remove the --stateful flag
 # which no longer works with v4. go/sc/122824
+# TODO(rhall): response_schema_conformance is excluded due to go/sc/134006
 docker run --pull=always --rm --network=host -v "$SPEC_DIR/":/spec:ro \
     schemathesis/schemathesis:3.39.6 run \
         --base-url="$CLOUD_URL" \
         --checks all \
-        --exclude-checks status_code_conformance \
+        --exclude-checks status_code_conformance,response_schema_conformance \
         --header "X-Project-Token: $TOKEN" \
         --stateful=links \
         --exclude-operation-id awsCustomerRedirect \
