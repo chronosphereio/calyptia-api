@@ -502,7 +502,7 @@ components:
         configFormat:
           type: string
           enum:
-            - ini
+            - classic
             - json
             - yaml
         tags:
@@ -608,7 +608,7 @@ components:
         configFormat:
           type: string
           enum:
-            - ini
+            - classic
             - json
             - yaml
           nullable: true
@@ -658,7 +658,7 @@ components:
         configFormat:
           type: string
           enum:
-            - ini
+            - classic
             - json
             - yaml
           nullable: true
@@ -1768,10 +1768,8 @@ components:
         - updatedAt
         - minReplicas
         - maxReplicas
-        - scaleUpType
         - scaleUpValue
         - scaleUpPeriodSeconds
-        - scaleDownType
         - scaleDownValue
         - scaleDownPeriodSeconds
         - utilizationCPUAverage
@@ -1809,7 +1807,7 @@ components:
         configFormat:
           type: string
           enum:
-            - ini
+            - classic
             - json
             - yaml
         createdAt:
@@ -1841,6 +1839,7 @@ components:
             - CHECKS_FAILED
         events:
           type: array
+          nullable: true
           items:
             $ref: "#/components/schemas/PipelineEvent"
         createdAt:
@@ -3316,7 +3315,7 @@ components:
         configFormat:
           type: string
           enum:
-            - ini
+            - classic
             - json
             - yaml
           nullable: true
@@ -6964,7 +6963,7 @@ paths:
         - schema:
             type: string
             enum:
-              - ini
+              - classic
               - json
               - yaml
           in: query
@@ -7075,7 +7074,7 @@ paths:
           schema:
             type: string
             enum:
-              - ini
+              - classic
               - json
               - yaml
           in: query
@@ -7143,7 +7142,7 @@ paths:
         - schema:
             type: string
             enum:
-              - ini
+              - classic
               - json
               - yaml
           in: query
@@ -7208,7 +7207,7 @@ paths:
           schema:
             type: string
             enum:
-              - ini
+              - classic
               - json
               - yaml
           in: query
@@ -7258,7 +7257,7 @@ paths:
         - schema:
             type: string
             enum:
-              - ini
+              - classic
               - json
               - yaml
           in: query
@@ -7379,7 +7378,7 @@ paths:
         - schema:
             type: string
             enum:
-              - ini
+              - classic
               - json
               - yaml
           in: query
@@ -10126,7 +10125,7 @@ paths:
         - schema:
             type: string
             enum:
-              - ini
+              - classic
               - json
               - yaml
           in: query
@@ -10197,7 +10196,7 @@ paths:
         - schema:
             type: string
             enum:
-              - ini
+              - classic
               - json
               - yaml
           in: query
@@ -10290,7 +10289,7 @@ paths:
         - schema:
             type: string
             enum:
-              - ini
+              - classic
               - json
               - yaml
           in: query
@@ -10299,7 +10298,7 @@ paths:
         - schema:
             type: string
             enum:
-              - ini
+              - classic
               - json
               - yaml
           in: query
