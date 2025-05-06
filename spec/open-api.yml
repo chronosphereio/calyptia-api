@@ -1768,8 +1768,10 @@ components:
         - updatedAt
         - minReplicas
         - maxReplicas
+        - scaleUpType
         - scaleUpValue
         - scaleUpPeriodSeconds
+        - scaleDownType
         - scaleDownValue
         - scaleDownPeriodSeconds
         - utilizationCPUAverage
