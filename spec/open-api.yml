@@ -1492,6 +1492,8 @@ components:
           $ref: "#/components/schemas/Probe"
         startupProbe:
           $ref: "#/components/schemas/Probe"
+        lifecycle:
+          $ref: "#/components/schemas/Lifecycle"
       required:
         - name
         - image
@@ -1548,6 +1550,8 @@ components:
           $ref: "#/components/schemas/Probe"
         startupProbe:
           $ref: "#/components/schemas/Probe"
+        lifecycle:
+          $ref: "#/components/schemas/Lifecycle"
     ResourceProfile:
       type: object
       description: Resource profile model.
@@ -1730,6 +1734,14 @@ components:
         utilizationMemoryAverage:
           type: integer
           description: UtilizationMemoryAverage defines the target value for average CPU utilization
+        storageClass:
+          type: string
+          description: Represents the storageClass for PVC templates
+          nullable: true
+          default: null
+        pvcRetentionPolicy:
+          $ref: "#/components/schemas/PVCRetentionPolicy"
+          nullable: true
         portKind:
           $ref: "#/components/schemas/PipelinePortKind"
         labels:
@@ -1779,7 +1791,7 @@ components:
     PipelineKind:
       type: string
       default: deployment
-      enum: [deployment, daemonSet]
+      enum: [deployment, daemonSet, statefulSet]
     Pipelines:
       type: object
       properties:
@@ -3133,6 +3145,13 @@ components:
         lifecycle:
           $ref: "#/components/schemas/Lifecycle"
           nullable: true
+        storageClass:
+          type: string
+          description: Represents the storageClass for PVC templates
+          nullable: true
+        pvcRetentionPolicy:
+          $ref: "#/components/schemas/PVCRetentionPolicy"
+          nullable: true
 
       required:
         - name
@@ -3162,6 +3181,20 @@ components:
         - Pods
         - Percent
       default: "Unknown"
+    PVCRetentionPolicy:
+      type: object
+      description: Defines what happens to PVCs when StatefulSets are scaled or deleted (K8s 1.23+)
+      properties:
+        whenScaled:
+          type: string
+          description: Determines what happens to PVCs when a StatefulSet is scaled down
+          enum: [Retain, Delete]
+          default: Retain
+        whenDeleted:
+          type: string
+          description: Determines what happens to PVCs when a StatefulSet is deleted
+          enum: [Retain, Delete]
+          default: Retain
 
     Affinity:
       type: object
@@ -3453,6 +3486,11 @@ components:
           type: integer
           nullable: true
           default: null
+        storageClass:
+          type: string
+          description: Represents the storageClass for PVC templates
+          nullable: true
+          default: null
         labels:
           type: object
           nullable: true
@@ -3475,6 +3513,10 @@ components:
         lifecycle:
           $ref: "#/components/schemas/Lifecycle"
           nullable: true
+        pvcRetentionPolicy:
+          $ref: "#/components/schemas/PVCRetentionPolicy"
+          nullable: true
+          description: Defines what happens to PVCs when StatefulSets are scaled or deleted (K8s 1.23+)
     CreatePipelineCheck:
       description: Create pipeline check request body.
       type: object
