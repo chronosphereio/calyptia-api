@@ -1618,6 +1618,7 @@ components:
         The deployment strategy to use when creating or updating changes to this pipeline.
       default: rollingupdate
       enum:
+        - recreate
         - rollingupdate
         - hotReload
 
@@ -3336,6 +3337,7 @@ components:
             The deployment strategy to use when creating or updating changes to this pipeline.
           default: rollingupdate
           enum:
+            - recreate
             - rollingupdate
             - hotReload
         replicasCount:
