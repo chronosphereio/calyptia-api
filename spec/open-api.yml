@@ -1756,6 +1756,11 @@ components:
         updatedAt:
           type: string
           format: date-time
+        error:
+          type: string
+          nullable: true
+          default: null
+          description: Contains any error that occurred when rendering the pipeline with config sections
       required:
         - id
         - name
