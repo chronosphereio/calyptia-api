@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: chronosphereio/calyptia-cloud
-          token: ${{ secrets.CI_PAT }}
+          token: ${{ secrets.CALYPTIA_CI_PAT }}
           ref: "main"
           path: scripts/resources/cloud
 
