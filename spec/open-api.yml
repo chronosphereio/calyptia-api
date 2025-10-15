@@ -247,6 +247,9 @@ components:
         name:
           type: string
           example: my-project
+        v3Enabled:
+          type: boolean
+          description: The project is enabled to use V3 APIs.
         membersCount:
           type: integer
           minimum: 1
@@ -2632,6 +2635,9 @@ components:
         name:
           type: string
           example: new-project
+        v3Enabled:
+          type: boolean
+          description: The project is enabled to use V3 APIs.
       required:
         - name
     UpdateProject:
@@ -2643,6 +2649,11 @@ components:
           example: new-project
           nullable: true
           default: null
+        v3Enabled:
+          type: boolean
+          nullable: true
+          default: null
+          description: The project is enabled to use V3 APIs.
     CreateToken:
       description: Create token request body.
       type: object
