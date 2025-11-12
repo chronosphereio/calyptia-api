@@ -359,6 +359,11 @@ components:
           format: uuid
           nullable: true
           default: null
+        pipelineID:
+          type: string
+          format: uuid
+          nullable: true
+          default: null
         token:
           type: string
           example: redacted
@@ -6202,6 +6207,12 @@ paths:
       parameters:
         - name: fleet_id
           description: Filter agents from a single fleet.
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: pipeline_id
+          description: Filter agents from a single pipeline.
           in: query
           schema:
             type: string
