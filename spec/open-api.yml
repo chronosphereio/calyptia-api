@@ -250,6 +250,12 @@ components:
         v3Enabled:
           type: boolean
           description: The project is enabled to use V3 APIs.
+        settings:
+          type: object
+          additionalProperties: true
+          description: Project settings for the project
+          example:
+            gpt: true
         membersCount:
           type: integer
           minimum: 1
@@ -2659,6 +2665,23 @@ components:
           nullable: true
           default: null
           description: The project is enabled to use V3 APIs.
+        setSettings:
+          type: object
+          additionalProperties: true
+          description: Settings to set or update (merged with existing settings)
+          example:
+            gpt: true
+        unsetSettings:
+          type: array
+          items:
+            type: string
+          description: Setting keys to remove
+          example:
+            - oldSetting
+        clearAllSettings:
+          type: boolean
+          description: Clear all settings before applying setSettings/unsetSettings
+          default: false
     CreateToken:
       description: Create token request body.
       type: object
