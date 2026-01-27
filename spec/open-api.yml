@@ -1988,10 +1988,16 @@ components:
           type: number
           format: int32
           minimum: 0
+        pollingIntervalMs:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Recommended polling interval in milliseconds for agents to poll for new log requests. Calculated server-side based on active agent count. (v3 pipelines only, 0 for legacy pipelines)
       required:
         - items
         - endCursor
         - count
+        - pollingIntervalMs
     CreatePipelineLog:
       type: object
       properties:
