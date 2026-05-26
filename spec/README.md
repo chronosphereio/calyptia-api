@@ -5,8 +5,9 @@ OpenAPI spec for the API to [Calyptia Core](https://core.calyptia.com).
 ## Spec
 
 This directory contains an OpenAPI specification.
-You can use it to generate clients for your favorite programming language or preview it
-using [SwaggerUI](https://editor.swagger.io/?url=https://raw.githubusercontent.com/chronosphereio/calyptia-api/main/spec/open-api.yml).
+You can use it to generate clients for your favorite programming language
+or preview it using
+[SwaggerUI](https://editor.swagger.io/?url=https://raw.githubusercontent.com/chronosphereio/calyptia-api/main/spec/open-api.yml).
 
 ### Typescript codegen
 
