@@ -17,7 +17,7 @@ touch "$TOKENFILE"
 chmod 666 "$TOKENFILE"
 # END OF TODO
 
-docker rm -f cloud || true
+docker rm -f cloud
 docker run --pull=always -d \
     --name cloud \
     -e DEBUG=true \
