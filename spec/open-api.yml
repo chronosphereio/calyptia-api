@@ -34,7 +34,6 @@ tags:
   - name: aggregator
   - name: resource_profile
   - name: core_instance_check
-  - name: ingest_check
   - name: pipeline
   - name: pipeline_config
   - name: pipeline_sidecar
@@ -2223,41 +2222,6 @@ components:
           type: string
           format: date-time
       required: [updatedAt]
-    IngestCheck:
-      type: object
-      description: Core Ingest check model.
-      properties:
-        id:
-          type: string
-          format: uuid
-        config:
-          type: string
-          format: fluent-bit configuration
-        status:
-          $ref: "#/components/schemas/CheckStatus"
-        collectLogs:
-          type: boolean
-          default: false
-        logs:
-          type: string
-          format: byte
-        retries:
-          type: number
-          default: 0
-          description: number of retries for the check before marking it as failed
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-      required:
-        - id
-        - config
-        - status
-        - retries
-        - createdAt
-        - updatedAt
     PipelineFile:
       type: object
       description: Pipeline file model.
@@ -3617,32 +3581,6 @@ components:
         - protocol
         - host
         - port
-    CreateIngestCheck:
-      description: Create core instance Ingest check request body.
-      type: object
-      properties:
-        status:
-          $ref: "#/components/schemas/CheckStatus"
-        retries:
-          type: number
-          default: 3
-          description: number of retries for the check before marking it as failed
-        configSectionID:
-          type: string
-          description: |
-            config section UUID to be used on this Ingest check.
-            Note that the ingest check config section's kind has to be of either type input or output.
-          format: uuid
-        collectLogs:
-          type: boolean
-          default: false
-          description: |
-            Determine if the logs for the fluent-bit pod should be forwarded
-            to Calyptia.
-      required:
-        - status
-        - retries
-        - configSectionID
     CreatePipelineFile:
       description: Create pipeline file request body.
       type: object
@@ -3737,19 +3675,6 @@ components:
           nullable: true
           default: null
           description: number of retries for the check before marking it as unreachable.
-    UpdateIngestCheck:
-      description: Update a core instance Ingest check request body.
-      type: object
-      properties:
-        logs:
-          description: logs coming from the fluent-bit pod, maximum size is 10MiB.
-          nullable: true
-          default: null
-          type: string
-        status:
-          $ref: "#/components/schemas/CheckStatus"
-          nullable: true
-          default: null
     CreatePipelineSecret:
       description: Create pipeline secret request body.
       type: object
@@ -4078,19 +4003,6 @@ components:
     CreatedCoreInstanceCheck:
       type: object
       description: Created core instance check response body.
-      properties:
-        id:
-          type: string
-          format: uuid
-        createdAt:
-          type: string
-          format: date-time
-      required:
-        - id
-        - createdAt
-    CreatedIngestCheck:
-      type: object
-      description: Created core instance Ingest check response body.
       properties:
         id:
           type: string
@@ -7863,78 +7775,6 @@ paths:
         "204":
           description: No Content
 
-  "/v1/core_instances/{coreInstanceID}/ingest_checks":
-    parameters:
-      - schema:
-          type: string
-          format: uuid
-        name: coreInstanceID
-        in: path
-        required: true
-    post:
-      tags:
-        - ingest_check
-      summary: Create Ingest check
-      operationId: createIngestCheck
-      description: |-
-        Create an Ingest check within a core instance.
-      security:
-        - user: []
-        - project: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateIngestCheck"
-      responses:
-        "201":
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CreatedIngestCheck"
-    get:
-      tags:
-        - ingest_check
-      summary: Ingest checks
-      operationId: IngestChecks
-      description: Ingest checks associated to a core instance.
-      security:
-        - user: []
-        - project: []
-      parameters:
-        - schema:
-            type: integer
-            minimum: 0
-          in: query
-          name: last
-          description: Last Ingest checks.
-        - schema:
-            type: string
-          in: query
-          name: before
-          description: End cursor.
-      responses:
-        "200":
-          description: OK
-          headers:
-            Link:
-              schema:
-                type: string
-                example: </v1/core_instances/foo/ingest_checks?before=bar>; rel="next"
-              description: RFC5988 with `rel="next"`.
-          links:
-            NextChecksPage:
-              operationId: IngestChecks
-              parameters:
-                before: "$response.header.Link#rel=next"
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/IngestCheck"
-
   "/v1/core_instances/{coreInstanceID}/checks":
     parameters:
       - schema:
@@ -8062,60 +7902,6 @@ paths:
         "204":
           description: No Content
 
-  "/v1/ingest_checks/{checkID}":
-    parameters:
-      - schema:
-          type: string
-          format: uuid
-        name: checkID
-        in: path
-        required: true
-    get:
-      tags:
-        - ingest_check
-      summary: Ingest Check
-      operationId: ingestCheck
-      description: Check by ID.
-      security:
-        - user: []
-        - project: []
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/IngestCheck"
-    patch:
-      tags:
-        - ingest_check
-      summary: Update Ingest check
-      operationId: updateIngestCheck
-      description: Update a Ingest check by its ID.
-      security:
-        - user: []
-        - project: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateIngestCheck"
-      responses:
-        "204":
-          description: No Content
-    delete:
-      tags:
-        - ingest_check
-      summary: Delete a Ingest check.
-      operationId: deleteIngestCheck
-      description: |-
-        Delete Ingest check by its ID.
-      security:
-        - user: []
-        - project: []
-      responses:
-        "204":
-          description: No Content
   "/v1/pipelines/{pipelineID}/cluster_objects":
     parameters:
       - schema:
