@@ -3462,6 +3462,13 @@ components:
           nullable: true
           default: null
           additionalProperties: true
+        disableHPA:
+          type: boolean
+          default: false
+          description: |
+            Remove horizontal pod autoscaling from the pipeline. Resets min/max replicas,
+            scaling policies and utilization targets, and deletes the HPA. Cannot be combined
+            with other HPA fields.
         minReplicas:
           type: integer
           nullable: true
